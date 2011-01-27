@@ -139,6 +139,10 @@
 		const ROUGHCUT_NOT_FOUND = "ROUGHCUT_NOT_FOUND,Roughcut not found";
 		
 		const SERVICE_FORBIDDEN = "SERVICE_FORBIDDEN,The access to this service is forbidden";
+
+		const SERVICE_FORBIDDEN_CONTENT_BLOCKED = "SERVICE_FORBIDDEN_CONTENT_BLOCKED,The access to this service is forbidden since the specified partner is blocked";
+		
+		const SERVICE_FORBIDDEN_FULLY_BLOCKED = "SERVICE_FORBIDDEN_FULLY_BLOCKED,The access to this service is forbidden since the specified partner is fully blocked";
 		
 		const SERVICE_FORBIDDEN_PARTNER_DELETED = "SERVICE_FORBIDDEN_PARTNER_DELETED,The access to this service is forbidden since the specified partner is deleted";
 		
