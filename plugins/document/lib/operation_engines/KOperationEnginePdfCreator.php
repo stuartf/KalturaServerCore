@@ -2,8 +2,24 @@
 
 class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 {
-	
+	/**
+	 * @var string
+	 */
 	private $orgInFilePath = '';
+	
+	/**
+	 * @var KalturaPdfFlavorParamsOutput
+	 */
+	private $flavorParamsOutput;
+
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	{
+		parent::configure($taskConfig, $data);
+		if(!($data->flavorParamsOutput instanceof KalturaPdfFlavorParamsOutput))
+			throw new Exception("KOperationEnginePdfCreator must work on KalturaPdfFlavorParamsOutput object, " . get_class($data->flavorParamsOutput) . " received");
+
+		$this->flavorParamsOutput = $data->flavorParamsOutput;
+	}
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
@@ -13,7 +29,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
-		if ($inputExtension == 'pdf') {
+		if (($inputExtension == 'pdf') && (!$this->flavorParamsOutput->readonly)) {
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
 			if (!@copy($inFilePath, $this->outFilePath)) {
 				$error = '';
@@ -27,6 +43,10 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 				return;
 			}
 		}
+		
+		/*if (($inputExtension != 'pdf') && ($this->flavorParamsOutput->readonly)) {
+			throw new KOperationEngineException('Cannot create a readonly PDF file from a none pdf file');
+		}*/
 				
 		// renaming with unique name to allow conversion 2 conversions of same input file to be done together (PDF+SWF)
 		$tmpUniqInFilePath = dirname($inFilePath).'/'.uniqid().'_'.basename($inFilePath);
@@ -46,9 +66,15 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		if ($uniqueName) {
 			@unlink($tmpUniqInFilePath);
 		}
+		
+			
 		//TODO: RENAME - will not be needed once PDFCreator can work with a configurations file
-		$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
-		$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+		if (($inputExtension == 'pdf') && ($this->flavorParamsOutput->readonly == true)){
+			$tmpFile = $this->outFilePath.'.pdf';
+		}else{
+			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
+			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+		}
 		
 		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
 		$sleepTimes = 50;
@@ -60,7 +86,9 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		if (!file_exists(realpath($tmpFile))) {
-			throw new KOperationEngineException('Temp PDF Creator file not found ['.$tmpFile.']');
+			throw new KOperationEngineException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.']');
+		}else{
+			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}
 		
 		

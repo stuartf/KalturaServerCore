@@ -50,6 +50,7 @@ class KalturaFlavorParams extends KalturaObject implements IFilterable
 	 * The Flavor Params tags are used to identify the flavor for different usage (e.g. web, hd, mobile)
 	 * 
 	 * @var string
+	 * @filter eq
 	 */
 	public $tags;
 

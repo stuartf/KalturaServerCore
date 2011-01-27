@@ -1407,6 +1407,7 @@
     </class>
     <class name="KalturaDataEntry" base="KalturaBaseEntry">
       <property name="dataContent" type="string" readOnly="0" insertOnly="0" description="The data of the entry&#13;"/>
+      <property name="retrieveDataContentByGet" type="bool" readOnly="0" insertOnly="1" description="indicator whether to return the object for get action with the dataContent field.&#13;"/>
     </class>
     <class name="KalturaDataEntryBaseFilter" abstract="1" base="KalturaBaseEntryFilter"/>
     <class name="KalturaDataEntryFilter" base="KalturaDataEntryBaseFilter"/>
@@ -1529,6 +1530,7 @@
     <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
       <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaFlavorParamsFilter" base="KalturaFlavorParamsBaseFilter"/>
     <class name="KalturaFlavorParamsListResponse">
@@ -2015,6 +2017,7 @@
       <property name="enable508Players" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableMetadata" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableAuditTrail" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="enableAnnotation" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="defThumbOffset" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSystemPartnerPackage">

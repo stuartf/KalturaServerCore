@@ -214,6 +214,9 @@ KalturaLog::log(__METHOD__."==>\n");
 			$flavor->setAudioChannels($target->_audio->_channels);
 			$flavor->setAudioSampleRate($target->_audio->_sampleRate);
 		}
+		
+		if($target->_pdf)
+			$flavor->putInCustomData('readonly',$target->_pdf->_readonly);
 
 		$cdlOprSets = KDLWrap::convertOperatorsKdl2Cdl($target->_transcoders);
 		if($target->_engineVersion==1) {
@@ -381,10 +384,12 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 		}
 		
 		if($cdlFlavor instanceof PdfFlavorParams) {
+		
 			$kdlFlavor->_pdf = new KDLPDFData();
 			$kdlFlavor->_pdf->_resolution  = $cdlFlavor->getResolution();
 			$kdlFlavor->_pdf->_paperHeight = $cdlFlavor->getPaperHeight();
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
+			$kdlFlavor->_pdf->_readonly  = $cdlFlavor->getReadonly();
 		}
 		
 KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));

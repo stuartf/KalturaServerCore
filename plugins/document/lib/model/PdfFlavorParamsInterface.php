@@ -21,6 +21,10 @@ interface PdfFlavorParamsInterface
 	
 	public function getPaperWidth();
 	
+	public function setReadonly($readonly);
+		
+	public function getReadonly();
+	
 	
 	
 
