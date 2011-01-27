@@ -12,7 +12,9 @@ class flavorParamsFilter extends baseObjectFilter
 			"_in_id",
 			"_eq_is_system_default",
 			"_gte_created_at",
-			"_lte_created_at"
+			"_lte_created_at",
+			"_eq_format",
+			"_eq_tags"
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at")	;
