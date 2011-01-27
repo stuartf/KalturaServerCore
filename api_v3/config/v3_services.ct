@@ -127,6 +127,7 @@ data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |
 data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |
 data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |
 data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |
+data.serve							|			|1		|1	|1		|2		|1		|	|		|	|   |
 
 baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |
 baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |
