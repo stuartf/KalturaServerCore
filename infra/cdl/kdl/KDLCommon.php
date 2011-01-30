@@ -41,7 +41,7 @@
 				KDLConstants::VideoIndex=>array("icod","intermediate codec","apcn","apch"),
 			),
 			KDLTranscoders::FFMPEG => array(
-				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
+//				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
 				KDLConstants::VideoIndex=>array("iv41","iv50","icod","intermediate codec","apcn","apch"),
 //				KDLConstants::AudioIndex=>array("vorbis"),
 			),
@@ -81,7 +81,7 @@
 											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
 											   KDLVideoTarget::VP8,
 											   "h264", "h.264", "x264", "avc1", "wvc1",
-											   "avc", "wmv3", "wmva", "rv40");
+											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
 											   		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;
@@ -137,6 +137,9 @@
 		const ISMV = "ismv";
 		const MKV = "mkv";
 		const WEBM = "webm";
+		const MPEG = "mpeg";
+		const MPEGTS = "mpegts";
+		const APPLEHTTP = "applehttp";
 	};
 
 	class KDLVideoTarget {
