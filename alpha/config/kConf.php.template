@@ -188,6 +188,7 @@ class kConf
 					"SphinxSearchPlugin", // Should always be enabled
                     "AuditPlugin", // Should be enabled only if audit trail support required
 					"AnnotationPlugin",
+					"SegmenterPlugin",
 				),
 
                 "search_plugin"	=> "sphinxSearch",
