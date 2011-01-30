@@ -269,7 +269,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		
 //echo "flavor "; print_r($flavor);
 		
-KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
+//KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		return $flavor;
 	}
 	
@@ -337,7 +337,7 @@ KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		
 $operators = $cdlFlavor->getOperators();
 $transObjArr = array();
-KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
+//KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
 		if(!empty($operators) || $cdlFlavor->getEngineVersion()==1) {
 			$transObjArr = KDLWrap::convertOperatorsCdl2Kdl($operators);
 			$kdlFlavor->_engineVersion = 1;
@@ -392,7 +392,7 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_readonly  = $cdlFlavor->getReadonly();
 		}
 		
-KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
+//KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 		return $kdlFlavor;
 	}
 	
@@ -523,9 +523,26 @@ KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 		}
 		return $transObjArr;
 	}
+
+	/* ------------------------------
+	 * function convertOperatorKdl2Cdl
+	 */
+	public static function convertOperatorKdl2Cdl($kdlOperator, $id=null)
+	{
+		$opr = new kOperator();
+		if(!$id || $id===false)
+			$opr->id = $kdlOperator->_id;
+		else
+			$opr->id = $id;
+		
+		$opr->extra = $kdlOperator->_extra;
+		$opr->command = $kdlOperator->_cmd;
+		$opr->config = $kdlOperator->_cfg;
+		return $opr;
+	}
 	
 	/* ------------------------------
-	 * function convertOperatorsCdl2Kdl
+	 * function convertOperatorsKdl2Cdl
 	 */
 	public static function convertOperatorsKdl2Cdl($kdlOperators)
 	{
@@ -534,29 +551,31 @@ KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 			$auxArr = array();
 			if(is_array($transObj)) {
 				foreach($transObj as $tr) {
-					$opr = new kOperator();
 					$key=array_search($tr->_id,self::$TranscodersCdl2Kdl);
-					if($key===false)
-						$opr->id = $tr->_id;
-					else
-						$opr->id = $key;
-					$opr->extra = $tr->_extra;
-					$opr->command = $tr->_cmd;
-					$opr->config = $tr->_cfg;
-					$auxArr[] = $opr;
+//					$opr = new kOperator();
+//					if($key===false)
+//						$opr->id = $tr->_id;
+//					else
+//						$opr->id = $key;
+//					$opr->extra = $tr->_extra;
+//					$opr->command = $tr->_cmd;
+//					$opr->config = $tr->_cfg;
+//					$auxArr[] = $opr;
+					$auxArr[] = KDLWrap::convertOperatorKdl2Cdl($tr, $key);
 				}
 			}
 			else {
-				$opr = new kOperator();
 				$key=array_search($transObj->_id,self::$TranscodersCdl2Kdl);
-				if($key===false)
-					$opr->id = $transObj->_id;
-				else
-					$opr->id = $key;
-				$opr->extra = $transObj->_extra;
-				$opr->command = $transObj->_cmd;
-				$opr->config = $transObj->_cfg;
-				$auxArr[] = $opr;
+//				$opr = new kOperator();
+//				if($key===false)
+//					$opr->id = $transObj->_id;
+//				else
+//					$opr->id = $key;
+//				$opr->extra = $transObj->_extra;
+//				$opr->command = $transObj->_cmd;
+//				$opr->config = $transObj->_cfg;
+//				$auxArr[] = $opr;
+				$auxArr[] = KDLWrap::convertOperatorKdl2Cdl($transObj, $key);
 			}
 			$cdlOprSets->addSet($auxArr);
 		}
@@ -618,6 +637,7 @@ KalturaLog::log(__METHOD__.":operators id=$id :");
 			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
 			break;
 		default:
+//		KalturaLog::log("in default :operators id=$id :");
 			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
 			break;
 	}
@@ -628,7 +648,7 @@ KalturaLog::log(__METHOD__.":operators id=$id :");
 	else if($id=="fastStart.FastStart") {
 		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
 	}
-	//	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
+//	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
 //		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "expressionEncoder.ExpressionEncoder");
 //	}
 //	else if($id==KDLTranscoders::QT_FASTSTART) {
