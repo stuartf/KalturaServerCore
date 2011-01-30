@@ -185,8 +185,8 @@ class KalturaContainerFormat
 	const SWF = "swf";
 	const PDF = "pdf";
 	const APPLEHTTP = "applehttp";
-	const SWF = "swf";
-	const PDF = "pdf";
+	const MPEG = "mpeg";
+	const MPEGTS = "mpegts";
 }
 
 class KalturaControlPanelCommandOrderBy
