@@ -371,7 +371,7 @@ class kFlowHelper
 				// For apple http flavors do not attempt to get thumbs and media info,
 				// It is up to the operator to provide that kind of data, rather than hardcoded check
 				// To-fix 
-		if($flavorParamsOutput->getFormat()==assetParams::CONTAINER_FORMAT_APPLEHTTP) {
+		if($flavorParamsOutput->getFormat()==flavorParams::CONTAINER_FORMAT_APPLEHTTP) {
 			$createThumb = false;
 			$extractMedia = false;
 		}
@@ -415,8 +415,11 @@ class kFlowHelper
 				{
 					if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
 						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
-				
-					if($flavorAsset->getType() == assetType::FLAVOR)
+						
+						//
+						// For the apple http streaming format - set the below values from the predefined flavoorParamsoutput
+						// sinc it can not go through the post convert procedure, but those vals are still required for further processing  
+					if($flavorParamsOutput->getFormat()==flavorParams::CONTAINER_FORMAT_APPLEHTTP)
 					{
 						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate());
 						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
