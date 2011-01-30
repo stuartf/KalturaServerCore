@@ -184,6 +184,9 @@ class KalturaContainerFormat
 	const WEBM = "webm";
 	const SWF = "swf";
 	const PDF = "pdf";
+	const APPLEHTTP = "applehttp";
+	const SWF = "swf";
+	const PDF = "pdf";
 }
 
 class KalturaControlPanelCommandOrderBy
