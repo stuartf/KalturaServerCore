@@ -368,6 +368,13 @@ class kFlowHelper
 				}
 			}
 		}
+				// For apple http flavors do not attempt to get thumbs and media info,
+				// It is up to the operator to provide that kind of data, rather than hardcoded check
+				// To-fix 
+		if($flavorParamsOutput->getFormat()==assetParams::CONTAINER_FORMAT_APPLEHTTP) {
+			$createThumb = false;
+			$extractMedia = false;
+		}
 		
 		if($createThumb)
 		{
@@ -409,6 +416,16 @@ class kFlowHelper
 					if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
 						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 				
+					if($flavorAsset->getType() == assetType::FLAVOR)
+					{
+						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate());
+						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
+						$flavorAsset->setHeight($flavorParamsOutput->getHeight());
+						$flavorAsset->setFrameRate($flavorParamsOutput->getFrameRate());
+						$flavorAsset->setIsOriginal(0);
+						$flavorAsset->save();
+					}
+					
 					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
 				}	
 			}
