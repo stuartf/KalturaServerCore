@@ -26,7 +26,7 @@ class SegmenterPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 			return new KOperationEngineSegmenter($params->segmenterCmd, $constructorArgs['outFilePath']);
 		}
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(SegmenterConversionEngineType::SEGMENTER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == SegmenterConversionEngineType::get()->apiValue(SegmenterConversionEngineType::SEGMENTER))
 		{
 			return new KDLOperatorSegmenter($enumValue);
 		}
@@ -41,10 +41,10 @@ class SegmenterPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(SegmenterConversionEngineType::SEGMENTER))
+		if($baseClass == 'KOperationEngine' && $enumValue == SegmenterConversionEngineType::get()->apiValue(SegmenterConversionEngineType::SEGMENTER))
 			return 'KOperationEngineSegmenter';
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(SegmenterConversionEngineType::SEGMENTER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == SegmenterConversionEngineType::get()->coreValue(SegmenterConversionEngineType::Segmenter))
 			return 'KDLOperatorSegmenter';
 		
 		return null;
@@ -59,22 +59,5 @@ class SegmenterPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 			return array('SegmenterConversionEngineType');
 			
 		return array();
-	}
-	
-	/**
-	 * @return int id of dynamic enum in the DB.
-	 */
-	public static function getConversionEngineCoreValue($valueName)
-	{
-		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
-	}
-	
-	/**
-	 * @return string external API value of dynamic enum.
-	 */
-	public static function getApiValue($valueName)
-	{
-		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }
