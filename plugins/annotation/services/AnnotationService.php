@@ -11,6 +11,12 @@ class AnnotationService extends KalturaBaseService
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
+		
+		// when session is not admin, allow access to user entries only
+		if (!$this->getKs() || !$this->getKs()->isAdmin())
+		{
+			AnnotationPeer::setDefaultCriteriaFilterByKuser();
+		}
 				
 		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
