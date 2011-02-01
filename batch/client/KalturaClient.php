@@ -234,10 +234,11 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = "99";
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
-	const SEGMENTER = "segmenter.Segmenter";
 	const FAST_START = "fastStart.FastStart";
+	const SEGMENTER = "segmenter.Segmenter";
 	const AVIDEMUX = "avidemux.Avidemux";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 }
 
 class KalturaConversionProfileOrderBy
