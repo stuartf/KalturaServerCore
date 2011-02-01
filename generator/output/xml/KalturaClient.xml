@@ -1,10 +1,16 @@
 <?xml version="1.0"?>
 <xml apiVersion="3.1">
-  <!-- Generated on date 19/11/10 10:40:25 -->
+  <!-- Generated on date 01/02/11 12:00:25 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
+    <enum name="KalturaAnnotationOrderBy" enumType="string">
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
     </enum>
     <enum name="KalturaAudioCodec" enumType="string">
       <const name="NONE" value=""/>
@@ -197,6 +203,9 @@
       <const name="ISMV" value="ismv"/>
       <const name="MKV" value="mkv"/>
       <const name="WEBM" value="webm"/>
+      <const name="MPEG" value="mpeg"/>
+      <const name="MPEGTS" value="mpegts"/>
+      <const name="APPLEHTTP" value="applehttp"/>
       <const name="SWF" value="swf"/>
       <const name="PDF" value="pdf"/>
     </enum>
@@ -236,9 +245,10 @@
       <const name="FFMPEG_AUX" value="99"/>
       <const name="PDF2SWF" value="201"/>
       <const name="PDF_CREATOR" value="202"/>
-      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
+      <const name="SEGMENTER" value="segmenter.Segmenter"/>
       <const name="FAST_START" value="fastStart.FastStart"/>
-      <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
+      <const name="AVIDEMUX" value="avidemux.Avidemux"/>
+      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
     </enum>
     <enum name="KalturaConversionProfileOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -318,7 +328,6 @@
       <const name="AUTOMATIC" value="-1"/>
       <const name="MEDIA_CLIP" value="1"/>
       <const name="MIX" value="2"/>
-      <const name="BUBBLES" value="4"/>
       <const name="PLAYLIST" value="5"/>
       <const name="DATA" value="6"/>
       <const name="LIVE_STREAM" value="7"/>
@@ -1529,8 +1538,8 @@
     </class>
     <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
-      <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaFlavorParamsFilter" base="KalturaFlavorParamsBaseFilter"/>
     <class name="KalturaFlavorParamsListResponse">
@@ -1686,6 +1695,7 @@
       <property name="searchInTags" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="searchInAdminTags" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="categories" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="timeZoneOffset" type="int" readOnly="0" insertOnly="0" description="time zone offset in minutes&#13;"/>
     </class>
     <class name="KalturaReportGraph">
       <property name="id" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1934,6 +1944,67 @@
       <property name="objects" type="array" arrayType="KalturaWidget" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaFileSyncBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileObjectTypeEqual" type="int" enumType="KalturaFileSyncObjectType" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileObjectTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="objectIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="objectIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="versionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="versionIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="objectSubTypeEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="objectSubTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dcEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dcIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="originalEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="readyAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="readyAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="syncTimeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="syncTimeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaFileSyncStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileTypeEqual" type="int" enumType="KalturaFileSyncType" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="linkedIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="linkCountGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="linkCountLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileSizeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileSizeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaFileSyncFilter" base="KalturaFileSyncBaseFilter"/>
+    <class name="KalturaFileSync">
+      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileObjectType" type="int" enumType="KalturaFileSyncObjectType" readOnly="1" insertOnly="0" description=""/>
+      <property name="objectId" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="version" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="objectSubType" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="dc" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="original" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="readyAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="syncTime" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaFileSyncStatus" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileType" type="int" enumType="KalturaFileSyncType" readOnly="1" insertOnly="0" description=""/>
+      <property name="linkedId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="linkCount" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileRoot" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="filePath" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileSize" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileUrl" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileContent" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileDiscSize" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="isCurrentDc" type="bool" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaFileSyncListResponse">
+      <property name="objects" type="array" arrayType="KalturaFileSync" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaSystemUser">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="email" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2023,67 +2094,6 @@
     <class name="KalturaSystemPartnerPackage">
       <property name="id" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaFileSyncBaseFilter" abstract="1" base="KalturaFilter">
-      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileObjectTypeEqual" type="int" enumType="KalturaFileSyncObjectType" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileObjectTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="objectIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="objectIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="versionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="versionIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="objectSubTypeEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="objectSubTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="dcEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="dcIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="originalEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="readyAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="readyAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="syncTimeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="syncTimeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="statusEqual" type="int" enumType="KalturaFileSyncStatus" readOnly="0" insertOnly="0" description=""/>
-      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileTypeEqual" type="int" enumType="KalturaFileSyncType" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="linkedIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="linkCountGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="linkCountLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileSizeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileSizeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaFileSyncFilter" base="KalturaFileSyncBaseFilter"/>
-    <class name="KalturaFileSync">
-      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileObjectType" type="int" enumType="KalturaFileSyncObjectType" readOnly="1" insertOnly="0" description=""/>
-      <property name="objectId" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="version" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="objectSubType" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="dc" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="original" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="readyAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="syncTime" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="status" type="int" enumType="KalturaFileSyncStatus" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileType" type="int" enumType="KalturaFileSyncType" readOnly="1" insertOnly="0" description=""/>
-      <property name="linkedId" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="linkCount" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileRoot" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="filePath" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileSize" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileUrl" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileContent" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileDiscSize" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="isCurrentDc" type="bool" readOnly="1" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaFileSyncListResponse">
-      <property name="objects" type="array" arrayType="KalturaFileSync" readOnly="1" insertOnly="0" description=""/>
-      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaFlavorParamsOutputBaseFilter" abstract="1" base="KalturaFlavorParamsFilter">
       <property name="flavorParamsIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2446,15 +2456,35 @@
       <property name="objects" type="array" arrayType="KalturaAuditTrail" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaInternalToolsSession">
-      <property name="partner_id" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="valid_until" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="partner_pattern" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="type" type="int" enumType="KalturaSessionType" readOnly="0" insertOnly="0" description=""/>
-      <property name="error" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="rand" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="user" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="privileges" type="string" readOnly="0" insertOnly="0" description=""/>
+    <class name="KalturaAnnotationBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationFilter" base="KalturaAnnotationBaseFilter"/>
+    <class name="KalturaAnnotation">
+      <property name="id" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="text" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="startTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="endTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userId" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationListResponse">
+      <property name="objects" type="array" arrayType="KalturaAnnotation" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaVirusScanProfileBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -3602,6 +3632,18 @@
         <result type="string"/>
       </action>
     </service>
+    <service id="filesync_filesync" name="fileSync" description="System user service&#13;">
+      <action name="list" description="List file syce objects by filter and pager&#10;">
+        <param name="filter" type="KalturaFileSyncFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaFileSyncListResponse"/>
+      </action>
+      <action name="sync" description="">
+        <param name="fileSyncId" type="int" optional="0" description="&#13;"/>
+        <param name="fileData" type="file" optional="0" description="&#13;"/>
+        <result type="KalturaFileSync"/>
+      </action>
+    </service>
     <service id="systemuser_systemuser" name="systemUser" description="System user service&#13;">
       <action name="verifyPassword" description="Verify password for email address&#10;">
         <param name="email" type="string" optional="0" description="&#13;"/>
@@ -3679,18 +3721,6 @@
       </action>
       <action name="getPackages" description="">
         <result type="array" arrayType="KalturaSystemPartnerPackage"/>
-      </action>
-    </service>
-    <service id="filesync_filesync" name="fileSync" description="System user service&#13;">
-      <action name="list" description="List file syce objects by filter and pager&#10;">
-        <param name="filter" type="KalturaFileSyncFilter" optional="1" default="null" description="&#13;"/>
-        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
-        <result type="KalturaFileSyncListResponse"/>
-      </action>
-      <action name="sync" description="">
-        <param name="fileSyncId" type="int" optional="0" description="&#13;"/>
-        <param name="fileData" type="file" optional="0" description="&#13;"/>
-        <result type="KalturaFileSync"/>
       </action>
     </service>
     <service id="adminconsole_flavorparamsoutput" name="flavorParamsOutput" description="Flavor Params Output service&#13;">
@@ -4860,18 +4890,28 @@
         <result type="KalturaAuditTrail"/>
       </action>
     </service>
-    <service id="kalturainternaltools_kalturainternaltools" name="KalturaInternalTools" description="Internal Tools Service&#10;"/>
-    <service id="kalturainternaltools_kalturainternaltoolssystemhelper" name="kalturaInternalToolsSystemHelper" description="Internal Tools Service&#10;">
-      <action name="fromSecureString" description="KS from Secure String&#10;">
-        <param name="str" type="string" optional="0" description="&#13;"/>
-        <result type="KalturaInternalToolsSession"/>
+    <service id="annotation_annotation" name="annotation" description="Annotation service - Video Annotation&#13;">
+      <action name="list" description="List annotation objects by filter and pager&#10;">
+        <param name="filter" type="KalturaAnnotationFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaAnnotationListResponse"/>
       </action>
-      <action name="iptocountry" description="from ip to country&#10;">
-        <param name="remote_addr" type="string" optional="0" description="&#13;"/>
-        <result type="string"/>
+      <action name="add" description="Allows you to add an annotation object and Annotation content associated with Kaltura object&#10;">
+        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
       </action>
-      <action name="getRemoteAddress" description="">
-        <result type="string"/>
+      <action name="get" description="Retrieve an Annotation object by id&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+      <action name="delete" description="delete annotation by id, and delete all children annotations&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="update" description="Update annotation by id &#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
       </action>
     </service>
     <service id="virusscan_virusscanprofile" name="virusScanProfile" description="Virus scan profile service&#13;">
