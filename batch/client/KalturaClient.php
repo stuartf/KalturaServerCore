@@ -182,11 +182,11 @@ class KalturaContainerFormat
 	const ISMV = "ismv";
 	const MKV = "mkv";
 	const WEBM = "webm";
-	const SWF = "swf";
-	const PDF = "pdf";
-	const APPLEHTTP = "applehttp";
 	const MPEG = "mpeg";
 	const MPEGTS = "mpegts";
+	const APPLEHTTP = "applehttp";
+	const SWF = "swf";
+	const PDF = "pdf";
 }
 
 class KalturaControlPanelCommandOrderBy
@@ -234,10 +234,9 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = "99";
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const FAST_START = "fastStart.FastStart";
-	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const SEGMENTER = "segmenter.Segmenter";
 	const AVIDEMUX = "avidemux.Avidemux";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 }
 
 class KalturaConversionProfileOrderBy
@@ -308,7 +307,6 @@ class KalturaEntryType
 	const AUTOMATIC = "-1";
 	const MEDIA_CLIP = "1";
 	const MIX = "2";
-	const BUBBLES = "4";
 	const PLAYLIST = "5";
 	const DATA = "6";
 	const LIVE_STREAM = "7";
@@ -5387,6 +5385,13 @@ abstract class KalturaFlavorParamsBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $tagsEqual = null;
+
+	/**
+	 * 
+	 *
 	 * @var KalturaContainerFormat
 	 */
 	public $formatEqual = null;
@@ -6576,6 +6581,14 @@ class KalturaDataEntry extends KalturaBaseEntry
 	 * @var string
 	 */
 	public $dataContent = null;
+
+	/**
+	 * indicator whether to return the object for get action with the dataContent field.
+	 *
+	 * @var bool
+	 * @insertonly
+	 */
+	public $retrieveDataContentByGet = null;
 
 
 }
