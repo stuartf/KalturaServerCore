@@ -235,6 +235,7 @@ class KalturaConversionEngineType
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
 	const SEGMENTER = "segmenter.Segmenter";
+	const FAST_START = "fastStart.FastStart";
 	const AVIDEMUX = "avidemux.Avidemux";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 }
