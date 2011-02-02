@@ -712,9 +712,13 @@ class playManifestAction extends kalturaAction
 				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, null, 'video/x-flv', $duration, null, $mediaUrl);
 				break;
 		}
-		
-		header("Content-Type: text/xml; charset=UTF-8");
-		header("Content-Disposition: inline; filename=manifest.xml");
+
+		if($this->format != StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		{
+			header("Content-Type: text/xml; charset=UTF-8");
+			header("Content-Disposition: inline; filename=manifest.xml");
+		}
+
 		echo $xml;
 		die;
 	}
