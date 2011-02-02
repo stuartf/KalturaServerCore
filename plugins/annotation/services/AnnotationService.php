@@ -11,12 +11,6 @@ class AnnotationService extends KalturaBaseService
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
-		
-		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin())
-		{
-			AnnotationPeer::setDefaultCriteriaFilterByKuser();
-		}
 				
 		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
@@ -36,6 +30,13 @@ class AnnotationService extends KalturaBaseService
 		
 		if (!$filter)
 			$filter = new KalturaAnnotationFilter();
+			
+		// when session is not admin, allow access to user entries only
+		if (!$this->getKs() || !$this->getKs()->isAdmin())
+		{
+			$filter->userIdEqual = $this->getKuser()->getPuserId();
+			$filter->userIdIn = $this->getKuser()->getPuserId();
+		}
 			
 		$c = new Criteria();
 		$c->add(AnnotationPeer::STATUS,AnnotationStatus::ANNOTATION_STATUS_READY);
@@ -130,6 +131,13 @@ class AnnotationService extends KalturaBaseService
 	function deleteAction($id)
 	{
 		kalturalog::debug("annotation service deleteAction");
+		
+		// when session is not admin, allow access to user entries only
+		if (!$this->getKs() || !$this->getKs()->isAdmin())
+		{
+			AnnotationPeer::setDefaultCriteriaFilterByKuser();
+		}
+		
 		$dbAnnotation = AnnotationPeer::retrieveByPK( $id );
 		if(!$dbAnnotation)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
@@ -152,8 +160,17 @@ class AnnotationService extends KalturaBaseService
 	function updateAction($id, KalturaAnnotation $annotation)
 	{
 		kalturalog::debug("annotation service updateAction");
+		
+		// when session is not admin, allow access to user entries only
+		if (!$this->getKs() || !$this->getKs()->isAdmin())
+		{
+			AnnotationPeer::setDefaultCriteriaFilterByKuser();
+		}
 
 		$dbAnnotation = AnnotationPeer::retrieveByPK($id);
+		
+		if (!$dbAnnotation)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 		
 		if ($dbAnnotation->getType() != AnnotationType::ANNOTATION)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
