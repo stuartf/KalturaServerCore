@@ -50,17 +50,27 @@ class serveFlavorAction extends kalturaAction
 		
 		$flvWrapper = new myFlvHandler ( $path );
 		$isFlv = $flvWrapper->isFlv();
-	
-		if (!$isFlv)
-		{
-			kFile::dumpFile($path);
-			die;
-		}
-		
-		 
-		$clipFrom = $this->getRequestParameter ( "clipFrom" , 0); // milliseconds 
+
+		$clipFrom = $this->getRequestParameter ( "clipFrom" , 0); // milliseconds
 		$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
 		if ( $clipTo == 0 ) $clipTo = 2147483647;
+
+		if (!$isFlv)
+		{
+			$limit_file_size = 0;
+			if ($clipTo != 2147483647)
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+				if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
+				{
+					$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ?
+					$mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+					$limit_file_size = floor(@filesize($path) * ($clipTo / $duration));
+				}
+			}
+			kFile::dumpFile($path, null, null, $limit_file_size);
+			die;
+		}
 		
 		$audioOnly = $this->getRequestParameter ( "audioOnly" ); // milliseconds
 		if ( $audioOnly === '0' )
