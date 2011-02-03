@@ -713,7 +713,11 @@ class playManifestAction extends kalturaAction
 				break;
 		}
 
-		if($this->format != StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		if($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		{
+			header("Content-Type: text/plain; charset=UTF-8");
+		}
+		else
 		{
 			header("Content-Type: text/xml; charset=UTF-8");
 			header("Content-Disposition: inline; filename=manifest.xml");
