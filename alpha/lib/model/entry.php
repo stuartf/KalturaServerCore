@@ -1840,6 +1840,13 @@ class entry extends Baseentry implements ISyncableFile
 		return "";
 	}
 	 
+	 
+	// -- retrieveDataContentByGet --
+	// disable/enable sending data content for data entries in API v3 (for binary-data-entry use-case)
+	public function setRetrieveDataContentByGet( $v ) { $this->putInCustomData("retrieveDataContentByGet", $v); }
+	public function getRetrieveDataContentByGet() { return $this->getFromCustomData("retrieveDataContentByGet", "", 1); }
+
+
 	// ------------------------------------------------------------
 	// setters & gettes for entry when callnig addentry
 	private $m_url;
