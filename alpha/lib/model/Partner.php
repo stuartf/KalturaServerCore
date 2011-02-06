@@ -34,7 +34,7 @@ class Partner extends BasePartner
 	
 	const MAX_ACCESS_CONTROLS = 24;
 	
-	const MAX_NUMBER_OF_CATEGORIES = 200;
+	const MAX_NUMBER_OF_CATEGORIES = 1000;
 	
 	const CATEGORIES_LOCK_TIMEOUT = 300; // in seconds
 	
