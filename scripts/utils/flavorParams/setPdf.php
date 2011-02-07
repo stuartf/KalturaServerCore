@@ -68,7 +68,7 @@ else
 }
 
 $pdfOperator = new kOperator();
-$pdfOperator->id = kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR;
+$pdfOperator->id = conversionEngineType::PDF_CREATOR;
 $operators = new kOperatorSets();
 $operators->addSet(array($pdfOperator));
 

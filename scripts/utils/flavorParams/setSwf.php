@@ -74,9 +74,9 @@ else
 }
 
 $swfOperator = new kOperator();
-$swfOperator->id = kConvertJobData::CONVERSION_ENGINE_PDF2SWF;
+$swfOperator->id = conversionEngineType::PDF2SWF;
 $pdfOperator = new kOperator();
-$pdfOperator->id = kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR;
+$pdfOperator->id = conversionEngineType::PDF_CREATOR;
 $operators = new kOperatorSets();
 $operators->addSet(array($pdfOperator, $swfOperator));
 $operators->addSet(array($swfOperator));
