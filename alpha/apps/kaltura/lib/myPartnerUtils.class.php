@@ -366,7 +366,7 @@ class myPartnerUtils
 	public static function getCdnHost ( $partner_id, $protocol = null )
 	{
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getCdnHost() ) ) return requestUtils::getCdnHost($protocol);
+		if ( !$partner || (! $partner->getCdnHost() ) ) return requestUtils::getCdnHost($protocol === null ? 'http' : $protocol);
 	
 		$cdnHost = $partner->getCdnHost();
 
