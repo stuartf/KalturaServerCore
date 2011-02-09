@@ -11,6 +11,7 @@ class serveFlavorAction extends kalturaAction
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$ks = $this->getRequestParameter( "ks" );
+		$fileParam = $this->getRequestParameter( "file" );
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
@@ -55,7 +56,12 @@ class serveFlavorAction extends kalturaAction
 		$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
 		if ( $clipTo == 0 ) $clipTo = 2147483647;
 
-		if (!$isFlv)
+		if(is_dir($path) && $fileParam) {
+			$path .= "/$fileParam";
+			kFile::dumpFile($path);
+			die;
+		}
+		else if (!$isFlv)
 		{
 			$limit_file_size = 0;
 			if ($clipTo != 2147483647)
