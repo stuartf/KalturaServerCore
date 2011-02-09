@@ -269,17 +269,44 @@ class playManifestAction extends kalturaAction
 		$urlManager->setSeekFromTime($this->seekFrom);
 		$urlManager->setDomain($this->cdnHost);
 		$urlManager->setProtocol($this->format);
-		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-		{
-			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-			$url = $urlManager->getFileSyncUrl($fileSync);
-		}
-		else
+
 	        $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
 		
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return $this->protocol . '://' . $url;
+	}
+
+	private function serveUrl()
+	{
+		if($this->entry->getType() != entryType::MEDIA_CLIP)
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+
+			switch($this->entry->getType())
+			{
+			case entryType::MEDIA_CLIP:
+				switch($this->entry->getMediaType())
+				{					
+					case entry::ENTRY_MEDIA_TYPE_IMAGE:
+						// TODO - create sequence manifest
+						break;
+						
+					case entry::ENTRY_MEDIA_TYPE_VIDEO:
+					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
+						if($this->flavorId && ($flavorAsset = flavorAssetPeer::retrieveById($this->flavorId)) != null)
+						{
+							$url = $this->getFlavorHttpUrl($flavorAsset);
+							header("location:$url");
+							die;
+						}
+						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				}
+				
+			default:
+				break;
+		}
+		
+		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 	}
 	
 	private function serveHttp()
@@ -696,6 +723,11 @@ class playManifestAction extends kalturaAction
 			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
 				$xml = $this->serveSilverLight();
 				break;
+
+			case "url":
+				return $this->serveUrl();
+				break;
+				
 				
 			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
 				$xml = $this->serveAppleHttp();
