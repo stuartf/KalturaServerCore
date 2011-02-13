@@ -198,13 +198,16 @@ class kBatchManager
 		if(!$entry)
 			return $mediaInfoDb;
 
-		if($mediaInfoDb->getVideoWidth() && $mediaInfoDb->getVideoHeight())
+		$contentDuration = $mediaInfoDb->getContainerDuration();
+		if (!$contentDuration)
 		{
-			$entry->setDimensions($mediaInfoDb->getVideoWidth(), $mediaInfoDb->getVideoHeight());
-			$entry->setLengthInMsecs($mediaInfoDb->getContainerDuration());
-			$entry->save();
+			$contentDuration = $mediaInfoDb->getVideoDuration();
+			if (!$contentDuration)
+				$contentDuration = $mediaInfoDb->getAudioDuration();
 		}
+		$entry->setLengthInMsecs($contentDuration);
 		
+		$entry->save();
 		return $mediaInfoDb;
 	}
 	
