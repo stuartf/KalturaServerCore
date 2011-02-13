@@ -50,7 +50,11 @@ class kSphinxSearchManager implements
 		{
 			$entry = kMetadataManager::getObjectFromPeer($object);
 			if ($entry && $entry instanceOf entry)
-				$this->saveToSphinx($entry, false, true);
+			{
+				$entry->setUpdatedAt(time());
+				$entry->save();
+//				$this->saveToSphinx($entry, false, true);
+			}
 		}
 		
 		return true;
