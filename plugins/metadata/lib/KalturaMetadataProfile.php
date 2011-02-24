@@ -42,6 +42,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
+	 * @filter eq
 	 */
 	public $name;
 
