@@ -83,6 +83,13 @@ class UploadTokenService extends KalturaBaseService
 		if (is_null($uploadTokenDb))
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
 			
+		// if the token was generated on another datacenter, proxy the upload action there
+		$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+		if($remoteDCHost)
+		{
+			kFile::dumpApiRequest($remoteDCHost);
+		}
+
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);
 		try
 		{
