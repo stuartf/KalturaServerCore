@@ -1408,6 +1408,7 @@
     <class name="KalturaConversionProfileBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaConversionProfileFilter" base="KalturaConversionProfileBaseFilter"/>
     <class name="KalturaConversionProfileListResponse">
@@ -2226,6 +2227,7 @@
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="metadataObjectTypeEqual" type="int" enumType="KalturaMetadataObjectType" readOnly="0" insertOnly="0" description=""/>
       <property name="versionEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
