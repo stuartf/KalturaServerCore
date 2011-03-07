@@ -119,6 +119,8 @@ class kJobsManager
 		{
 			$dbBatchJob->setExecutionAttempts(0);
 			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
+			$dbBatchJob->setCheckAgainTimeout(time() + BatchJobPeer::getCheckAgainTimeout($jobType));
+			$dbBatchJob->setQueueTime(null);
 			$dbBatchJob->save();
 		}
 			
