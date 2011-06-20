@@ -89,7 +89,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return new KalturaYouTubeDistributionJobProviderData();
 		}
 		
-		if (class_exists('KalturaClient') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 			{
@@ -154,20 +154,19 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'YouTubeDistributionEngine';
 		
-			if($baseClass == 'KalturaDistributionProfile')
-				return 'KalturaYouTubeDistributionProfile';
+			
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaYouTubeDistributionJobProviderData';
 		}
 		
-		if (class_exists('KalturaClient') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_YouTubeProfileConfiguration';
 				
-			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
-				return 'Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile';
+			if($baseClass == 'KalturaDistributionProfile')
+				return 'KalturaYouTubeDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
