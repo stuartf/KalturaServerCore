@@ -285,60 +285,6 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 
 }
 
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaDistributionFieldConfig extends KalturaObjectBase
-{
-	/**
-	 * A value taken from a connector field enum which associates the current configuration to that connector field
-	 * Field enum class should be returned by the provider's getFieldEnumClass function.
-	 *
-	 * @var string
-	 */
-	public $fieldName = null;
-
-	/**
-	 * A string that will be shown to the user as the field name in error messages related to the current field
-	 *
-	 * @var string
-	 */
-	public $userFriendlyFieldName = null;
-
-	/**
-	 * An XSLT string that extracts the right value from the Kaltura entry MRSS XML.
-	 * The value of the current connector field will be the one that is returned from transforming the Kaltura entry MRSS XML using this XSLT string.
-	 *
-	 * @var string
-	 */
-	public $entryMrssXslt = null;
-
-	/**
-	 * Is the field required to have a value for submission ?
-	 *
-	 * @var bool
-	 */
-	public $isRequired = null;
-
-	/**
-	 * Trigger distribution update when this field changes or not ?
-	 *
-	 * @var bool
-	 */
-	public $updateOnChange = null;
-
-	/**
-	 * Entry column or metadata xpath that should trigger an update
-	 * TODO: find a better solution for this
-	 *
-	 * @var string
-	 */
-	public $updateParam = null;
-
-
-}
-
 class KalturaEntryDistribution extends KalturaObjectBase
 {
 	/**
@@ -819,6 +765,68 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 
 }
 
+class KalturaDistributionFieldConfig extends KalturaObjectBase
+{
+	/**
+	 * A value taken from a connector field enum which associates the current configuration to that connector field
+	 * Field enum class should be returned by the provider's getFieldEnumClass function.
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+	/**
+	 * A string that will be shown to the user as the field name in error messages related to the current field
+	 *
+	 * @var string
+	 */
+	public $userFriendlyFieldName = null;
+
+	/**
+	 * An XSLT string that extracts the right value from the Kaltura entry MRSS XML.
+	 * The value of the current connector field will be the one that is returned from transforming the Kaltura entry MRSS XML using this XSLT string.
+	 *
+	 * @var string
+	 */
+	public $entryMrssXslt = null;
+
+	/**
+	 * Is the field required to have a value for submission ?
+	 *
+	 * @var bool
+	 */
+	public $isRequired = null;
+
+	/**
+	 * Trigger distribution update when this field changes or not ?
+	 *
+	 * @var bool
+	 */
+	public $updateOnChange = null;
+
+	/**
+	 * Entry column or metadata xpath that should trigger an update
+	 * TODO: find a better solution for this
+	 *
+	 * @var string
+	 */
+	public $updateParam = null;
+
+
+}
+
+abstract class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionFieldConfig
+	 */
+	public $fieldConfigArray;
+
+
+}
+
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -888,34 +896,16 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 
 }
 
-/**
- * @package Scheduler
- * @subpackage Client
- */
-abstract class KalturaConfigurableDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+abstract class KalturaConfigurableDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fieldValues = null;
 
-}
 
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaConfigurableDistributionProfileFilter extends KalturaConfigurableDistributionProfileBaseFilter
-{
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaConfigurableDistributionProfileOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
 }
 
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
