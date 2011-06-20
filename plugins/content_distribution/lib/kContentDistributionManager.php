@@ -560,6 +560,8 @@ class kContentDistributionManager
 		self::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 		self::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
 		
+		$entryDistribution->save(); // need to save before checking validations
+		
 		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 		$entryDistribution->setValidationErrorsArray($validationErrors);
 

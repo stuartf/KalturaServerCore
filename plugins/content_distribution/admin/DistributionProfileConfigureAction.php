@@ -142,6 +142,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
 		}
+		$action->view->form = $form;
 	}
 }
 
