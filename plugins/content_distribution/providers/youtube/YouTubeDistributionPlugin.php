@@ -5,7 +5,7 @@
 class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'youTubeDistribution';
-	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
+	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
@@ -89,7 +89,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return new KalturaYouTubeDistributionJobProviderData();
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 			{
@@ -161,7 +161,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return 'KalturaYouTubeDistributionJobProviderData';
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_YouTubeProfileConfiguration';
@@ -219,7 +219,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	    // append Hulu specific report statistics
+	    // append YouTube specific report statistics
 	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		$mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
 		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
