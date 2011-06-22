@@ -16,6 +16,7 @@ require_once (KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'alpha'.DIRECTORY_SEPARATOR.
 require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "lib", "*")); // needed for testmeDoc
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "content_distribution", "*")); // needed for testmeDoc
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/general/classMap.cache');
 KAutoloader::register();
 
@@ -41,9 +42,14 @@ if(!$conversion_flavor)
 
 $conversion = conversionProfile2Peer::retrieveByPK($conversion_profile_id);
 $input_tags_maps = $conversion->getInputTagsMap();
-$input_tags_maps .= ",mbr";
 
-$conversion->setInputTagsMap($input_tags_maps);
+if (strpos($input_tags_maps, ",mbr") === false)
+{
+	$input_tags_maps .= ",mbr";
+	
+	$conversion->setInputTagsMap($input_tags_maps);
+	$conversion->save();
+}
 
 $conversion_flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL);
 $conversion_flavor->save();
