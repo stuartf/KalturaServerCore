@@ -15,5 +15,7 @@ class kShortLinkFlowManager implements kObjectDeletedEventConsumer
 				$shortLink->save();
 			}
 		}
+		
+		return true;
 	}
 }
