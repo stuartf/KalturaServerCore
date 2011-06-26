@@ -25,8 +25,22 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		self::onDistributionJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-			
+		$jobTypes = array(
+			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT),
+			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE),
+		);
+		if(!in_array($dbBatchJob->getJobType(), $jobTypes))
+		{
+			return true;
+		}
+		
+		$jobData = $dbBatchJob->getData();
+		$providerData = $jobData->getProviderData();
+		if($providerData instanceof kYouTubeDistributionJobProviderData)
+		{
+			self::onDistributionJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		}
+
 		return true;
 	}
 

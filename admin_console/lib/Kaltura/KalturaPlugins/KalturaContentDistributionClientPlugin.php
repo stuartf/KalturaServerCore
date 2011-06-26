@@ -856,9 +856,17 @@ class KalturaDistributionFieldConfig extends KalturaObjectBase
 	 * Entry column or metadata xpath that should trigger an update
 	 * TODO: find a better solution for this
 	 *
-	 * @var string
+	 * @var array of KalturaString
 	 */
-	public $updateParam = null;
+	public $updateParams;
+
+	/**
+	 * Is this field config is the default for the distribution provider?
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isDefault = null;
 
 
 }

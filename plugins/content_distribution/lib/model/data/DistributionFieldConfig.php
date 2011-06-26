@@ -37,9 +37,15 @@ class DistributionFieldConfig
     /**
      * Entry column or metadata xpath that should trigger an update
      * TODO: find a better solution for this
-     * @var string
+     * @var array of string
      */
-    private $updateParam;
+    private $updateParams;
+    
+    /**
+     * Is this field config is the default for the distribution provider?
+     * @var bool
+     */
+    private $isDefault;
     
     
 	/**
@@ -121,19 +127,44 @@ class DistributionFieldConfig
     }
 
 	/**
-     * @return the $updateParam
+     * @return the $updateParams
      */
-    public function getUpdateParam ()
+    public function getUpdateParams ()
     {
-        return $this->updateParam;
+        return $this->updateParams;
     }
 
 	/**
-     * @param string $updateParam
+     * @param string $updateParams
      */
-    public function setUpdateParam ($updateParam)
+    public function setUpdateParams ($updateParams)
     {
-        $this->updateParam = $updateParam;
+    	if (!is_array($updateParams)) {
+    		$updateParams = array($updateParams);
+    	}
+        $this->updateParams = $updateParams;
     }
+    
+	/**
+	 * @return the $isDefault
+	 */
+	public function getIsDefault() 
+	{
+		return $this->isDefault;
+	}
 
+	/**
+	 * @param bool $isDefault
+	 */
+	public function setIsDefault($isDefault) 
+	{
+		$this->isDefault = $isDefault;
+	}
+	
+	public function __sleep()
+	{
+		$vars = get_class_vars(get_class($this));
+		unset($vars['isDefault']); // isDefault should not be serialized
+		return array_keys($vars);
+	}
 }

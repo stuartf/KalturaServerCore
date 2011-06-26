@@ -37,7 +37,10 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	        }
 	        foreach ($tempArray as $tempConfig)
 	        {
+	            if (!$tempConfig instanceof DistributionFieldConfig)
+	            	continue;
 	            $fieldName = $tempConfig->getFieldName();
+	            $tempConfig->setIsDefault(false);
 	            $this->fieldConfigArray[$fieldName] = $tempConfig;
 	        }
 	        
@@ -48,6 +51,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	            $fieldName = $defaultConfig->getFieldName();
 	            if (!array_key_exists($fieldName, $this->fieldConfigArray))
 	            {
+	                $defaultConfig->setIsDefault(true);
 	                $this->fieldConfigArray[$fieldName] = $defaultConfig;
 	            }
 	        }
@@ -180,6 +184,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
         </xsl:stylesheet>
         ';
         
+        KalturaLog::debug('Result XSL: '. $xsl);
         return $xsl;
     }
 		
@@ -229,8 +234,9 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
         /* DEBUG logs
 		KalturaLog::log('entry mrss = '.$mrssStr);
 		KalturaLog::log('profile xslt = '.$xslStr);
-		KalturaLog::log('resutl xml = '.$resultXmlObj->saveXML());
 		*/
+		
+		KalturaLog::debug('Result XML: '.$resultXmlObj->saveXML());		
 		
 		return $resultXmlObj;
 	}
@@ -302,9 +308,12 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
         foreach ($fieldConfigArray as $fieldConfig)
         {
             if ($fieldConfig->getUpdateOnChange()) {
-                $updateParam = $fieldConfig->getUpdateParam();
-                if (stripos($updateParam, 'ENTRY.') === 0) {
-                    $updateRequired[] = $updateParam;
+                $updateParams = $fieldConfig->getUpdateParams();
+                foreach ($updateParams as $updateParam)
+                {
+	                if (stripos($updateParam, 'ENTRY.') === 0) {
+	                    $updateRequired[] = $updateParam;
+	                }
                 }
             }            
         }
@@ -322,9 +331,12 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
         foreach ($fieldConfigArray as $fieldConfig)
         {
             if ($fieldConfig->getUpdateOnChange()) {
-                $updateParam = $fieldConfig->getUpdateParam();
-                if (stripos($updateParam, "/*[local-name()='metadata']/*[local-name()='") === 0) {
-                    $updateRequired[] = $updateParam;
+                $updateParams = $fieldConfig->getUpdateParams();
+                foreach ($updateParams as $updateParam)
+                {
+	                if (stripos($updateParam, "/*[local-name()='metadata']/*[local-name()='") === 0) {
+	                    $updateRequired[] = $updateParam;
+	                }
                 }
             }            
         }
