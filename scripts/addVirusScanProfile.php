@@ -15,20 +15,20 @@ DbManager::initialize();
 $partnerId = null;
 
 // please enter a name for the profile:
-$profileName = null;
+$profileName = 'virusScan';
 
 // please entery profile's status (enabled/disabled):
 $profileStatus = KalturaVirusScanProfileStatus::ENABLED; // can be changed to KalturaVirusScanProfileStatus::DISABLED
 
 // please choose engine type:
-$engineType = null; // Value from KalturaVirusScanEngineType
+$engineType = SymantecScanEnginePlugin::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . SymantecScanEngineVirusScanEngineType::SYMANTEC_SCAN_ENGINE; // Value from KalturaVirusScanEngineType
 
 // action if file is found infected:
-$actionIfInfected = KalturaVirusFoundAction::CLEAN_NONE;
+$actionIfInfected = KalturaVirusFoundAction::CLEAN_DELETE;
 
 // please enter required parameters for entry filter - only entries that suit the filter will be scanned by this profile
 $entryFilter = new KalturaBaseEntryFilter();
-$entryFilter->typeEqual = KalturaEntryType::DOCUMENT; // FOR EXAMPLE
+$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP . "," . KalturaEntryType::MIX;
 
 
 /**************************************************
