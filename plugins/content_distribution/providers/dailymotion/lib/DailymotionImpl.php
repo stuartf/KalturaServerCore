@@ -11,7 +11,7 @@ class DailyMotionImpl
 	private $user = "";
 	private $pass = "";
 	
-		private static $categoriesMap = array(
+	private static $categoriesMap = array(
 		"animals" => "Animals",
 		"creation" => "Arts",
 		"auto" => "Auto Moto",
@@ -90,7 +90,14 @@ class DailyMotionImpl
 		return $result['status'];
 	}
 	
-
+	public function setOption($option, $value)
+	{
+		if (!property_exists($this->api, $option))
+			throw new Exception('The option "'.$option.'" doesn\'t exists for Dailymotion API Client Library');
+			
+		$this->api->$option = $value;
+	}
+	
 	public static function getCategoriesMap()
 	{
 		return self::$categoriesMap;
