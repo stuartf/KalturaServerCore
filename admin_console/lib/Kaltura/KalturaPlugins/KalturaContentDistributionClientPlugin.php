@@ -19,6 +19,13 @@ class KalturaDistributionErrorType
 	const INVALID_DATA = 4;
 }
 
+class KalturaDistributionFieldRequiredStatus
+{
+	const NOT_REQUIRED = 0;
+	const REQUIRED_BY_PROVIDER = 1;
+	const REQUIRED_BY_PARTNER = 2;
+}
+
 class KalturaDistributionProfileActionStatus
 {
 	const DISABLED = 1;
@@ -841,7 +848,7 @@ class KalturaDistributionFieldConfig extends KalturaObjectBase
 	/**
 	 * Is the field required to have a value for submission ?
 	 *
-	 * @var bool
+	 * @var KalturaDistributionFieldRequiredStatus
 	 */
 	public $isRequired = null;
 
