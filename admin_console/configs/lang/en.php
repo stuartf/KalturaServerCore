@@ -903,6 +903,10 @@ return array(
 	'KalturaDistributionErrorType::MISSING_METADATA' => 'Missing Metadata',
 	'KalturaDistributionErrorType::INVALID_DATA' => 'Invalid Data',
 	
+	'KalturaDistributionFieldRequiredStatus::NOT_REQUIRED' => 'Not Required',
+	'KalturaDistributionFieldRequiredStatus::REQUIRED_BY_PARTNER' => 'Required By Partner',
+	'KalturaDistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER' => 'Required By Provider',
+	
 	'KalturaTrackEntryEventType::UPLOADED_FILE' => 'Uploaded File',
 	'KalturaTrackEntryEventType::WEBCAM_COMPLETED' => 'Webcam Completed',
 	'KalturaTrackEntryEventType::IMPORT_STARTED' => 'Import Started',
