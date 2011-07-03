@@ -11,7 +11,9 @@ class KalturaResponseCacher
 	protected $_cacheDataFilePath = "";
 	protected $_cacheHeadersFilePath = "";
 	protected $_cacheLogFilePath = "";
+	protected $_cacheExpiryFilePath = "";
 	protected $_ks = "";
+	protected $_defaultExpiry = 600;
 	protected $_expiry = 600;
 	
 	protected static $_useCache = true;
@@ -21,7 +23,7 @@ class KalturaResponseCacher
 		self::$_useCache = kConf::get('enable_cache');
 
 		if ($expiry)
-			$this->_expiry = $expiry;
+			$this->_defaultExpiry = $this->_expiry = $expiry;
 			
 		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
 			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -97,6 +99,7 @@ class KalturaResponseCacher
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
 		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
+		$this->_cacheExpiryFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".expiry";
 	}
 	
 	public static function disableCache()
@@ -203,6 +206,15 @@ class KalturaResponseCacher
 			$this->createDirForPath($this->_cacheHeadersFilePath);
 			file_put_contents($this->_cacheHeadersFilePath, $contentType);
 		}
+
+		// store specific expiry shorter than the default one
+		if ($this->_expiry != $this->_defaultExpiry)
+			file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
+	}
+
+	public function setExpiry($expiry)
+	{
+		$this->_expiry = $expiry;
 	}
 	
 	private function createDirForPath($filePath)
@@ -219,17 +231,25 @@ class KalturaResponseCacher
 	{
 		if (file_exists($this->_cacheDataFilePath))
 		{
-			if (filemtime($this->_cacheDataFilePath) + $this->_expiry < time())
+			// check for a specific expiry 
+			$fileExpiry = @file_get_contents($this->_cacheExpiryFilePath);
+			if ($fileExpiry)
 			{
-				@unlink($this->_cacheDataFilePath);
-				@unlink($this->_cacheHeadersFilePath);
-				@unlink($this->_cacheLogFilePath);
-				return false;
+				$useCache = $fileExpiry > time(); 
 			}
-			else
+			else // otherwise check for the "default" expiry
 			{
+				$useCache = filemtime($this->_cacheDataFilePath) + $this->_expiry > time();
+			}
+
+			if($useCache)
 				return true;
-			}
+
+			@unlink($this->_cacheDataFilePath);
+			@unlink($this->_cacheHeadersFilePath);
+			@unlink($this->_cacheLogFilePath);
+			@unlink($this->_cacheExpiryFilePath);
+			return false;
 		}
 		return false;
 	}
