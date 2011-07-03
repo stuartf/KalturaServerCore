@@ -82,6 +82,13 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 *
 	 * @var string
 	 */
+	public $sftpBaseDir = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $ownerName = null;
 
 	/**
