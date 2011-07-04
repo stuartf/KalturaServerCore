@@ -272,6 +272,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			{
 				$this->checkAclForNavigation($page);
 			}
+			if ($action == 'dynamic_action') {
+			    $localPages = $page->getPages();
+			    $firstPage = reset($localPages);
+			    if ($firstPage) {
+			        $firstPageAction = $firstPage->get('action');
+			        $page->set('action', $firstPageAction);
+			    }
+			}
 		}
 	}
 }
