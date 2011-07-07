@@ -6,6 +6,12 @@ class KalturaSyndicationFeedRenderer
 	const LEVEL_INDENTATION = '  ';
 	
 	/**
+	 * Maximum number of items to list
+	 * @var int
+	 */
+	private $limit = self::MAX_RETUREND_ENTRIES;
+	
+	/**
 	 * @var KalturaBaseSyndicationFeed
 	 */
 	public $syndicationFeed = null;
@@ -214,7 +220,7 @@ class KalturaSyndicationFeedRenderer
 		}
 		
 		++$this->returnedEntriesCount;
-		if ($this->returnedEntriesCount == self::MAX_RETUREND_ENTRIES)
+		if ($this->returnedEntriesCount > $this->limit)
 			return false;
 				
 		$entry = current($this->entriesCurrentPage);
@@ -343,10 +349,13 @@ class KalturaSyndicationFeedRenderer
 		return $c;
 	}
 	
-	public function execute()
+	public function execute($limit = 0)
 	{
 		if($this->executed)
 			return;
+
+		if ($limit)
+			$this->limit = $limit;
 			
 		$microTimeStart = microtime(true);
 		
