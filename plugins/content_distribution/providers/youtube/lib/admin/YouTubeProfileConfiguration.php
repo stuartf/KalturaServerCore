@@ -39,6 +39,8 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 	
 	protected function addProviderElements()
 	{
+	    $this->setDescription(null);
+	    
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('YouTube Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -58,6 +60,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->addElement('text', 'owner_name', array(
 			'label' => 'Owner Name:',
 		));
+			
 		
 		$this->addElement('select', 'target', array(
 			'label' => 'Target:',
@@ -69,10 +72,11 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		));
 		
 		$this->addDisplayGroup(
-			array('username', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
+			array('username', 'notification_email', 'owner_name', 'target'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
+			
 		
 		// SFTP Configuration
 		$this->addElement('text', 'sftp_host', array(
@@ -114,6 +118,31 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'metadata',
 			array('legend' => 'Metadata', 'decorators' => array('FormElements', 'Fieldset'))
 		);
+		
+		
+		// Advertising
+		$this->addElement('checkbox', 'enable_ad_server', array(
+			'label' => 'Enable AD server:',
+		));
+
+		$this->addElement('text', 'ad_server_partner_id', array(
+			'label' => 'Ad Server Partner ID:',
+		));		
+		
+		$this->addElement('checkbox', 'allow_pre_roll_ads', array(
+			'label' => 'Allow Pre-Roll Ads:',
+		));
+		
+		$this->addElement('checkbox', 'allow_post_roll_ads', array(
+			'label' => 'Allow Post-Roll Ads:',
+		));
+		
+        $this->addDisplayGroup(
+			array('enable_ad_server', 'ad_server_partner_id', 'allow_pre_roll_ads', 'allow_post_roll_ads'), 
+			'advertising', 
+			array('legend' => 'Advertising', 'decorators' => array('FormElements', 'Fieldset'))
+		);
+
 		
 		// Community
 		$this->addElement('select', 'allow_comments', array(
