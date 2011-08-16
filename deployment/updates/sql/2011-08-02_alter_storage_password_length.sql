@@ -1,0 +1,1 @@
+ALTER TABLE storage_profile MODIFY COLUMN storage_password VARCHAR(64);
