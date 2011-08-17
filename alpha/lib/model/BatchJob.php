@@ -453,31 +453,55 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$data = parent::getData();
 		if(!is_null($data))
 		{
-			try{
-				return unserialize($data);
-			}
-			catch(Exception $e){
+			try {
+				$unserializedData = unserialize ( $data );
+				if ($unserializedData instanceof kJobCompressedData) {
+					$compressedData = $unserializedData->getCompressedData ();
+					$unCompressedData = gzuncompress ( $compressedData );
+					if ($unCompressedData) {
+						return unserialize($unCompressedData);
+					}
+					else{
+						//TODO throw exception
+					}
+				}
+				return unserialize ( $unserializedData );
+			} catch(Exception $e){
 				return null;
 			}
 		}
 			
 		return null;
-	} 
+	}
 	
 	/**
 	 * @param boolean  $bypassSerialization enables PS2 support
 	 */
-	public function setData($v, $bypassSerialization = false)
-	{
-		if($bypassSerialization)
-			return parent::setData($v);
-			
-		$this->setDuplicationKey(BatchJobPeer::createDuplicationKey($this->getJobType(), $v));
+	public function setData($v, $bypassSerialization = false) {
+		if ($bypassSerialization)
+			return parent::setData ( $v );
+		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
 		
-		if(!is_null($v))
-			parent::setData(serialize($v));
-		else	
-			parent::setData(null);
+		if (! is_null ( $v )) {
+			$sereializedValue = serialize ( $v );
+			
+			if (strlen ( ( string ) $sereializedValue ) < 8193) { //TODO replaice 8192 with constant
+				parent::setData ( serialize ( $v ) );
+			}
+			//create kJobCompressedData and serialize it. 
+			else {
+				$compressedValue = gzcompress ( $sereializedValue );
+				
+				if ($compressedValue) {
+					$v = new kJobCompressedData ( $compressedValue );
+					parent::setData ( serialize ( $v ) );
+				} else {
+					//TODO throw exception
+				}
+			}
+		
+		} else
+			parent::setData ( null );
 	} 
 	
 	
