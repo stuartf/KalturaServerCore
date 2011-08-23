@@ -1,22 +1,33 @@
 <?php
 /**
+ * this class represent a compressed serialized kJobDate
  * @package Core
  * @subpackage model.data
  */
-class kJobCompressedData extends kJobData
-{
+class kJobCompressedData extends kJobData {
+	
 	/**
-	 * the compressed job's data
+	 * the compressed kJobData
 	 * @var string
 	 */
-	private $compressedData;
+	private $compressedJobData;
 	
-	public function kJobCompressedData($value){
-		$this->compressedData = $value;
+	/**
+	 * constructor. get a serialized kJobData and compress it.
+	 * @param string $serializedJobData serialized kJobData
+	 */
+	public function kJobCompressedData($serializedJobData) {
+		$this->compressedJobData = gzcompress ( $serializedJobData );
+		if (! $this->compressedJobData) {
+		//TODO throw exception
+		}
 	}
 	
-	public function getCompressedData(){
-		return $this->compressedData;
+	/**
+	 * return serialized kJobData
+	 */
+	public function getSerializedJobData() {
+		return gzuncompress($this->compressedJobData);
 	}
-	
+
 }

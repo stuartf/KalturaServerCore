@@ -37,6 +37,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 
+	const MAX_SERIALIZED_JOB_DATA_SIZE = 8193;
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
@@ -449,28 +450,25 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	{
 		if($bypassSerialization)
 			return parent::getData();
-			
 		$data = parent::getData();
 		if(!is_null($data))
 		{
 			try {
 				$unserializedData = unserialize ( $data );
 				if ($unserializedData instanceof kJobCompressedData) {
-					$compressedData = $unserializedData->getCompressedData ();
-					$unCompressedData = gzuncompress ( $compressedData );
-					if ($unCompressedData) {
-						return unserialize($unCompressedData);
+					$serializedJobData = $unserializedData->getSerializedJobData ();
+					if ($serializedJobData) {
+						$unserializedData = unserialize($serializedJobData);
 					}
 					else{
 						//TODO throw exception
 					}
 				}
-				return unserialize ( $unserializedData );
+				return $unserializedData;
 			} catch(Exception $e){
 				return null;
 			}
 		}
-			
 		return null;
 	}
 	
@@ -481,25 +479,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		if ($bypassSerialization)
 			return parent::setData ( $v );
 		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
-		
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
-			
-			if (strlen ( ( string ) $sereializedValue ) < 8193) { //TODO replaice 8192 with constant
-				parent::setData ( serialize ( $v ) );
+			if (strlen ( ( string ) $sereializedValue ) > $this::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
+				$v = new kJobCompressedData ( $sereializedValue );
+				$sereializedValue = serialize ( $v );
 			}
-			//create kJobCompressedData and serialize it. 
-			else {
-				$compressedValue = gzcompress ( $sereializedValue );
-				
-				if ($compressedValue) {
-					$v = new kJobCompressedData ( $compressedValue );
-					parent::setData ( serialize ( $v ) );
-				} else {
-					//TODO throw exception
-				}
-			}
-		
+			parent::setData ( $sereializedValue );	
 		} else
 			parent::setData ( null );
 	} 
