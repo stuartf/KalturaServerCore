@@ -9,6 +9,7 @@ update flavor_params
   where isnull(deleted_at) and partner_id!=-1 and tags not like '%iphonenew%' and tags like '%iphone%'  
     and name = 'Mobile (H264)'
     and frame_rate=25
+;
 
 # for 23 records
 update flavor_params
@@ -21,6 +22,7 @@ update flavor_params
   where isnull(deleted_at) and partner_id!=-1 and tags not like '%iphonenew%' and tags like '%iphone%'  
     and frame_rate=25
     and (tags='iphone,web' or tags='iphone' or tags='web,iphone,android')
+;
 
 # for 13 records - test accounts?
 update flavor_params
@@ -33,6 +35,7 @@ update flavor_params
   where isnull(deleted_at) and partner_id!=-1 and tags not like '%iphonenew%' and tags like '%iphone%'  
     and frame_rate=25
   and partner_id in(308862,336081,225802)
+;
 
 #ipad - 310
 update flavor_params
@@ -44,3 +47,4 @@ update flavor_params
   where isnull(deleted_at) and partner_id!=-1 and tags not like '%ipadnew%' and tags like '%ipad%'  
     and frame_rate in (0,25)
     and name='iPad'
+;
