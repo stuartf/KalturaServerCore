@@ -296,9 +296,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
-			$this->currentItem++;
+			
 			if($this->currentItem < $startIndex)
+			{
+				$this->currentItem++;
 				continue;
+			}
+				
 			
 			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 				return;
@@ -1924,7 +1928,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->exceededMaxRecordsEachRun = true;
 			return;
 		}
-		$this->handledRecordsThisRun++;
 		
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just the one theat was changed
