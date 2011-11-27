@@ -109,7 +109,7 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			
 		</xs:sequence>
 		
-		<xs:attribute name="entryDistributionId" use="required" type="xs:int">
+		<xs:attribute name="entryDistributionId" use="optional" type="xs:int">
 			<xs:annotation>
 				<xs:documentation>ID of entry distribution to apply update/delete action on</xs:documentation>
 			</xs:annotation>
