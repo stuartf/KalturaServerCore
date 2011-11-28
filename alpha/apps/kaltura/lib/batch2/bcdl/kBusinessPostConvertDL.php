@@ -115,7 +115,8 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::err($e->getMessage());
 		}
-				
+		KalturaLog::debug("profile [" . $profile->getId() . "]");
+								
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
 		
@@ -124,7 +125,14 @@ class kBusinessPostConvertDL
 			$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob)
 			KalturaLog::debug("root batch job id [" . $rootBatchJob->getId() . "] type [" . $rootBatchJob->getJobType() . "]");
-		
+		// update the root job end exit
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
+		{
+			KalturaLog::debug("finish remote convert root job");
+			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			return $dbBatchJob;
+		}
+				
 		// update the root job end exit
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
