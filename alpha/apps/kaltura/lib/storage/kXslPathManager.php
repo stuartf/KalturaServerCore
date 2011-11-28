@@ -1,9 +1,6 @@
 <?php
 class kXslPathManager extends kPathManager
 {
-    const PATH_CHARS_TO_REMOVE_REGEX = '/[^0-9^a-z^A-Z^_^.^\/]/';
-    
-    
 	/**
 	 * will return a pair of file_root and file_path
 	 * This is the only function that should be extended for building a different path
@@ -38,9 +35,16 @@ class kXslPathManager extends kPathManager
 		$xslVariables = $this->getXslVariables($storageProfile, $object, $subType, $version, $entry);
 		$xslStr = $this->getXsl($pathXsl, $xslVariables);
 		
-		$path = $this->getPathValue($entry, $xslStr);
+		try {
+		    $path = $this->getPathValue($entry, $xslStr);
+		}
+		catch (Exception $e) {
+		    KalturaLog::err('Error executing XSL - '.$e->getMessage());
+		    $path = null;
+		}
 		if (empty($path)) {
-		    throw new Exception('Cannot get path value by XSL');
+		    KalturaLog::log('Empty path recieved - using parent\'s path instead');
+		    return parent::generateFilePathArr($object, $subType, $version, $storageProfileId);
 		}
 		$path = trim($path);
 		
@@ -161,7 +165,7 @@ class kXslPathManager extends kPathManager
 		
 		if(!$xslObj->loadXML($xslStr))
 		{
-		    KalturaLog::err('Error loading distribution profile XSLT for profile ID ['.$this->getId().']');
+		    KalturaLog::err('Error loading XSL');
 			return null;
 		}
 		
@@ -171,7 +175,7 @@ class kXslPathManager extends kPathManager
 		
 		$resultXmlObj = $proc->transformToDoc($mrssObj);
 		if (!$resultXmlObj) {
-		    KalturaLog::err('Error transforming XML for distribution profile ['.$this->getId().'] and entry id ['.$entry->getId().']');
+		    KalturaLog::err('Error transforming XML for entry id ['.$entry->getId().']');
 		    return null;
 		}
 		
