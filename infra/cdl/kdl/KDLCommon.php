@@ -235,8 +235,10 @@
 		const MP3 = "mp3";
 		const AAC = "aac";
 		const WMA = "wma";
+		const WMAPRO = "wmapro";
 		const VORBIS = "vorbis";
 		const AMRNB = "amrnb";
+		const MPEG2= "mpeg2";
 		const COPY = "copy";
 	};
 	
