@@ -72,6 +72,27 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @var KalturaStringArray
 	 */
 	public $requiredPermissions;
+
+	/**
+	 * Id of remote storage profile that used to get the source, zero indicates Kaltura data center
+	 *  
+	 * @var int
+	 */
+	public $sourceRemoteStorageProfileId;
+
+	/**
+	 * Comma seperated ids of remote storage profiles that the flavor distributed to, the distribution done by the conversion engine
+	 *  
+	 * @var int
+	 */
+	public $remoteStorageProfileIds;
+
+	/**
+	 * Media parser type to be used for post-conversion validation
+	 *  
+	 * @var KalturaMediaParserType
+	 */
+	public $mediaParserType;
 	
 	private static $map_between_objects = array
 	(
@@ -83,6 +104,9 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"createdAt",
 		"isSystemDefault" => "isDefault",
 		"tags",
+		"sourceRemoteStorageProfileId",
+		"remoteStorageProfileIds",
+		"mediaParserType",
 	);
 	
 	/* (non-PHPdoc)
