@@ -32,6 +32,11 @@ class kConvartableJobData extends kJobData
 	private $flavorParamsOutputId;
 	
 	/**
+	 * @var string
+	 */
+	private $customData;
+	
+	/**
 	 * @var flavorParamsOutput
 	 */
 	private $flavorParamsOutput;
@@ -76,6 +81,23 @@ class kConvartableJobData extends kJobData
 	{
 		return $this->srcFileSyncRemoteUrl;
 	}
+
+	/**
+         * @param $customData the $customData to set
+         */
+        public function setCustomData($customData)
+        {
+                $this->customData = $customData;
+        }
+
+        /**
+         * @return the $customData
+         */
+        public function getCustomData()
+        {
+                return $this->customData;
+        }
+
 
 	/**
 	 * @param $flavorParamsOutput the $flavorParamsOutput to set
