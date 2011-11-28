@@ -226,11 +226,14 @@ class KAsyncConvert extends KBatchBase
 			}
 		}
 		
-		if(!file_exists($data->actualSrcFileSyncLocalPath))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath does not exist", KalturaBatchJobStatus::RETRY);
+		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
+		{
+			if(!file_exists($data->actualSrcFileSyncLocalPath))
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath does not exist", KalturaBatchJobStatus::RETRY);
 		
-		if(!is_file($data->actualSrcFileSyncLocalPath))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath is not a file", KalturaBatchJobStatus::FAILED);
+			if(!is_file($data->actualSrcFileSyncLocalPath))
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath is not a file", KalturaBatchJobStatus::FAILED);
+		}
 		
 		$data->logFileSyncLocalPath = "{$data->destFileSyncLocalPath}.log";
 		$monitorFiles = array(
@@ -282,36 +285,58 @@ class KAsyncConvert extends KBatchBase
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = "{$this->sharedTempPath}/$uniqid";
 		
-		clearstatcache();
-		$fileSize = filesize($data->destFileSyncLocalPath);
-		@rename($data->destFileSyncLocalPath . '.log', "$sharedFile.log");
-		kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
-		
-		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
+		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
-			KalturaLog::err("Error: moving file failed");
-			die();
-		}
+			clearstatcache();
+			$fileSize = filesize($data->destFileSyncLocalPath);
+			kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
 		
-		@chmod($sharedFile, 0777);
-		$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
+			if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
+			{
+				KalturaLog::err("Error: moving file failed");
+				die();
+			}
+		
+			@chmod($sharedFile, 0777);
+			$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 	
-		if($this->taskConfig->params->isRemote) // for remote conversion
-		{			
-			$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
-			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
-			$job->message = "File ready for download";
-		}
-		elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize))
-		{
-			$job->status = KalturaBatchJobStatus::FINISHED;
-			$job->message = "File moved to shared";
+			if($this->taskConfig->params->isRemote) // for remote conversion
+			{			
+				$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
+				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
+				$job->message = "File ready for download";
+			}
+			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize))
+			{
+				$job->status = KalturaBatchJobStatus::FINISHED;
+				$job->message = "File moved to shared";
+			}
+			else
+			{
+				$job->status = KalturaBatchJobStatus::RETRY;
+				$job->message = "File not moved correctly";
+			}
 		}
 		else
 		{
-			$job->status = KalturaBatchJobStatus::RETRY;
-			$job->message = "File not moved correctly";
+			$job->status = KalturaBatchJobStatus::FINISHED;
+			$job->message = "File is ready in the remote storage";
 		}
+		
+		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
+		{
+			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
+			@chmod("$sharedFile.log", 0777);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+		
+			if($this->taskConfig->params->isRemote) // for remote conversion
+				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
+		}
+		else 
+		{
+			$data->logFileSyncLocalPath = '';
+		}
+		
 		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
 	
