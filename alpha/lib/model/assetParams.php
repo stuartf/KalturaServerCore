@@ -148,6 +148,36 @@ class assetParams extends BaseassetParams
 	{
 		return $this->getFromCustomData('requiredPermissions');
 	}
+	
+	public function setSourceRemoteStorageProfileId($sourceRemoteStorageProfileId)
+	{
+		$this->putInCustomData('sourceRemoteStorageProfileId', $sourceRemoteStorageProfileId);
+	}
+	
+	public function getSourceRemoteStorageProfileId()
+	{
+		return $this->getFromCustomData('sourceRemoteStorageProfileId', null, StorageProfile::STORAGE_KALTURA_DC);
+	}
+	
+	public function setRemoteStorageProfileIds($remoteStorageProfileIds)
+	{
+		$this->putInCustomData('remoteStorageProfileIds', $remoteStorageProfileIds);
+	}
+	
+	public function getRemoteStorageProfileIds()
+	{
+		return $this->getFromCustomData('remoteStorageProfileIds');
+	}
+	
+	public function setMediaParserType($mediaParserType)
+	{
+		$this->putInCustomData('mediaParserType', $mediaParserType);
+	}
+	
+	public function getMediaParserType()
+	{
+		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
+	}
 	public function getCacheInvalidationKeys()
 	{
 		return array("flavorParams:id=".$this->getId());
