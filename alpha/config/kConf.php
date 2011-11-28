@@ -115,7 +115,7 @@ class kConf extends kConfLocal
 				"clipapp_version" => 'v1.0.1',
 				"kmc_secured_login" => false,
 				
-				"kmc_version" => 'v4.2.14.5',
+				"kmc_version" => 'v4.2.14.8',
 				"new_partner_kmc_version" => 4,
 				
 				"paypal_data" => array (),
