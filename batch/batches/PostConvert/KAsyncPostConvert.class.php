@@ -108,11 +108,14 @@ class KAsyncPostConvert extends KBatchBase
 		{
 			$mediaFile = trim($data->srcFileSyncLocalPath);
 			
+			if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
+			{
 			if(!file_exists($mediaFile))
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 			
 			if(!is_file($mediaFile))
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
+			}
 				
 			KalturaLog::debug("mediaFile [$mediaFile]");
 			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
@@ -126,8 +129,18 @@ class KAsyncPostConvert extends KBatchBase
 		
 		try
 		{
-//			if($this->taskConfig->params->useMediaInfo)
-				$mediaInfo = $this->extractMediaInfo(realpath($mediaFile));
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig, $job);
+			if($engine)
+			{
+				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
+				$mediaInfo = $engine->getMediaInfo();
+			}
+			else 
+			{
+				$err = "Media info engine not found for job subtype [".$job->jobSubType."]";
+				KalturaLog::info($err);
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
+			}
 		}
 		catch(Exception $ex)
 		{
@@ -135,17 +148,14 @@ class KAsyncPostConvert extends KBatchBase
 			$mediaInfo = null;
 		}
 		
+		if(is_null($mediaInfo))
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
+		}
+			
+		KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 		try
 		{
-//			if(is_null($mediaInfo) && $this->taskConfig->params->useFFMpeg)
-//				$mediaInfo = $this->extractFfmpegInfo(realpath($mediaFile));
-			
-			if(is_null($mediaInfo))
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
-			}
-			
-			KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
 			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 			
@@ -180,12 +190,8 @@ class KAsyncPostConvert extends KBatchBase
 			if($mediaInfo->videoBitRate)
 				$data->thumbBitrate = $mediaInfo->videoBitRate;
 					
-//			$width = $mediaInfo->videoWidth;
-//			$height = $mediaInfo->videoHeight;
-					
 			// generates the thumbnail
 			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
-//			$created = $thumbMaker->createThumnail($data->thumbOffset, $width, $height);
 			$created = $thumbMaker->createThumnail($data->thumbOffset);
 			
 			if(!$created || !file_exists($thumbPath))
