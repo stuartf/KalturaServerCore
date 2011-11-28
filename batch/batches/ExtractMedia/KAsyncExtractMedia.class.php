@@ -138,25 +138,36 @@ class KAsyncExtractMedia extends KBatchBase
 		
 		$mediaFile = trim($data->srcFileSyncLocalPath);
 		
-		if(!file_exists($mediaFile))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
+// 		if(!file_exists($mediaFile))
+// 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 		
-		if(!is_file($mediaFile))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
+// 		if(!is_file($mediaFile))
+// 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 			
 		KalturaLog::debug("mediaFile [$mediaFile]");
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
 			
 		$mediaInfo = null;
-		
-				// First mediaInfo attempt - 
 		try
 		{
-//			if($this->taskConfig->params->useMediaInfo)
-				$mediaInfo = $this->extractMediaInfo(realpath($mediaFile));
+			$mediaFile = realpath($mediaFile);
+			KalturaLog::debug("file path [$mediaFile]");
+			
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig, $job);
+			if($engine)
+			{
+				KalturaLog::debug("Found engine [" . get_class($engine) . "]");
+				$mediaInfo = $engine->getMediaInfo();
+			}
+			else
+			{
+				$err = "No media info parser engine found for job sub type [$job->jobSubType]";
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
+			}	
 		}
 		catch(Exception $ex)
 		{
+			KalturaLog::err($ex->getMessage());
 			$mediaInfo = null;
 		}
 
