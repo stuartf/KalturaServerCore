@@ -266,6 +266,15 @@ class kFlowHelper
 				
 			default:
 				// currently do nothing
+				if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+				{
+					kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+					
+					// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+					$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					if($currentFlavorAsset && $currentFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+						$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
+				}
 				break;
 		}
 		return $dbBatchJob;
@@ -355,27 +364,48 @@ class kFlowHelper
 		$flavorAsset->save();
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+
+		$flavorParamsOutput = $data->getFlavorParamsOutput();
+		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+		}
+		elseif($flavorParamsOutput->getRemoteStorageProfileIds())
+		{
+			$remoteStorageProfileIds = explode(',', $flavorParamsOutput->getRemoteStorageProfileIds());
+			foreach($remoteStorageProfileIds as $remoteStorageProfileId)
+			{
+				$storageProfile = StorageProfilePeer::retrieveByPK($remoteStorageProfileId);
+				kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $storageProfile);
+			}
+		}
 		
 		// creats the file sync
-		$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-		try{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath() . '.log', $logSyncKey);
-		}
-		catch(Exception $e){
-			$err = 'Saving conversion log: ' . $e->getMessage();
-			KalturaLog::err($err);
+		if(file_exists($data->getDestFileSyncLocalPath() . '.log'))
+		{
+			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			try{
+				kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath() . '.log', $logSyncKey);
+			}
+			catch(Exception $e){
+				$err = 'Saving conversion log: ' . $e->getMessage();
+				KalturaLog::err($err);
 			
-			$desc = $dbBatchJob->getDescription() . "\n" . $err;
-			$dbBatchJob->getDescription($desc);
+				$desc = $dbBatchJob->getDescription() . "\n" . $err;
+				$dbBatchJob->getDescription($desc);
+			}
 		}
 		
-		$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		KalturaLog::debug("Convert archived file to: " . $data->getDestFileSyncLocalPath());
+		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
+		{
+			$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+			KalturaLog::debug("Convert archived file to: " . $data->getDestFileSyncLocalPath());
 
-		// save the data changes to the db
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
+			// save the data changes to the db
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
+		}
 		
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
@@ -385,7 +415,6 @@ class kFlowHelper
 		$entry->save();
 		
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
-		$flavorParamsOutput = $data->getFlavorParamsOutput();
 		
 		$createThumb = $entry->getCreateThumb();
 		$extractMedia = true;
@@ -436,7 +465,7 @@ class kFlowHelper
 				if($flavorAsset->getIsOriginal())
 					$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE;
 					
-				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset, $data->getCustomData());
 			}
 			else // no need to run post convert
 			{
