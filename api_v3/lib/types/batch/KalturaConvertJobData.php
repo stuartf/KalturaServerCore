@@ -32,12 +32,18 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	 */
 	public $remoteMediaId;
     
+	/**
+	 * @var string
+	 */
+	public $customData;
+    
 	private static $map_between_objects = array
 	(
 		"destFileSyncLocalPath" ,
 		"destFileSyncRemoteUrl" ,
 		"flavorAssetId" ,
 		"remoteMediaId" ,
+		"customData" ,
 	);
 
 	public function getMapBetweenObjects ( )
