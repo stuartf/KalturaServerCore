@@ -67,7 +67,7 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 			exec ( $cmd, $output, $return_value );
 			if (! count ( $output ) || strpos ( $output [0], self::UNABLE_TO_SEND_DATA_TO_THE_SERVER ) === false)
 				break;
-			KalturaLog::debug ( "Retrying scan.attempt number:" . $tries + 1 );
+			KalturaLog::debug ( "Retrying scan.attempt number:" . ($tries + 1) );
 			sleep ( 10 );
 		}
 		
