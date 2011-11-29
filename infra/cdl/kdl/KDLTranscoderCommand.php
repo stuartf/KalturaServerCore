@@ -476,7 +476,8 @@ $format = "fl";
 					$cmdStr = $cmdStr.",flip";
 				else if($this->_vidRotation==90 || $this->_vidRotation==-90)
 					$cmdStr = $cmdStr.",rotate=1";
-				
+				else if($this->_vidRotation==270)
+					$cmdStr = $cmdStr.",rotate=3";
 			}
 		}
 		else {
