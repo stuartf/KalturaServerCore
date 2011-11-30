@@ -77,6 +77,17 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		}
 		
 		/*
+		 * Remove On2
+		 * for 270 rotated videos
+		 */
+		if($this->_id==KDLTranscoders::ON2
+		&& $target->_video && $target->_video->_rotation==270) {
+			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
+				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
+			return true;
+		}
+
+		/*
 		 * Non Mac transcoders should not mess up with QT/WMV/WMA
 		 * 
 		 */
