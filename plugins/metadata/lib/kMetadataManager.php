@@ -117,10 +117,11 @@ class kMetadataManager
 			{
 				$profileField->setType($xPathData['type']);
 				
-				if (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)){
-					$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $xPathData['type']);
+				if (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || 
+				    ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)){
+					$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $metadataProfile->getObjectType());
 					if (!isset($availableSearchIndex))
-						throw new Exception('could not find available search index for type: ' . $xPathData['type']);
+						throw new Exception('could not find available search index');
 										
 					$profileField->setSearchIndex($availableSearchIndex);
 				}
@@ -181,26 +182,23 @@ class kMetadataManager
 	 *
 	 * @return int
 	 */
-	public static function getAvailableSearchIndex($partnerId, $type)
+	public static function getAvailableSearchIndex($partnerId, $objectType)
 	{
 		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
 		
 		$occupiedIndexes = array();	
 		foreach($profileFields as $profileField)
-			$occupiedIndexes[$profileField->getType()][$profileField->getSearchIndex()] = true;
+			$occupiedIndexes[$profileField->getSearchIndex()] = true;
 			
-		$fieldsLimit =  MetadataPlugin::getSphinxLimitField($type);
+		$fieldsLimit =  MetadataPlugin::getAdditionalSearchableFieldsLimit($partnerId, $objectType);
 		
 		for ($i = 0; $i < $fieldsLimit; $i++)
 		{
-			if(!isset($occupiedIndexes[$type]))
-				return $i;
-			
-			if(!isset($occupiedIndexes[$type][$i]))
+			if(!isset($occupiedIndexes[$i]))
 				return $i;
 		}
 		
-		throw new Exception('could not find available search index for type: ' . $type);
+		throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT, $fieldsLimit);
 	}
 	
 	/**
@@ -270,16 +268,8 @@ class kMetadataManager
 			if(!$nodes->length)
 				continue;
 
-			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE){
-				foreach($nodes as $node){
-					if(!is_null($profileField->getSearchIndex()))
-						$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $profileField->getSearchIndex()] = $node->nodeValue;
-					break;
-				}
-				continue;
-			}
-
-			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || 
+			   $profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
 				foreach($nodes as $node){
 					if(!is_null($profileField->getSearchIndex()))
 						$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $profileField->getSearchIndex()] = $node->nodeValue;
@@ -544,38 +534,32 @@ class kMetadataManager
 	 * @param string $xsdData XSD metadata definition
 	 * @param boolean isPath - for xsdPath or actual content
 	 */
-	public static function validateMetadataProfileField( $partnerId, $xsdData, $isPath  = false){
-		$intFieldsCounter = 0;
-		$dateFieldsCounter = 0;
-		
-		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
+	public static function validateMetadataProfileField( $partnerId, $xsdData, $isPath, $obejctType, $metadataProfileId = null)
+	{
+		$additionalSearchableFieldsCounter = 0;
+			
 		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
-		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
 		
 		foreach($profileFields as $profileField)
 		{		
-			$type = $profileField->getType();
-			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
-				$dateFieldsCounter++;
+			if ($profileField->getMetadataProfileId() == $metadataProfileId)
+				continue;
 				
-			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
-				$intFieldsCounter++;
+			$type = $profileField->getType();
+			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || $type == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+				$additionalSearchableFieldsCounter++;
 		}
-
+		
 		$xPaths = kXsd::findXpathsByAppInfo($xsdData , kMetadataManager::APP_INFO_SEARCH, 'true', $isPath);
 		foreach($xPaths as $xPath => $xPathData)
 		{		
-			if(isset($xPathData['type']) && ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE))
-				$dateFieldsCounter++;
-				
-			if(isset($xPathData['type']) && ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT))
-				$intFieldsCounter++;
+			if(isset($xPathData['type']) && (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || 
+											 ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)))
+				$additionalSearchableFieldsCounter++;
 		}
-		
-		if ($dateFieldsCounter > MetadataPlugin::getSphinxLimitField(MetadataSearchFilter::KMC_FIELD_TYPE_DATE))
-			throw new APIException(MetadataErrors::EXCEEDED_LIMIT_SEARCHABLE_DATES);
-			
-		if ($intFieldsCounter > MetadataPlugin::getSphinxLimitField(MetadataSearchFilter::KMC_FIELD_TYPE_INT))
-			throw new APIException(MetadataErrors::EXCEEDED_LIMIT_SEARCHABLE_INTS);
+
+		$partnerLimit = MetadataPlugin::getAdditionalSearchableFieldsLimit($partnerId, $obejctType);
+		if ($additionalSearchableFieldsCounter > $partnerLimit)
+			throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT, $partnerLimit);
 	}
 }

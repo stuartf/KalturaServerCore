@@ -157,6 +157,10 @@ class kConf extends kConfLocal
 				"event_consumers_priorities" => array(
 					'kVirusScanFlowManager' => 7,
                 ),
+		"search_indexes" => array(
+			'entry' => 10,
+                ),
+		
                 
 				"cache_root_path" => dirname(__FILE__).'/../../cache/',
 				"general_cache_dir" => dirname(__FILE__).'/../../cache/general',

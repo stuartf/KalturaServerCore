@@ -12,8 +12,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const PLUGIN_NAME = 'metadata';
 	
 	const SPHINX_EXPANDER_FIELD_DATA = 'data';
-	const SPHINX_EXPENDER_FIELD_DATE = 'date_'; 
-	const SPHINX_EXPENDER_FIELD_INT = 'int_';
+	const SPHINX_EXPENDER_FIELD_INT = 'date_'; //for backward compatibility, all partners in production are using int field for date.
 	
 	const PLUGIN_VERSION_MAJOR = 2;
 	const PLUGIN_VERSION_MINOR = 1;
@@ -549,18 +548,16 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	public static function getSphinxSchema()
 	{
 		$kalturaEntryFields = Array ();
-
-		$numOfDateFields = MetadataPlugin::getSphinxLimitField(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE);
-		$numOfIntFields = MetadataPlugin::getSphinxLimitField(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT);
-			
-		for ($i=0; $i < $numOfDateFields; $i++)
-			$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $i] = SphinxFieldType::RT_ATTR_TIMESTAMP;
-			
-		for ($i=0; $i < $numOfIntFields; $i++)
-			$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_BIGINT;
+		$searchIndexes = kConf::get('search_indexes');
 		
-		//TODO - change to be taken using kSphinxManager::getSphinxIndexName('entry::table_name')
-		$sphinxSchema[kSphinxSearchManager::getSphinxIndexName('entry')]['fields'] = $kalturaEntryFields;
+		foreach ($searchIndexes as $indexName => $indexLimit)
+		{
+			for ($i=0; $i < $indexLimit; $i++)
+				$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_UINT;
+		
+			$sphinxSchema[kSphinxSearchManager::getSphinxIndexName($indexName)]['fields'] = $kalturaEntryFields;
+		}
+		
 		return $sphinxSchema;
 	}
 
@@ -568,18 +565,22 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * return number of fields in kaltura_entry index (in sphinx) for given type
 	 * @param int $type
 	 */
-	public static function getSphinxLimitField($type){
-		$numOfDateFields = kConf::hasParam('metadata_sphinx_num_of_date_fields') ? kConf::get('metadata_sphinx_num_of_date_fields') : self::SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS;
-		$numOfIntFields = kConf::hasParam('metadata_sphinx_num_of_int_fields') ? kConf::get('metadata_sphinx_num_of_int_fields') : self::SPHINX_DEFAULT_NUMBER_OF_INT_FIELDS;
+	public static function getAdditionalSearchableFieldsLimit($partnerId, $obejctType)
+	{
+		if ($obejctType != MetadataObjectType::ENTRY)
+			return 0;
 		
-		if ($type == self::SPHINX_EXPENDER_FIELD_DATE || MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
-			return $numOfDateFields;
-			
-		if ($type == self::SPHINX_EXPENDER_FIELD_INT || MetadataSearchFilter::KMC_FIELD_TYPE_INT)
-			return $numOfIntFields;
-			
-		return 0;
+		$partner = PartnerPeer::retrieveByPK ( $partnerId );
+		if (!$partner)
+			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
 		
+		$searchIndexes = kConf::get('search_indexes');
+		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
+		
+		if(!isset($searchIndexes[$partnerSearchIndex]))
+			throw new Exception('could not find partner\'s search index ' . $partnerSearchIndex);
+			
+		return $searchIndexes[$partnerSearchIndex];
 	}
 	/* (non-PHPdoc)
 	 * @see IKalturaMemoryCleaner::cleanMemory()
