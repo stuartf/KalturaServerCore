@@ -73,8 +73,9 @@ class thumbnailAction extends sfAction
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
 			if ($upload_token)
 			{
-				$partner = $upload_token->getPartnerId();
+				$partnerId = $upload_token->getPartnerId();
 				if($density == 0) {
+					$partner = PartnerPeer::retrieveByPK($partnerId);
 					$density = $partner->getDefThumbDensity();
 				}
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
