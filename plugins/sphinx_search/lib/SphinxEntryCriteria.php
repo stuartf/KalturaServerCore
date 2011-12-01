@@ -129,7 +129,18 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);;
+		if (!is_null(kCurrentContext::$partner_id) && kCurrentContext::$partner_id !== '') 
+			$partnerId = kCurrentContext::$partner_id;
+		else
+			$partnerId = kCurrentContext::$ks_partner_id;
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner)
+			return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);
+		
+		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
+		
+		return kSphinxSearchManager::getSphinxIndexName($partnerSearchIndex);
 	}
 	
 	/* (non-PHPdoc)
@@ -251,7 +262,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($freeTextsArr[$valIndex]);
 						else
 							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
@@ -267,7 +278,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($freeTextsArr[$valIndex]);
 						else
 							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
