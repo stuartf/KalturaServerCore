@@ -417,7 +417,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
@@ -438,7 +438,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
@@ -460,7 +460,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
@@ -479,7 +479,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 				
 				
 				case baseObjectFilter::EQ:
-					if(is_numeric($val) || strlen($val) > 1)
+					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val);
 						$this->matchClause[] = "@$sphinxField ^$val$";
@@ -493,7 +493,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					$vals = is_array($val) ? $val : explode(' ', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
