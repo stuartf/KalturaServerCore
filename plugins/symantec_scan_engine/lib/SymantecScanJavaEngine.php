@@ -56,14 +56,14 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 		$errorDescription = null;
 		$output = null;
 		
-		while (!$this->isEngineRunning())
-		{
-			KalturaLog::debug("Symantec engine not running, retrying in 10 seconds");
-			sleep(10);
-		}
 				
 		KalturaLog::debug("Executing - [$cmd]");
 		for($tries = 1; $tries <= self::NUM_OF_ATTEMPTS; $tries ++) {
+			while (!$this->isEngineRunning())
+			{
+				KalturaLog::debug("Symantec engine not running, retrying in 10 seconds");
+				sleep(10);
+			}
 			exec ( $cmd, $output, $return_value );
 			if (! count ( $output ) || strpos ( $output [0], self::UNABLE_TO_SEND_DATA_TO_THE_SERVER ) === false)
 				break;
