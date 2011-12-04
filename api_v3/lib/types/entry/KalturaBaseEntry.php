@@ -359,8 +359,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
 		}
-			
+			 
 		parent::toObject($dbObject, $skip);
+		
+	    if ($this->name && strrpos($this->name, "/") !== false)
+		{
+		    throw new KalturaAPIException( KalturaErrors::INVALID_PARAMETER_CHAR, "name");    
+		}
 		
 		if ($this->startDate === -1) // save -1 as null
 			$dbObject->setStartDate(null);
