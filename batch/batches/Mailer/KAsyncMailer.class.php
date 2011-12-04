@@ -244,10 +244,14 @@ class KAsyncMailer extends KBatchBase
 		KalturaLog::debug("footer [$footer]");
 		$body = vsprintf( $body, $bodyParamsArray );
 		if ($isHtml)
+		{
 			$body = str_replace( "<BR>", "<br />", $body );
+			$body = '<p align="left" dir="ltr">'.$body.'</p>';
+		}
 		else
+		{
 			$body = str_replace( "<BR>", chr(13).chr(10), $body );
-			
+		}	
 		$body = str_replace( "<EQ>", "=", $body );
 		$body = str_replace( "<EM>", "!", $body ); // exclamation mark
 		
