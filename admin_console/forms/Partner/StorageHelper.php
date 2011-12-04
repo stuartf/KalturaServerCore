@@ -30,6 +30,7 @@ class Form_Partner_StorageHelper
 			'kLimeLightUrlManager' => 'Lime Light CDN',
 			'kAkamaiUrlManager' => 'Akamai CDN',
 			'kLevel3UrlManager' => 'Level 3 CDN',
+			'AlldigitalUrlManager' => 'Alldigital CDN',
 		);
 		$form->getElement('urlManagerClass')->setMultiOptions($arr);
 	}
