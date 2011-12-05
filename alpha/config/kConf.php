@@ -129,7 +129,7 @@ class kConf extends kConfLocal
 				"marketo_access_key" => "", 
 				"marketo_secret_key" => "",
 							
-				'kdpwrapper_track_url' => "http://kalstats.kaltura.com/index.php/events/player_event",
+				'kdpwrapper_track_url' => "",
 				"kaltura_partner_id" => "",
 				
 				
