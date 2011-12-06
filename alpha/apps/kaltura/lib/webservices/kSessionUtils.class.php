@@ -78,7 +78,6 @@ class kSessionUtils
 			$ks->privileges = $privileges;
 			$ks->additional_data = $additional_data;
 			$ks_str = $ks->toSecureString();
-			$ks->setActionsLimit();
 			return 0;
 		}
 		else
@@ -267,6 +266,7 @@ class ks
 	public $additional_data = null;
 
 	private $original_str = "";
+	private $hash = null;
 
 	private $valid_string=false;
 
@@ -275,7 +275,7 @@ class ks
 		if ( self::$ERROR_MAP == null )
 		{
 			self::$ERROR_MAP  = array ( self::INVALID_STR => "INVALID_STR" , self::INVALID_PARTNER => "INVALID_PARTNER" , self::INVALID_USER => "INVALID_USER" ,
-				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT');
+				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT',self::EXCEEDED_RESTRICTED_IP=>'EXCEEDED_RESTRICTED_IP');
 		}
 		
 		$str =  @self::$ERROR_MAP[$code];
@@ -304,7 +304,7 @@ class ks
 		@list ( $hash , $real_str) = @explode ( "|" , $str , 2 );
 
 //		echo "[$str]<br>[$hash]<br>[$real_str]<br>[" . self::hash ( $real_str ) . "]<br>";
-
+		$ks->hash = $hash;
 		$ks->original_str = $encoded_str;
 
 		$parts = explode(self::SEPARATOR, $real_str);
@@ -352,28 +352,32 @@ class ks
 	{
 		return $this->partner_id . $this->rand;
 	}
-
-	public function toSecureString ()
+	
+	public function getHash()
+	{
+		if ($this->hash)
+			return $this->hash;
+		
+		$salt = $this->getSalt();
+		$this->hash = self::hash($salt, $this->getSecureFields());
+		
+		return $this->hash;
+	}
+	
+	private function getSecureFields()
 	{
 		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
 		$str = implode ( self::SEPARATOR , $fields );
+		
+		return $str;
+	}
 
-		$salt = $this->getSalt();
-		$hashed_str = self::hash ( $salt , $str ) . "|" . $str ;
+	public function toSecureString()
+	{
+		$hashed_str = $this->getHash() . "|" . $this->getSecureFields() ;
 		$decoded_str = base64_encode( $hashed_str );
 
 		return $decoded_str;
-	}
-
-	/**
-	 * 
-	 * @param string $ks_str
-	 */
-	public function setActionsLimit()
-	{
-		$limit = $this->isSetLimitAction();
-		if ($limit)
-			invalidSessionPeer::actionsLimitKs($this, $limit);		
 	}
 	
 	public function isWidgetSession()
@@ -395,17 +399,26 @@ class ks
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
 			!$this->isWidgetSession())								// Since anyone can create a widget session, no need to check for invalidation
 		{
-			if ($this->isSetLimitAction()){
-				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-				if (!$isValidCctionLimit){
-					KalturaLog::debug("actionLimits: EXCEEDED_ACTIONS_LIMIT");
+			$criteria = new Criteria();
+			$criteria->add(invalidSessionPeer::KS, $this->getHash());
+			$dbKs = invalidSessionPeer::doSelectOne($criteria);
+			if ($dbKs)
+			{
+				$currentActionLimit = $dbKs->getActionsLimit();
+				if(is_null($currentActionLimit))
+					return self::LOGOUT;
+				elseif($currentActionLimit <= 0)
 					return self::EXCEEDED_ACTIONS_LIMIT;
-				} 
+
+				$dbKs->setActionsLimit($currentActionLimit - 1);
+				$dbKs->save();
 			}
-			
-			$invalid = invalidSessionPeer::isInvalid($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-			if($invalid)
-				return self::LOGOUT;
+			else
+			{
+				$limit = $this->isSetLimitAction();
+				if ($limit)
+					invalidSessionPeer::actionsLimitKs($this, $limit - 1);
+			}
 		}
 		
 		return self::OK;
