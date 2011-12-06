@@ -42,7 +42,13 @@ class KAsyncVirusScan extends KBatchBase
 			return $this->init();
 		
 		if(is_null($jobs))
-			$jobs = $this->kClient->virusScanBatch->getExclusiveVirusScanJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		{
+			$maxJobsEachRun = $this->taskConfig->maxJobsEachRun;
+			if(!$maxJobsEachRun)
+				$maxJobsEachRun = 1;
+				
+			$jobs = $this->kClient->virusScanBatch->getExclusiveVirusScanJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $maxJobsEachRun, $this->getFilter());
+		}
 		
 		KalturaLog::info(count($jobs) . " virus scan jobs to perform");
 		
