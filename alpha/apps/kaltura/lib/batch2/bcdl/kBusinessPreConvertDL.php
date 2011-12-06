@@ -45,6 +45,7 @@ class kBusinessPreConvertDL
 	 */
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false)
 	{
+KalturaLog::info("entryId($entryId)");
 		$srcAsset = null;
 		if($sourceAssetId)
 		{
@@ -141,7 +142,7 @@ class kBusinessPreConvertDL
 		}
 
 		$errDescription = null;
-		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription);
+		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $mediaInfo->getVideoRotation(), $errDescription);
 		
 		// failed
 		if(!$capturedPath)
@@ -242,8 +243,9 @@ class kBusinessPreConvertDL
 		}
 	}
 	
-	public static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription)
+	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, $rotate, &$errDescription)
 	{
+KalturaLog::info("rotate($rotate)");
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
@@ -275,7 +277,7 @@ class kBusinessPreConvertDL
 			if($srcAsset->getType() == assetType::FLAVOR)
 			{
 				// generates the thumbnail
-				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
+				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'),false);
 				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset());
 				if(!$created || !file_exists($destPath))
 				{
@@ -828,7 +830,7 @@ class kBusinessPreConvertDL
 		$mediaInfo = null;
 		if($mediaInfoId)
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
-		
+	
 		if($profile->getCreationMode() == ConversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
 		{
 			KalturaLog::log("The profile created from old conversion profile with bypass flv");
@@ -981,10 +983,10 @@ class kBusinessPreConvertDL
 			
 			$entry->addFlavorParamsId($sourceFlavor->getId());
 			$entry->save();
-			
+
 			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
-		
+
 		if(!count($flavors))
 			$shouldConvert = false;
 	
