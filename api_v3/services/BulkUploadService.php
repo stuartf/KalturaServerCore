@@ -194,7 +194,7 @@ class BulkUploadService extends KalturaBaseService
 		if (!$batchJob)
 		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
 		    
-		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
+		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD);
 		
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJob);
