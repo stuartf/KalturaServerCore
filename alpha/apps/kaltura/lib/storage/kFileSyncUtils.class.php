@@ -207,11 +207,17 @@ class kFileSyncUtils
 		}
 	}
 	
-	public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key , $strict = true, $copyOnly = false)
+public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key , $strict = true, $copyOnly = false, $cacheOnly = false)
 	{
 		KalturaLog::log(__METHOD__." - move file: [$temp_file_path] to key [$target_key], ");
+		
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $target_key );
-		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
+		
+		if($cacheOnly)
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_CACHE);
+		else
+			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
+		
 		$existsFileSync = FileSyncPeer::doSelectOne( $c );
 		if($existsFileSync)
 		{
@@ -254,7 +260,7 @@ class kFileSyncUtils
 		if($success)
 		{
 			if(!$existsFileSync)
-				self::createSyncFileForKey($target_key, $strict);
+				self::createSyncFileForKey($target_key, $strict, false, $cacheOnly);
 		}
 		else
 		{
@@ -720,7 +726,7 @@ class kFileSyncUtils
 	 * @param $strict
 	 * @return SyncFile
 	 */
-	public static function createSyncFileForKey ( FileSyncKey $key , $strict = true , $already_exists = false )
+public static function createSyncFileForKey ( FileSyncKey $key , $strict = true , $already_exists = false, $cacheOnly = false)
 	{
 		KalturaLog::log(__METHOD__." - key [$key], strict[$strict], already_exists[$already_exists]");
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
@@ -731,7 +737,10 @@ class kFileSyncUtils
 		if ( $already_exists )
 		{
 			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-			$c->add ( FileSyncPeer::DC , $dc_id );
+			$c->add (FileSyncPeer::DC, $dc_id);
+			if($cacheOnly)
+				$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_CACHE);
+			
 			$current_dc_file_sync = FileSyncPeer::doSelectOne( $c );
 		}
 		else
@@ -762,10 +771,15 @@ class kFileSyncUtils
 			else
 				$current_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
 		}
-		$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+		if($cacheOnly)
+			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_CACHE );
+		else
+			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+			
 		$current_dc_file_sync->save();
 		
-		// TODO - create FileSyncs for other DCs if error ??
+		if($cacheOnly)
+			return $current_dc_file_sync;
 		
 		// create records for all other DCs with status PENDING
 		if ( $already_exists )
