@@ -20,6 +20,9 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	const CUSTOM_DATA_FIELD_CONFIG_VERSION = "configVersion";
 	const CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET = "sunriseDefaultOffset";
 	const CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET = "sunsetDefaultOffset";
+	const CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD	= "recommendedStorageProfileForDownload";
+	const CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD					= "recommendedDcForDownload";
+	
 	
 	/**
 	 * @return IDistributionProvider
