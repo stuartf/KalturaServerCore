@@ -36,6 +36,10 @@ class kConf extends kConfLocal
 				// production environment hit by unexpected random parameters
 				"v3cache_ignore_params" => array(),
 			
+				// list of partner ids for which we don't remove the contextDataParams:referrer parameter from
+				// the cache key. should be used for partners using access control with only site restriction.
+				"v3cache_include_referrer_in_key" => array(),
+
 		     	//xslt_enabled_php_functions.can be used in as a parameter in registerPHPFunctions
 			    "xslt_enabled_php_functions" =>array(
 			       	 'date'),

@@ -653,6 +653,15 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 				}
 			}
 			
+			// no need to disable caching if the access control has only site restriction and the referrer was 
+			// included the api cache key
+			if (count($accessControl->getRestrictions()) == 1 &&
+				$accessControl->hasSiteRestriction())
+			{
+				if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key'))) 
+					$disableCache = false;
+			}
+						
 			if ($disableCache)
 				KalturaResponseCacher::disableCache();
 			
