@@ -365,9 +365,14 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function getConfigVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}	
 	public function getSunriseDefaultOffset()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
 	public function getSunsetDefaultOffset()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}
-
+    public function getRecommendedStorageProfileForDownload()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD);}	
+	public function getRecommendedDcForDownload()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD);}
+	
+	
 	public function incrementConfigVersion()	{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}
 	public function setSunriseDefaultOffset($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET, $v);}
 	public function setSunsetDefaultOffset($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET, $v);}
+	public function setRecommendedStorageProfileForDownload($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD, $v);}
+	public function setRecommendedDcForDownload($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD, $v);}
 	
 } // DistributionProfile
