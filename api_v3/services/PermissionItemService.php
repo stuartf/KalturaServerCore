@@ -38,11 +38,9 @@ class PermissionItemService extends KalturaBaseService
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
 	 */
 	public function addAction(KalturaPermissionItem $permissionItem)
-	{
-		$permissionItem->validatePropertyNotNull('permissionId');
-		$permissionItem->validatePropertyNotNull('type');
-							
-		$dbPermissionItem = $permissionItem->toInsertableObject();
+	{							    
+	    $dbPermissionItem = $permissionItem->toInsertableObject();
+	    $dbPermissionItem->setPartnerId($this->getPartnerId());
 		$dbPermissionItem->save();
 		
 		$permissionItem = new KalturaPermissionItem();
@@ -156,8 +154,10 @@ class PermissionItemService extends KalturaBaseService
 		$permissionItemFilter->attachToCriteria($c);
 		$count = PermissionItemPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		
+		$pager->attachToCriteria ( $c );
 		$list = PermissionItemPeer::doSelect($c);
 		
 		$response = new KalturaPermissionItemListResponse();
