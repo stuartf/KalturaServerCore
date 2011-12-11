@@ -145,7 +145,7 @@ class kFlowHelper
 			$flavorAsset->setFileExt($ext);
 			$flavorAsset->save();
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey);
+			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
 		}
 		
 		// set the path in the job data
