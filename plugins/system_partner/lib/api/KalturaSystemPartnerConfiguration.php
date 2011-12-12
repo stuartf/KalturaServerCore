@@ -235,6 +235,25 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $internalUse;
 	
+
+	/**
+	 * @var KalturaSourceType
+	 */
+	public $defaultLiveStreamEntrySourceType;
+
+	
+	/**
+	 * @var string
+	 */
+	public $liveStreamProvisionParams;
+	
+
+	/**
+	 * 
+	 * @var KalturaBaseEntryFilter
+	 */
+	public $autoModerateEntryFilter;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -282,7 +301,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"enableBulkUploadNotificationsEmails",
 		"deliveryRestrictions",
 		"bulkUploadNotificationsEmail",
-		"internalUse"
+		"internalUse",
+		"defaultLiveStreamEntrySourceType",
+		"liveStreamProvisionParams",
 	);
 
 	public function getMapBetweenObjects()
@@ -297,6 +318,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
 		$this->permissions = KalturaPermissionArray::fromDbArray($permissions);
 		$this->limits = KalturaSystemPartnerLimitArray::fromPartner($source_object);
+		
+		$dbAutoModerationEntryFilter = $source_object->getAutoModerateEntryFilter();
+		if ($dbAutoModerationEntryFilter)
+		{
+			$this->autoModerateEntryFilter = new KalturaBaseEntryFilter();
+			$this->autoModerateEntryFilter->fromObject($dbAutoModerationEntryFilter);
+		}		
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -342,6 +370,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			{
 				$limit->apply($object_to_fill);
 			}
+		}
+		
+		if (!is_null($this->autoModerateEntryFilter))
+		{
+			$dbAutoModerationEntryFilter = new entryFilter();
+			$this->autoModerateEntryFilter->toObject($dbAutoModerationEntryFilter);
+			$object_to_fill->setAutoModerateEntryFilter($dbAutoModerationEntryFilter);
 		}
 		
 		return $object_to_fill;

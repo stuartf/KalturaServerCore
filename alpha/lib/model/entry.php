@@ -360,7 +360,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		}
 		else
 		{
-			$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId() );
+			$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId(), $this);
 		}
 
 		if( $should_moderate )

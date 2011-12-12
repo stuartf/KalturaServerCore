@@ -441,5 +441,20 @@ class entryFilter extends baseObjectFilter
 		$this->set('_matchor_flavor_params_ids', $v);
 	}
 	
+	public function typeMatches(entry $entry)
+	{		
+		if ($this->get('_eq_type') && $entry->getType() != $this->get('_eq_type'))
+		{
+			return false;
+		}
+		
+		if ($this->get('_in_type') && !in_array($entry->getType(), explode(',', $this->get('_in_type'))))
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
 }
 

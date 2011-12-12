@@ -713,6 +713,7 @@ class Partner extends BasePartner
 	public function setLoginUsersOverageUnit($v)          {$this->putInCustomData('login_users_overage_unit', $v);}
     public function setMaxLoginAttemptsOverageUnit($v)    {$this->putInCustomData('login_attempts_overage_unit', $v);}
     public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
+    public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -749,6 +750,7 @@ class Partner extends BasePartner
 	public function getLoginUsersOverageUnit()          {$this->getFromCustomData('login_users_overage_unit');}
     public function getMaxLoginAttemptsOverageUnit()    {$this->getFromCustomData('login_attempts_overage_unit');}
     public function getMaxBulkSizeOverageUnit()         {$this->getFromCustomData('bulk_size_overage_unit');}
+	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
 	
 	
 	/**
@@ -768,7 +770,42 @@ class Partner extends BasePartner
 		$content = serialize($akamaiLiveParams);
 		$this->putInCustomData('akamai_live_params', $content);
 	}
-		
+	
+	
+	const CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE = 'default_live_stream_entry_source_type';
+	
+	public function setDefaultLiveStreamEntrySourceType($v)	
+		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE, $v);}
+    
+	public function getDefaultLiveStreamEntrySourceType()
+    {
+        $defaultSourceType = $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE, null, null);
+        if (is_null($defaultSourceType)) {
+            $kc = kConf::get('default_live_stream_entry_source_type');
+            $evalResult= eval("\$defaultSourceType = $kc;");
+            if ($evalResult === false){
+            	$defaultSourceType = EntrySourceType::AKAMAI_LIVE;
+            } 
+        }
+        return $defaultSourceType;
+    }
+    
+
+    const CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS = 'live_stream_provision_params';
+    
+	public function setLiveStreamProvisionParams($v)
+		{$this->putInCustomData(self::CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS, $v);}
+    
+	public function getLiveStreamProvisionParams()
+    {
+        $provisionParams = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS, null, null);
+        if (is_null($provisionParams)) {
+            $provisionParams = "";
+        }
+        return $provisionParams;
+    }
+	
+    
 	public function getAdminLoginUsersNumber()
 	{
 		$c = new Criteria();

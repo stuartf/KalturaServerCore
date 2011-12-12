@@ -143,6 +143,8 @@ class kConf extends kConfLocal
                                 
 		
 				"kaltura_email_hash" => "admin",
+				
+				"default_live_stream_entry_source_type" => "EntrySourceType::AKAMAI_LIVE",
                                 
 				"default_plugins" => array(
 					"MetadataPlugin" => "MetadataPlugin", // Should always be enabled
