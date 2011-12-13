@@ -143,8 +143,7 @@ class kBusinessPreConvertDL
 		$errDescription = null;
 		
 		// Since this method is called when trying to crop an existing thumbnail, need to add this check - thumbAssets have no mediaInfo.
-		if ($mediaInfo)
-		    $capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $mediaInfo->getVideoRotation(), $errDescription);
+		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription, $mediaInfo? $mediaInfo->getVideoRotation() : null);
 		
 		// failed
 		if(!$capturedPath)
@@ -245,9 +244,8 @@ class kBusinessPreConvertDL
 		}
 	}
 	
-	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, $rotate, &$errDescription)
+	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null)
 	{
-KalturaLog::info("rotate($rotate)");
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
