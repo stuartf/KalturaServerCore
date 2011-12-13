@@ -45,7 +45,6 @@ class kBusinessPreConvertDL
 	 */
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false)
 	{
-KalturaLog::info("entryId($entryId)");
 		$srcAsset = null;
 		if($sourceAssetId)
 		{
