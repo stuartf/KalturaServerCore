@@ -142,7 +142,10 @@ KalturaLog::info("entryId($entryId)");
 		}
 
 		$errDescription = null;
-		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $mediaInfo->getVideoRotation(), $errDescription);
+		
+		// Since this method is called when trying to crop an existing thumbnail, need to add this check - thumbAssets have no mediaInfo.
+		if ($mediaInfo)
+		    $capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $mediaInfo->getVideoRotation(), $errDescription);
 		
 		// failed
 		if(!$capturedPath)
