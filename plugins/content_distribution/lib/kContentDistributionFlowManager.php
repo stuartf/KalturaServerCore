@@ -140,10 +140,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			return true;
-			
-		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
-		    return true;
-	
 		
 		return false;
 	}
@@ -170,9 +166,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-			
-	    if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
-			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return true;
 	}
@@ -421,26 +414,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
 				return self::onDistributionEnableJobFailed($dbBatchJob, $data, $twinJob);
-			default:
-				return $dbBatchJob;
-		}
-	}
-	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function onImportJobUpdated(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
-	{
-		switch($dbBatchJob->getStatus())
-		{
-			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onImportJobFinished($dbBatchJob, $data, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_FAILED:
-			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onImportJobFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
@@ -864,69 +837,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->save();
 		
 		return $dbBatchJob;
-	}
-	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
-	{
-		$statuses = array(
-			EntryDistributionStatus::IMPORT_SUBMITTING,
-			EntryDistributionStatus::IMPORT_UPDATING,
-		);
-		
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryAndStatuses($dbBatchJob->getEntryId(), $statuses);
-		foreach($entryDistributions as $entryDistribution)
-		{
-			/* @var $entryDistribution EntryDistribution */
-			
-			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
-			
-			if($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING)
-			{
-				kContentDistributionManager::submitAddEntryDistribution($entryDistribution, $distributionProfile, true);
-			}
-			elseif($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING)
-			{
-				kContentDistributionManager::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);	
-			}
-		}
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function onImportJobFailed(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
-	{
-		$statuses = array(
-			EntryDistributionStatus::IMPORT_SUBMITTING,
-			EntryDistributionStatus::IMPORT_UPDATING,
-		);
-		
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryAndStatuses($dbBatchJob->getEntryId(), $statuses);
-		foreach($entryDistributions as $entryDistribution)
-		{
-			/* @var $entryDistribution EntryDistribution */
-			
-			if($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING)
-				$entryDistribution->setStatus(EntryDistributionStatus::ERROR_SUBMITTING);
-			elseif($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING)
-				$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
-				
-			$entryDistribution->setErrorType($dbBatchJob->getErrType());
-			$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
-			$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
-			
-			$entryDistribution->setDirtyStatus(null);
-			$entryDistribution->save();
-		}
 	}
 
 	/**
