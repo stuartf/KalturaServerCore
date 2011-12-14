@@ -524,8 +524,9 @@ class kFile
 	
 	public static function dumpApiRequest($host)
 	{
-		if (kCurrentContext::$multiRequest_index > 1)
-            KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
+		 if (kCurrentContext::$multiRequest_index > 1)
+                        KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
+		
 		self::closeDbConnections();
 		
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
@@ -591,7 +592,10 @@ class kFile
 	public static function cacheRedirect($url)
 	{
 		if (function_exists('apc_store'))
-       		 	apc_store("redirect-".$_SERVER["REQUEST_URI"], $url, 60);	
+		{
+			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
+		}
 	}
 	
 	
@@ -627,10 +631,10 @@ class kFile
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
 
 		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
-		// we need to ensure the original HOST is sent in order to allow restirctions checks		
+		// we need to ensure the original HOST is sent in order to allow restirctions checks
 		
 		$host = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : $_SERVER["HTTP_HOST"];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("HOST:$host"));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("HOST:$host"));		
 		
 		if($_SERVER['REQUEST_METHOD'] == 'HEAD')
 		{
