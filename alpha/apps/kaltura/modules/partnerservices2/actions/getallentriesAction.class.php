@@ -133,6 +133,7 @@ $this->benchmarkStart( "list_type_kuser" );
 						$kuserIds[] = $apiv3Kuser->getId();
 					}
 				}
+/*
 				if(count($kuserIds) > 1)
 				{
 					$c->addAnd ( entryPeer::KUSER_ID , $kuserIds, Criteria::IN );
@@ -151,6 +152,28 @@ $this->benchmarkStart( "list_type_kuser" );
 					$kuser_entry_list = entryPeer::doSelect( $c );
 				else
 					$kuser_entry_list = entryPeer::doSelectJoinkuser( $c );
+*/
+				$this->addOffsetAndLimit ( $c ); // limit the number of the user's clips
+				if ( $merge_entry_lists )
+				{
+					// if will join lists - no need to fetch entries twice
+					$this->addIgnoreIdList ($c , $aggrigate_id_list);
+				}
+				
+				$kuser_entry_list = array(); 
+				$kuserIds = array_unique($kuserIds);
+				foreach($kuserIds as $kuserId)
+				{
+					$newC = clone $c;
+					$newC->addAnd ( entryPeer::KUSER_ID , $kuserId );
+
+					if ( $disable_user_data )
+						$one_kuser_list = entryPeer::doSelect( $newC );
+					else
+						$one_kuser_list = entryPeer::doSelectJoinkuser( $newC );
+					
+					$kuser_entry_list = array_merge($kuser_entry_list, $one_kuser_list);
+				}
 					
 				// Since we are using 2 potential kusers, we might not have the obvious kuser from $puser_kuser
 				$strEntries = "";
