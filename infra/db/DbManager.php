@@ -19,6 +19,20 @@ class DbManager
 	
 	public static function setConfig(array $config)
 	{
+		foreach ($config['datasources'] as $connectionName => $connectionConfig) 
+		{
+			if(!is_array($connectionConfig) || !isset($connectionConfig['connection']))
+				continue;
+			
+			$conn = &$config['datasources'][$connectionName]['connection'];
+			if(!isset($conn['options']))
+				$conn['options'] = array();
+
+			$hostSpec = isset($conn['hostspec']) ? $conn['hostspec'] : "unknown";
+				
+			$conn['options']['KalturaPDO::KALTURA_ATTR_NAME'] = array('value' => $connectionName.":".$hostSpec);
+		}
+		
 		self::$config = $config;
 	}
 	
@@ -45,7 +59,16 @@ class DbManager
 		
 		Propel::setConfiguration(self::$config);
 		Propel::setLogger(KalturaLog::getInstance());
-		Propel::initialize();
+		
+		try
+		{
+			Propel::initialize();
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 	
 	public static function shutdown()
@@ -59,7 +82,18 @@ class DbManager
 	public static function createSphinxConnection($sphinxServer, $port = 9312)
 	{
 		$dsn = "mysql:host=$sphinxServer;port=$port;";
-		return new KalturaPDO($dsn);
+		
+		try
+		{
+			$con = new KalturaPDO($dsn);
+			$con->setCommentsEnabled(false);
+			return $con;
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 
 	/**
@@ -72,8 +106,8 @@ class DbManager
 
 		$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 		$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
-		$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 3;
-
+		$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
+		
 		// loop twice, on first iteration try only connections not marked as failed
 		// in case all connections failed, try all connections on second iteration
 
@@ -104,6 +138,8 @@ class DbManager
 
 					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
 					self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
+					
+					self::$sphinxConnection->setCommentsEnabled(false);
 
 					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
