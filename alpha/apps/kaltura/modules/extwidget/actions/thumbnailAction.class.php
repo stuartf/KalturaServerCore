@@ -73,7 +73,7 @@ class thumbnailAction extends sfAction
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
 			if ($upload_token)
 			{
-				$partnerId = $upload_token->getPartnerId();
+			    $partnerId = $upload_token->getPartnerId();
 				if($density == 0) {
 					$partner = PartnerPeer::retrieveByPK($partnerId);
 					$density = $partner->getDefThumbDensity();
@@ -108,7 +108,6 @@ class thumbnailAction extends sfAction
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
-                    KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 					kFile::dumpUrl($remoteUrl);
 				}
 			}			
