@@ -405,7 +405,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			if(filesize($destFile) != $fileSize)
 			{
 				// destination file size is wrong
-				KalturaLog::err("Error: file [$destFile] has a wrong size");
+				KalturaLog::err("Error: file [$destFile] has a wrong size.  file size: [".filesize($destFile)."] should be [$fileSize]");
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
 				return false;
 			}
