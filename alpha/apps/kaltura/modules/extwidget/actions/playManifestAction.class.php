@@ -289,7 +289,7 @@ class playManifestAction extends kalturaAction
 	{
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 	
-		$iisHost = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		$iisHost = parse_url(myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol), PHP_URL_HOST);;
 		$kalturaUrlManager = kUrlManager::getUrlManagerByCdn($iisHost);
 		$kalturaUrlManager->setClipTo($this->clipTo);
 		$kalturaUrlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
