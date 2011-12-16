@@ -123,9 +123,7 @@ abstract class DropFolderFileHandler
 		
 		$this->impersonate($this->dropFolderFile->partnerId);
 		$updatedFile = $dropFolderFilePlugin->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
-		if ($updateStatus) {
-		    $updatedFile = $dropFolderFilePlugin->dropFolderFile->updateStatus($this->dropFolderFile->id, $this->dropFolderFile->status);
-		}
+		$updatedFile = $dropFolderFilePlugin->dropFolderFile->updateStatus($this->dropFolderFile->id, $this->dropFolderFile->status);
 		$this->unimpersonate();
 		
 		return $updatedFile;
