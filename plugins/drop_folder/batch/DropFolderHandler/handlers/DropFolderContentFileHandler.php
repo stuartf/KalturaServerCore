@@ -80,21 +80,22 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			
 		}
 		
+		$updatedStatus = false;
 		// handle file according to the defined policy
 		switch ($this->config->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				$this->addAsNewContent();
+				$updatedStatus = $this->addAsNewContent();
 				break;
 			
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER:
-				$this->addAsExistingContent();
+				$updatedStatus = $this->addAsExistingContent();
 				break;
 				
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW:
-				$this->addAsExistingContent();
+				$updatedStatus = $this->addAsExistingContent();
 				if ($this->dropFolderFile->status === KalturaDropFolderFileStatus::NO_MATCH) {
-					$this->addAsNewContent();
+					$updatedStatus = $this->addAsNewContent();
 				}
 				break;
 				
@@ -105,7 +106,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 
 		// update file with all changes that were done during the handling process except for the status which will is already updated by the addContent/updateContent API call
 		try {
-			$this->updateDropFolderFile(false);
+			$this->updateDropFolderFile($updatedStatus);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update file - '.$e->getMessage());
@@ -139,30 +140,11 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		KalturaLog::debug('Parsed slug ['.$this->dropFolderFile->parsedSlug.'], Parsed flavor ['.$this->dropFolderFile->parsedFlavor.']');
 		return true; // file name matches the defined regex
 	}
-
-	/**
-	 * Update the status of all drop folder files with the given ids to be KalturaDropFolderFileStatus::HANDLED
-	 * @param array $idsArray array of drop folder file ids
-	 */
-	private function setAsHandled($idsArray)
-	{
-		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
-		
-		$this->impersonate($this->dropFolderFile->partnerId);
-		$this->kClient->startMultiRequest();
-		foreach ($idsArray as $id)
-		{
-			KalturaLog::debug('Updating additional drop folder file ['.$id.'] with status HANDLED');
-			$dropFolderFilePlugin->dropFolderFile->updateStatus($id, KalturaDropFolderFileStatus::HANDLED);
-		}
-		$this->kClient->doMultiRequest();		
-		$this->unimpersonate();
-	}
 	
 	/**
 	 * Add the new file to a new entry, together with all other relevant drop folder files, according to the ingestion profile
 	 * 
-	 * @return bool true if file was handled or false otherwise
+	 * @return bool true if drop folder file status should be updated or false otherwise
 	 */
 	private function addAsNewContent()
 	{ 
@@ -214,17 +196,17 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_ADD_ENTRY;
 			$this->dropFolderFile->errorDescription = 'Internal error adding new entry';	
-			return false;
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 
 	/**
 	 * Match the current file to an existing entry and flavor according to the slug regex.
 	 * Update the matched entry with the new file and all other relevant files from the drop folder, according to the ingestion profile.
 	 *
-	 * @return bool true if file was handled or false otherwise
+	 * @return bool true if drop folder file status should be updated or false otherwise
 	 */
 	private function addAsExistingContent()
 	{	    
@@ -237,7 +219,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::NO_MATCH;
 			$this->dropFolderFile->errorDescription = 'No matching entry found';
 			KalturaLog::debug($this->dropFolderFile->errorDescription);
-			return true; // file handled even though no match was found
+			return true;
 		}
 		
 		// if configuration does not include a flavor system name reference -> just update content with the file
@@ -253,7 +235,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_NOT_FOUND;
 			$this->dropFolderFile->errorDescription = 'Parsed flavor system name ['.$this->dropFolderFile->parsedFlavor.'] could not be found';
 			KalturaLog::err($this->dropFolderFile->errorDescription);
-			return false; // file not handled
+			return true;
 		}
 		
 
@@ -266,7 +248,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
         }
 		if (!$resource) {
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
-			return false;
+			return true;
 		}
 		
 		try 
@@ -283,10 +265,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_UPDATE_ENTRY;
 			$this->dropFolderFile->errorDescription = 'Internal error updating entry';	
-			return false;
+			return true;
 		}
 		
-		return true;		
+		return false;		
 	}
 	
 	/**
