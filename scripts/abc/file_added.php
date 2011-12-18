@@ -50,29 +50,35 @@ $existingEntry = null;
 if ($listResult->totalCount != 0)
 {
     echo "Entry already exists. Replacing ". $listResult[0]->id;
-	$existingEntry = $listResult[0];
+	$existingEntry = $listResult->objects[0]->id;
 }
 
-// Get the conversion profile that should be used
-if ($conversionProfileName == null) {
-	$conversionProfileName = $path_parts['basename'];
-}
-echo "cp sysname: $conversionProfileName\r\n";
-$filter = new KalturaConversionProfileFilter;
-$filter->systemNameEqual = $conversionProfileName;
-$cps = $client->conversionProfile->listAction($filter);
-if ($cps->totalCount == 1)
-	$cpid = $cps->objects[0]->id;
-else {
-	throw new Exception("cannot find cpid sysname=$conversionProfileName");
+// Get the conversion profile that should be used, on the condition that the action being done is not
+//and entry update
+if (!$existingEntry)
+{
+    if ($conversionProfileName == null) {
+    	$conversionProfileName = $path_parts['basename'];
+    }
+    echo "cp sysname: $conversionProfileName\r\n";
+    $filter = new KalturaConversionProfileFilter;
+    $filter->systemNameEqual = $conversionProfileName;
+    $cps = $client->conversionProfile->listAction($filter);
+    if ($cps->totalCount == 1)
+    	$cpid = $cps->objects[0]->id;
+    else {
+    	throw new Exception("cannot find cpid sysname=$conversionProfileName");
+    }
 }
 
 // Create a no-content entry
-$entry = new KalturaMediaEntry;
+$entry = new KalturaMediaEntry();
 $entry->name = $entry->referenceId = $path_parts['basename'];
 
 $entry->mediaType = KalturaMediaType::VIDEO;
-if ($cpid)
+
+//If the action being performed is an update to an existing entry, no need to change the conversionProfileId
+if ($cpid && !$existingEntry)
 	$entry->conversionProfileId = $cpid;
 	
 // Create custom metadata for the entry
@@ -88,5 +94,3 @@ else
 {
     $adEntry =  $client->media->update($existingEntry->id, $entry);
 }
-
-
