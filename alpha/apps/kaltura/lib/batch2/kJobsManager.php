@@ -1072,11 +1072,10 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}
 	
-    public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSyncKey $syncKey)
+    public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
-		
+	    $srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync));
+	    
 		$netStorageDeleteData = new kStorageDeleteJobData();
 	    $netStorageDeleteData->setServerUrl($storage->getStorageUrl()); 
 	    $netStorageDeleteData->setServerUsername($storage->getStorageUsername()); 
