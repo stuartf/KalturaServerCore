@@ -49,8 +49,8 @@ $listResult = $client->media->listAction($filter);
 $existingEntry = null;
 if ($listResult->totalCount != 0)
 {
-    echo "Entry already exists. Replacing ". $listResult[0]->id;
-	$existingEntry = $listResult->objects[0]->id;
+    echo "Entry already exists. Replacing ". $listResult->objects[0]->id;
+	$existingEntry = $listResult->objects[0];
 }
 
 // Get the conversion profile that should be used, on the condition that the action being done is not
