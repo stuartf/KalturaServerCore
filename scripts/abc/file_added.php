@@ -55,6 +55,7 @@ if ($listResult->totalCount != 0)
 
 // Get the conversion profile that should be used, on the condition that the action being done is not
 //and entry update
+$cpid = null;
 if (!$existingEntry)
 {
     if ($conversionProfileName == null) {
