@@ -220,10 +220,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		}
 
 		foreach ($sphinxPluginsData as $key => $value){
-			$search=array("\\","\0","\n","\r","\x1a","'",'"');
-			$replace=array("\\\\","\\0","\\n","\\r","\\Z","\\'",'\"');
-			
 			if (!is_numeric($value)){
+				$value = SphinxUtils::escapeString($value, 1);
+				$search = array("\0", 	"\n",	"\r",	"\x1a");
+				$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 				$value = str_replace($search, $replace, $value);
 				$data[$key] = "'$value'";
 			}else{
@@ -234,8 +234,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataStrings as $key => $value)
 		{
-			$search=array("\\","\0","\n","\r","\x1a","'",'"');
-			$replace=array("\\\\","\\0","\\n","\\r","\\Z","\\'",'\"');
+			$value = SphinxUtils::escapeString($value, 1);
+			$search = array("\0", 	"\n",	"\r",	"\x1a");
+			$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 			$value = str_replace($search, $replace, $value);
 			$data[$key] = "'$value'";
 		}
