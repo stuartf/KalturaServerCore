@@ -531,7 +531,7 @@ class requestUtils
     		$params[$key['value']] = $value['value'];
     	}
     		
-		return array_merge($params, $_GET, $_POST);
+		return array_merge($params, $_GET, $_POST, $_FILES);
     }
 	
 }
