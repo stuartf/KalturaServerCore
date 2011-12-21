@@ -115,7 +115,7 @@ class kConf extends kConfLocal
 				"editors_flex_wrapper_version" => 'v1.01',
 				"kdp_wrapper_version" => 'v11.0',
 				"kdp3_wrapper_version" => 'v34.0',
-				"html5_version" => 'v1.6.1',
+				"html5_version" => 'v1.5.9',
 				"clipapp_version" => 'v1.0.4',
 				"kmc_secured_login" => false,
 				
