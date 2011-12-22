@@ -1,17 +1,17 @@
- <?php
+<?php
 
 ini_set("memory_limit","256M");
 
 require_once 'bootstrap.php';
 
-if (!$argc)
+if ($argc < 2)
 {
 	die('pleas provide partner id as input' . PHP_EOL . 
 		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
 		'whereas X is partner id' . PHP_EOL);
 }
 
-$partnerId = $argv[0];
+$partnerId = $argv[1];
 
 $dbConf = kConf::getDB();
 DbManager::setConfig ( $dbConf );
