@@ -310,7 +310,7 @@ class KAutoloader
 			{
 				$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
 				error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
-				die('PHP Class map could be loaded');
+				die('PHP Class map could not be loaded');
 			}
 		}
 	}
