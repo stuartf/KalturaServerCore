@@ -39,7 +39,7 @@ class thumbAsset extends asset
 		$finalPath .= '/ks/' . $ksStr;
 			
 		if($useCdn)
-			$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+			$downloadUrl = myPartnerUtils::getThumbnailHost($partnerId) . $finalPath;
 		else
 			$downloadUrl = requestUtils::getRequestHost() . $finalPath;
 		
