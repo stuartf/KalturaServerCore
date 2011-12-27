@@ -121,7 +121,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
-	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 			return true;
@@ -140,6 +140,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			return true;
+		
+		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return false;
 	}
@@ -839,6 +842,63 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return $dbBatchJob;
 	}
 
+public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	{
+		$statuses = array(
+			EntryDistributionStatus::IMPORT_SUBMITTING,
+			EntryDistributionStatus::IMPORT_UPDATING,
+		);
+		
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryAndStatuses($dbBatchJob->getEntryId(), $statuses);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			/* @var $entryDistribution EntryDistribution */
+			
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+			
+			if($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING)
+			{
+				kContentDistributionManager::submitAddEntryDistribution($entryDistribution, $distributionProfile, true);
+			}
+			elseif($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING)
+			{
+				kContentDistributionManager::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);	
+			}
+		}
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onImportJobFailed(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	{
+		$statuses = array(
+			EntryDistributionStatus::IMPORT_SUBMITTING,
+			EntryDistributionStatus::IMPORT_UPDATING,
+		);
+		
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryAndStatuses($dbBatchJob->getEntryId(), $statuses);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			/* @var $entryDistribution EntryDistribution */
+			
+			if($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING)
+				$entryDistribution->setStatus(EntryDistributionStatus::ERROR_SUBMITTING);
+			elseif($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING)
+				$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+				
+			$entryDistribution->setErrorType($dbBatchJob->getErrType());
+			$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+			$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+			
+			$entryDistribution->setDirtyStatus(null);
+			$entryDistribution->save();
+		}
+	}
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
