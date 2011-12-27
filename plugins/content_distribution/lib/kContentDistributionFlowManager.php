@@ -142,7 +142,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 		
 		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
-			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			return true;
 		
 		return false;
 	}
@@ -170,6 +170,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
+		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		
+			
 		return true;
 	}
 	
@@ -417,6 +421,26 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
 				return self::onDistributionEnableJobFailed($dbBatchJob, $data, $twinJob);
+			default:
+				return $dbBatchJob;
+		}
+	}
+	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onImportJobUpdated(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return self::onImportJobFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return self::onImportJobFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
@@ -842,7 +866,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return $dbBatchJob;
 	}
 
-public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+    public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
 	{
 		$statuses = array(
 			EntryDistributionStatus::IMPORT_SUBMITTING,
