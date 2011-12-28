@@ -1481,6 +1481,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					$entryDistribution->save();
 
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
+					if (count($distributionProfile->getAutoCreateFlavorsArray()) || count($distributionProfile->getAutoCreateThumbArray()) )
+					{
+					    self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+					}
+					
 					break;
 					
 				case EntryDistributionStatus::QUEUED:
