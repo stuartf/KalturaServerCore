@@ -250,6 +250,7 @@
 		const NoValidTranscoders = 1102;
 		const MissingMediaStream = 1103;
 		const NoValidMediaStream = 1104;
+		const InvalidDuration = 1105;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
