@@ -226,7 +226,7 @@ KalturaLog::log(__METHOD__."==>\n");
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
 						$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
-							KDLErrors::ToString(KDLErrors::InvalidDuration, $plannedDur/1000, $srcVid->_duration/1000);
+							KDLErrors::ToString(KDLErrors::InvalidDuration, $prdVid->_duration/1000, $plannedDur/1000);
 						$rv=false;
 					}
 					else if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
