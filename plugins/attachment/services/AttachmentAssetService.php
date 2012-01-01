@@ -408,7 +408,9 @@ class AttachmentAssetService extends KalturaBaseService
 		if(is_null($ext))
 			$ext = 'txt';
 			
-		$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
+		$fileName = $attachmentAsset->getFilename();
+		if (!$fileName)	
+			$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
 		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
