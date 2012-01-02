@@ -720,7 +720,8 @@ class playManifestAction extends kalturaAction
 			//In this case, it is not advisable that the playback start with it.
 			if (($flavor['width'] == 0) && ($flavor['height'] == 0))
 			{
-			    $attachAsLast = $bitrate;
+			    $attachAsLast = $flavor;
+			    $attachAsLast['bitrate'] = $bitrate;
 			    continue;
 			}
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
@@ -729,8 +730,8 @@ class playManifestAction extends kalturaAction
 		
 		if ($attachAsLast)
 		{
-		    $content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$attachAsLast."\n";
-			$content .= $flavor['url']."\n";
+		    $content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$attachAsLast['bitrate']."\n";
+			$content .= $attachAsLast['url']."\n";
 		}
 		
 		return $content;
