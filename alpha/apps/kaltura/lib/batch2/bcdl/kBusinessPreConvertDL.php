@@ -701,7 +701,7 @@ class kBusinessPreConvertDL
 		$thumbParamsOutput->setOperators($thumbParams->getOperators());
 		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
 		$thumbParamsOutput->setFileExt('jpg');
-		
+		$thumbParamsOutput->setRotate($mediaInfo? $mediaInfo->getVideoRotation() : null);
 		
 		$thumbParamsOutput->setCropType($thumbParams->getCropType());
 		$thumbParamsOutput->setQuality($thumbParams->getQuality());
@@ -984,6 +984,7 @@ class kBusinessPreConvertDL
 			$entry->addFlavorParamsId($sourceFlavor->getId());
 			$entry->save();
 
+KalturaLog::info("ROTATE_BUG_API==>generateThumbnailsFromFlavor\n");
 			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
 
