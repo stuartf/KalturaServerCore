@@ -137,13 +137,36 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		
 		if ( $this->isNew() )
 		{
-			// set the dc to the current data center ONLY if it wasnt initialized
+			// set the dc ONLY if it wasnt initialized
 			// this is required in the special case of file_sync import jobs which are created on one dc but run from the other
 			// all other jobs run from the same datacenter they were created on.
 			// setting the dc later results in a race condition were the job is picked up by the current datacenter before the dc value is changed 
 			if(is_null($this->dc) || !$this->isColumnModified(BatchJobPeer::DC))
-				$this->setDc ( kDataCenterMgr::getCurrentDcId());
-		
+			{
+				// by default set the dc to the current data center. However whenever a batch job is operating on an entry, we rather run it
+				// in the DC where the file sync of the entry exists. Since the batch job doesnt refer to a flavor (we only have an entry id member)
+				// we check the file sync of the source flavor asset (if one exists)
+				  
+				$dc = kDataCenterMgr::getCurrentDcId(); 
+				
+                if ($this->getEntryId())
+                {
+                	$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->getEntryId());
+                    if ($flavorAsset)
+                    {
+                    	$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+                    	$flavorFileSync = kFileSyncUtils::getOriginFileSyncForKey($flavorSyncKey, false);
+                    	if ($flavorFileSync && in_array($flavorFileSync->getDc(), kDataCenterMgr::getDcIds()))
+                    		$dc = $flavorFileSync->getDc();                    	
+                    }
+                    else
+                    {
+                        $dc = kDataCenterMgr::getDCByObjectId($this->getEntryId(), true);
+                    }
+		    	}
+		    	kalturaLog::debug("setting the job's DC to [$dc]");
+				$this->setDc ( $dc );
+			}		
 			// if the status not set upon creation
 			if(is_null($this->status) || !$this->isColumnModified(BatchJobPeer::STATUS))
 			{
