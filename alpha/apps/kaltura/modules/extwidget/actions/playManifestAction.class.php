@@ -712,10 +712,24 @@ class playManifestAction extends kalturaAction
 		$content = "#EXTM3U\n";
 		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
+		$attachAsLast = null;
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
+			//If this asset has width and height parameters set to 0, this means that it is not a visual asset.
+			//In this case, it is not advisable that the playback start with it.
+			if (($flavor['width'] == 0) && ($flavor['height'] == 0))
+			{
+			    $attachAsLast = $bitrate;
+			    continue;
+			}
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
+			$content .= $flavor['url']."\n";
+		}
+		
+		if ($attachAsLast)
+		{
+		    $content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$attachAsLast."\n";
 			$content .= $flavor['url']."\n";
 		}
 		
