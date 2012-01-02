@@ -75,6 +75,7 @@ class KAsyncCaptureThumb extends KBatchBase
 	private function captureThumb(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
 	{
 		KalturaLog::debug("captureThumb($job->id)");
+KalturaLog::info("ROTATE_BUG_BATCH==>\n".print_r($data->thumbParamsOutput,1));
 		
 		try
 		{
@@ -150,8 +151,9 @@ class KAsyncCaptureThumb extends KBatchBase
 			$scaleWidth = $data->thumbParamsOutput->scaleWidth;
 			$scaleHeight = $data->thumbParamsOutput->scaleHeight;
 			$density = $data->thumbParamsOutput->density;
+			$rotate = $data->thumbParamsOutput->rotate;
 									
-			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
+			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true, $rotate);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density);
 			if(!$cropped || !file_exists($thumbPath))
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not cropped", KalturaBatchJobStatus::FAILED);
