@@ -712,29 +712,34 @@ class playManifestAction extends kalturaAction
 		$content = "#EXTM3U\n";
 		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
-		$attachAsLast = null;
+		uasort($flavors, 'flavorCmpFunction');
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
-			//If this asset has width and height parameters set to 0, this means that it is not a visual asset.
-			//In this case, it is not advisable that the playback start with it.
-			if (($flavor['width'] == 0) && ($flavor['height'] == 0))
-			{
-			    $attachAsLast = $flavor;
-			    $attachAsLast['bitrate'] = $bitrate;
-			    continue;
-			}
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
 			$content .= $flavor['url']."\n";
 		}
-		
-		if ($attachAsLast)
-		{
-		    $content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$attachAsLast['bitrate']."\n";
-			$content .= $attachAsLast['url']."\n";
-		}
-		
+
 		return $content;
+	}
+	
+	private function flavorCmpFunction ($flavor1, $flavor2)
+	{
+	    if ($flavor1 == $flavor2)
+	    {
+	        return 0;
+	    }
+	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
+	    {
+	        return -1;
+	    }
+	    $bitrate1 = isset($flavor1['bitrate']) ? $flavor1['bitrate'] : 0;
+	    $bitrate2 = isset($flavor2['bitrate']) ? $flavor2['bitrate'] : 0;
+	    if ($bitrate1 <= $bitrate2)
+	    {
+	        return -1;
+	    }
+        return 1;
 	}
 	
 	private function serveHDNetwork()
