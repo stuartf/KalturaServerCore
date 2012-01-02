@@ -731,15 +731,16 @@ class playManifestAction extends kalturaAction
 	    }
 	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
 	    {
-	        return -1;
+	        return 1;
 	    }
 	    $bitrate1 = isset($flavor1['bitrate']) ? $flavor1['bitrate'] : 0;
 	    $bitrate2 = isset($flavor2['bitrate']) ? $flavor2['bitrate'] : 0;
-	    if ($bitrate1 <= $bitrate2)
+	    if ($bitrate1 >= $bitrate2)
 	    {
-	        return -1;
+	        return 1;
 	    }
-        return 1;
+	    
+        return -1;
 	}
 	
 	private function serveHDNetwork()
