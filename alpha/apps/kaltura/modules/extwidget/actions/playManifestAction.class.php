@@ -723,15 +723,23 @@ class playManifestAction extends kalturaAction
 		return $content;
 	}
 	
-	private function flavorCmpFunction ($flavor1, $flavor2)
+	/**
+	 * 
+	 * Private function which compares 2 flavors in order to sort an array.
+	 * If a flavor's width and height parameters are equal to 0, it is 
+	 * automatically moved down the list so the player will not start playing it by default.
+	 * @param asset $flavor1
+	 * @param asset $flavor2
+	 */
+    private function flavorCmpFunction ($flavor1, $flavor2)
 	{
-	    if ($flavor1 == $flavor2)
-	    {
-	        return 0;
-	    }
 	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
 	    {
 	        return 1;
+	    }
+	    if ($flavor2['height'] == 0 && $flavor2['width'] == 0)
+	    {
+	        return -1;
 	    }
 	    $bitrate1 = isset($flavor1['bitrate']) ? $flavor1['bitrate'] : 0;
 	    $bitrate2 = isset($flavor2['bitrate']) ? $flavor2['bitrate'] : 0;
