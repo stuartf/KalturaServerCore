@@ -1940,9 +1940,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	}
 		
 	// this will make sure that the extra data set in the search_text won't leak out 
-	public function getSearchText()	{		return mySearchUtils::removePartner( parent::getSearchText() );	}
+	public function getSearchText()	{	return '';	}
 
-	public function getSearchTextRaw()	{		return parent::getSearchText();	}
 /*	
 	public function dumpContent() 
 	{
