@@ -13,8 +13,6 @@
 		const MaxFramerate = 90;		// 
 		const MinDAR = 0.5;
 		const MaxDAR = 2.5;		// 
-		const MinDurationFactor = 0.5;
-		const MaxDurationFactor = 1.5;
 	}
 
 	class KDLConstants {
@@ -250,7 +248,6 @@
 		const NoValidTranscoders = 1102;
 		const MissingMediaStream = 1103;
 		const NoValidMediaStream = 1104;
-		const InvalidDuration = 1105;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -277,9 +274,6 @@
 					break;
 				case self::NoValidMediaStream:
 					$str = $err."#Invalid File - No media content.";
-					break;
-				case self::InvalidDuration:
-					$str = $err."#Product invalid duration - product($param1 sec), source($param2 sec).";
 					break;
 				case self::Other:
 				default:
