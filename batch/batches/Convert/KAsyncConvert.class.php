@@ -248,13 +248,9 @@ class KAsyncConvert extends KBatchBase
 		}
 		catch(KOperationEngineException $e)
 		{
-			if($job->jobSubType == KalturaConversionEngineType::ENCODING_COM || $job->jobSubType == KalturaConversionEngineType::KALTURA_COM)
-			{
-				$log = $this->operationEngine->getLogData();
-				if($log && strlen($log))
-					$this->kClient->batch->logConversion($data->flavorAssetId, $log);
-			}
-			
+			$log = $this->operationEngine->getLogData();
+			if($log && strlen($log))
+				$this->kClient->batch->logConversion($data->flavorAssetId, $log);			
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);
 		}
