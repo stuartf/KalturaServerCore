@@ -712,14 +712,43 @@ class playManifestAction extends kalturaAction
 		$content = "#EXTM3U\n";
 		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
+		uasort($flavors, 'flavorCmpFunction');
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
 			$content .= $flavor['url']."\n";
 		}
-		
+
 		return $content;
+	}
+	
+	/**
+	 * 
+	 * Private function which compares 2 flavors in order to sort an array.
+	 * If a flavor's width and height parameters are equal to 0, it is 
+	 * automatically moved down the list so the player will not start playing it by default.
+	 * @param asset $flavor1
+	 * @param asset $flavor2
+	 */
+    private function flavorCmpFunction ($flavor1, $flavor2)
+	{
+	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
+	    {
+	        return 1;
+	    }
+	    if ($flavor2['height'] == 0 && $flavor2['width'] == 0)
+	    {
+	        return -1;
+	    }
+	    $bitrate1 = isset($flavor1['bitrate']) ? $flavor1['bitrate'] : 0;
+	    $bitrate2 = isset($flavor2['bitrate']) ? $flavor2['bitrate'] : 0;
+	    if ($bitrate1 >= $bitrate2)
+	    {
+	        return 1;
+	    }
+	    
+        return -1;
 	}
 	
 	private function serveHDNetwork()
