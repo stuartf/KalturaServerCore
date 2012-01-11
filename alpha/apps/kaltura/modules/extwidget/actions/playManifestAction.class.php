@@ -713,6 +713,9 @@ class playManifestAction extends kalturaAction
 		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
 		uasort($flavors, 'flavorCmpFunction');
+		
+		KalturaLog::debug(print_r($flavors,true));
+		
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
