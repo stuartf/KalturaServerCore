@@ -713,9 +713,6 @@ class playManifestAction extends kalturaAction
 		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
 		uasort(&$flavors, array($this,'flavorCmpFunction'));
-		
-		KalturaLog::debug("order flavors: ".print_r($flavors,true));
-		
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
@@ -736,7 +733,6 @@ class playManifestAction extends kalturaAction
 	 */
     private function flavorCmpFunction ($flavor1, $flavor2)
 	{
-	    KalturaLog::debug("in compare func");
 	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
 	    {
 	        return 1;
