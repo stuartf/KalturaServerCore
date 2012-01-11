@@ -714,7 +714,7 @@ class playManifestAction extends kalturaAction
 		$flavors = $this->buildFlavorsArray($duration);
 		uasort($flavors, 'flavorCmpFunction');
 		
-		KalturaLog::debug(print_r($flavors,true));
+		KalturaLog::debug("order flavors: ".print_r($flavors,true));
 		
 		foreach($flavors as $flavor)
 		{
