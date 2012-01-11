@@ -1499,6 +1499,7 @@ class kFlowHelper
 
 	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
 	{
+	    KalturaLog::debug("in bulkdownload pending");
 		$entryIds = explode(',', $data->getEntryIds());
 		$flavorParamsId = $data->getFlavorParamsId();
 		$jobIsFinished = true;
