@@ -452,7 +452,8 @@ class BaseEntryService extends KalturaEntryService
 		return $response;
 	}
 	
-	/* List base entries by filter according to reference id
+	 /**
+	 * List base entries by filter according to reference id
 	 * 
 	 * @action listByReferenceId
 	 * @param string $refId Entry Reference ID
