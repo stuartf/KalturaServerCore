@@ -736,6 +736,7 @@ class playManifestAction extends kalturaAction
 	 */
     private function flavorCmpFunction ($flavor1, $flavor2)
 	{
+	    KalturaLog::debug("in compare func");
 	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
 	    {
 	        return 1;
