@@ -204,6 +204,8 @@ class kConf extends kConfLocal
 
 				"temp_folder" => '/opt/kaltura/tmp',
 				
+				"max_file_size_downloadable_from_cdn_in_KB" => 1.8 * 1024 * 1024, // files grater then 1.8GB can't be downloaded from cdn
+				
 				'ps2_actions_not_blocked_by_permissions' => array(
 					// should list action class names lowercase!
 					'contactsalesforceaction',
