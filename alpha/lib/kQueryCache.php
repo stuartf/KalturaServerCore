@@ -32,7 +32,7 @@ class kQueryCache
 		//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
 		
 		$connStart = microtime(true);
-		$res = @$memcache->connect();
+		$res = @$memcache->connect($hostName, $port);
 		KalturaLog::debug("kQueryCache: connect took - ". (microtime(true) - $connStart). " seconds to $hostName:$port");
 		if (!$res)
 		{
@@ -59,7 +59,7 @@ class kQueryCache
 		self::$s_memcacheKeys = self::connectToMemcache(kConf::get("global_keys_memcache_host"), kConf::get("global_keys_memcache_port"));
 		if (self::$s_memcacheKeys === null)
 		{
-			// no reason to inities queries server, the query cache won't be used anyway
+			// no reason to init the queries server, the query cache won't be used anyway
 			return;
 		}
 		
@@ -272,7 +272,10 @@ class kQueryCache
 		{
 			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
-			self::$s_memcacheKeys->set($invalidationKey, $currentTime);
+			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime))
+			{
+				KalturaLog::err("kQueryCache: failed to update invalidation key");
+			}
 		}
 	}
 }
