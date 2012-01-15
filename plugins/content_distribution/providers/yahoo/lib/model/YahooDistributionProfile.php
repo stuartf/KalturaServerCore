@@ -32,7 +32,6 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	const VIDEO_STREAM_BITRATE_VALID_VALUES = '8,14,16,20,28,32,48,56,64,80,96,100,115,128,150,250,300,319,350,500,600,700,1000,1200,1500,1800,2000';
 	const VIDEO_STREAM_FORMAT_VALID_VALUES = 'MP4,MOV';
 	
-	const VIDEO_STREAM_SECURE_VALID_VALUES = 'True,False';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -51,9 +50,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 			YahooDistributionField::VIDEO_FEEDITEM_ID => self::FEED_ITEM_ID_MAXIMUM_LENGTH,		    		    
 		);
 		    		
-		$inListOrNullFields = array (  	    	    
-		    YahooDistributionField::VIDEO_STREAM_SECURE => self::VIDEO_STREAM_SECURE_VALID_VALUES,			
-		);		
+		$inListOrNullFields = array ();		
 
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
@@ -63,6 +60,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateTwoThumbnailsExist($entryDistribution, $action));
 		//$validationErrors = array_merge($validationErrors, $this->validateVideoStreamFormatAndBitrate($entryDistribution, $action));
 		//$validationErrors = array_merge($validationErrors, $this->validateThumbnailsDimensions($entryDistribution, $action));
 		//TODO: validate only video stream formats and remove bitrate and thumb dimensions	
@@ -92,6 +90,34 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 							
 		return $validationErrors;
 	}
+	
+	/**
+	 * Validate two thumbnails exist
+	 * @param $entryDistribution
+	 * @param $action
+	 */
+	private function validateTwoThumbnailsExist($entryDistribution, $action)
+	{
+		$validationErrors = array();		
+		//Validating thumbnails
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ID, explode(',',$entryDistribution->getThumbAssetIds()), Criteria::IN);
+		$c->addAscendingOrderByColumn(assetPeer::ID);
+		$thumbAssets = assetPeer::doSelect($c);		
+		if (!count($thumbAssets)|| count($thumbAssets)<2)
+		{
+			KalturaLog::debug('Two thumbnails are required');
+			$errorMsg = 'two thumbnails are required';			
+    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
+    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+    		$validationError->setValidationErrorParam($errorMsg);
+    		$validationError->setDescription($errorMsg);
+    		$validationErrors[] = $validationError;
+		}
+		return $validationErrors;			
+	}	
+			
+
 	
 	/**
 	 * Validate video format and video bitrate
@@ -323,13 +349,6 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YahooDistributionField::VIDEO_EXPIRATION_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('entry expiration time');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunset" />');	    
-	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YahooDistributionField::VIDEO_STREAM_SECURE);
-	    $fieldConfig->setUserFriendlyFieldName('video stream secure');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YahooStreamSecure"/>');
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    

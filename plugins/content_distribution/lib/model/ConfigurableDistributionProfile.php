@@ -211,13 +211,14 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
                 $xsl .= '</value>';
             }
         }
-        
-        $xsl .= '
+             
+      $xsl .= '
         		</distribution_values>
         	</xsl:template>
+        	'.implode(PHP_EOL.PHP_EOL, $this->getXslTemplates()).' 
         </xsl:stylesheet>
         ';
-        
+      
         KalturaLog::debug('Result XSL: '. $xsl);
         return $xsl;
     }
@@ -237,12 +238,21 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		entryPeer::setDefaultCriteriaFilter();
 		entryPeer::addPartnerToCriteria($entryDistribution->getPartnerId(), true);
 		
-		$mrss = null;
-		$mrssParams = new kMrssParameters();
-		if ($this->getItemXpathsToExtend())
-			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
-		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
-		$mrssStr = $mrss->asXML();
+		try
+		{
+    		$mrss = null;
+    		$mrssParams = new kMrssParameters();
+    		if ($this->getItemXpathsToExtend())
+    			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
+    		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
+    		$mrssStr = $mrss->asXML();
+		}
+		catch (Exception $e)
+		{
+		    // restore the original criteria so it will not get stuck due to the exception
+		    entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
+		    throw $e;
+		}
 		
 		// restore the original criteria
 		entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
@@ -499,6 +509,35 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 			$this->requiredFields[$fieldName] = $fieldName;
 		}
 	}
+	
+	/**
+	 * @return array<string> an array containing xsl templates to add to the default xsl
+	 */
+	protected function getXslTemplates()
+	{
+		$templates = array();
+		$stringReplaceAllTemplate = '<xsl:template name="string-replace-all">
+				    <xsl:param name="text" />
+				    <xsl:param name="replace" />
+				    <xsl:param name="by" />
+				    <xsl:choose>
+				      <xsl:when test="contains($text, $replace)">
+				        <xsl:value-of select="substring-before($text,$replace)" />
+				        <xsl:value-of select="$by" />
+				        <xsl:call-template name="string-replace-all">
+				          <xsl:with-param name="text" select="substring-after($text,$replace)" />
+				          <xsl:with-param name="replace" select="$replace" />
+				          <xsl:with-param name="by" select="$by" />
+				        </xsl:call-template>
+				      </xsl:when>
+				      <xsl:otherwise>
+				        <xsl:value-of select="$text" />
+				      </xsl:otherwise>
+				    </xsl:choose>
+			 	</xsl:template>';
 		
+		$templates[] = $stringReplaceAllTemplate;
+		return $templates;
+	}
 	
 }
