@@ -249,7 +249,7 @@ class mySearchUtils
 			
 			$partner_id = $obj->getPartnerId();
 			// if res == 1 - only for partner , if == 2 - also for kaltura network
-			$obj->setSearchText ( self::addPartner ( $partner_id , $prepared_text , $res , $extra_invisible_data ) );
+			//$obj->setSearchText ( self::addPartner ( $partner_id , $prepared_text , $res , $extra_invisible_data ) );
 
 	}
 	
@@ -274,7 +274,7 @@ class mySearchUtils
 		foreach($getFlavorParamsIds as $getFlavorParamsIds)
 			$searchText[] = self::ENTRY_FLAVOR_PARAMS_PREFIX . $getFlavorParamsIds;
 
-		$obj->setSearchTextDiscrete(implode(" ", $searchText));
+		//$obj->setSearchTextDiscrete(implode(" ", $searchText));
 	}
 
 	private static function setRes ( &$res , $new_value , $boolean_value= true )
