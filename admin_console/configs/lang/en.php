@@ -148,6 +148,8 @@ return array(
 	'Kaltura_Client_Enum_EntryStatus::MODERATE' => 'Modarated',
 	'Kaltura_Client_Enum_EntryStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_EntryStatus::NO_CONTENT' => 'No content',
+	'Kaltura_Client_Enum_EntryStatus::INFECTED' => 'Infected',
+	'Kaltura_Client_Enum_EntryStatus::SCAN_FAILURE' => 'Virus scan failure',
 
 	'Kaltura_Client_Enum_EntryType::AUTOMATIC' => 'Automatic',
 	'Kaltura_Client_Enum_EntryType::MEDIA_CLIP' => 'Media Clip',
@@ -989,6 +991,7 @@ return array(
 	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_ENGINE' => 'Symantec',
 	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_JAVA_ENGINE' => 'Symantec-Java',
 	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_DIRECT_ENGINE' => 'Symantec-Direct',
+    'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::CLAMAV_SCAN_ENGINE' => 'ClamAV',
 	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
 
 	'Virus Scan Profile' => 'Virus Scan Profile',

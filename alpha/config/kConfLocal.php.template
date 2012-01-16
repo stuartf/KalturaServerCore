@@ -186,6 +186,7 @@ class kConfLocal
 		self::$map['default_plugins'][] = "AttachmentBulkUploadXmlPlugin";
 		self::$map['default_plugins'][] = "IdeticDistributionPlugin";
 		self::$map['default_plugins'][] = "EdgeCastPlugin";
+		self::$map['default_plugins'][] = "ClamAVScanEnginePlugin";
 }
 
 	
