@@ -132,13 +132,17 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 */
 	public $creationMode;
 	
-
+	/**
+	 * @var string
+	 */
+	public $html5Url;
+		
 	private static $map_between_objects = array
 	(
 		"id" ,
 		"creationMode" , "partnerId" ,
 	 	"objType" , "objTypeAsString" , "name" , "description" , "width" , "height" ,
-		"htmlParams", "swfUrl" , "confFilePath" , "confFile" , "confFileFeatures" , "confVars" , "useCdn" , "tags" , "swfUrlVersion" , "createdAt" , "updatedAt" ,
+		"htmlParams", "swfUrl" , "confFilePath" , "confFile" , "confFileFeatures" , "confVars" , "useCdn" , "tags" , "swfUrlVersion" , "createdAt" , "updatedAt", "html5Url"
         
 	);
 
