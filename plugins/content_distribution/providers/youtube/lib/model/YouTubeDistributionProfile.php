@@ -27,7 +27,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ALLOW_POST_ROLL_ADS = 'allowPostRollAds';		
 	
 	// validations
-	const MEDIA_TITLE_MAXIMUM_LENGTH = 60;
+	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 715;
 	const METADATA_CUSTOM_ID_MAXIMUM_LENGTH = 64;
 	const TV_METADATA_EPISODE_MAXIMUM_LENGTH = 16;
@@ -194,12 +194,12 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_KEYWORDS);
 	    $fieldConfig->setUserFriendlyFieldName('Entry tags');
 	    $fieldConfig->setEntryMrssXslt(
-	    			'<xsl:for-each select="tags/tag">
-						<xsl:if test="position() &gt; 1">
-							<xsl:text>,</xsl:text>
-						</xsl:if>
-						<xsl:value-of select="." />
-					</xsl:for-each>');
+	                '<xsl:for-each select="tags/tag">
+	                	<xsl:if test="position() &gt; 1">
+	                		<xsl:text>,</xsl:text>
+                		</xsl:if>
+                		<xsl:text>"</xsl:text><xsl:value-of select="normalize-space(.)" /><xsl:text>"</xsl:text>
+            		</xsl:for-each>');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
