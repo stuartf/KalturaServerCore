@@ -99,7 +99,7 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function getSphinxConnection()
+	public static function getSphinxConnection($read = true)
 	{
 		if(self::$sphinxConnection)
 			return self::$sphinxConnection;
@@ -107,6 +107,20 @@ class DbManager
 		$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 		$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
 		$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
+		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
+		
+		$stickySessionKey = 'StickySession:'.kCurrentContext::$user_ip;
+		if (function_exists('apc_fetch'))
+		{
+			$key = apc_fetch($stickySessionKey);
+			if($key)
+			{
+				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
+					
+				if (!is_null($connection))
+					return $connection;
+			}
+		}
 		
 		// loop twice, on first iteration try only connections not marked as failed
 		// in case all connections failed, try all connections on second iteration
@@ -132,28 +146,45 @@ class DbManager
 						continue;
 				}
 
-				try {
-					if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
-						throw new Exception("DB Config [$key] not found");
-
-					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-					self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
+				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
+				
+				if (!$read && function_exists('apc_store'))
+					apc_store($stickySessionKey, $key, $stickySessionExpiry);
 					
-					self::$sphinxConnection->setCommentsEnabled(false);
-
-					KalturaLog::debug("getSphinxConnection: connected to $key");
-					return self::$sphinxConnection;
-				}
-				catch(Exception $ex)
-				{
-					KalturaLog::debug("getSphinxConnection: failed to connect to $key");
-					if (function_exists('apc_store'))
-						apc_store($cacheKey, 1, $cacheExpiry);
-				}
+				if (!is_null($connection))
+					return $connection;
 			}
 		}
 
 		KalturaLog::debug("getSphinxConnection: Failed to connect to any Sphinx config");
 		throw new Exception('Failed to connect to any Sphinx config');
+	}
+	
+	private static function getConnection($key, $cacheExpiry, $connectTimeout)
+	{
+		try {
+			if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
+				throw new Exception("DB Config [$key] not found");
+
+			$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
+			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
+					
+			self::$sphinxConnection->setCommentsEnabled(false);
+			
+			KalturaLog::debug("getSphinxConnection: connected to $key");
+			return self::$sphinxConnection;
+		}
+
+		catch(Exception $ex)
+		{
+			KalturaLog::debug("getSphinxConnection: failed to connect to $key");
+			if (function_exists('apc_store'))
+			{
+				$cacheKey = "sphinxCon:".$key;
+				apc_store($cacheKey, 1, $cacheExpiry);
+			}
+		}
+		
+		return null;
 	}
 }

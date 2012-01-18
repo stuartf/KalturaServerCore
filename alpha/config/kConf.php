@@ -180,7 +180,7 @@ class kConf extends kConfLocal
                 
                 'apc_cache_ttl' => 900, // 15 minutes in seconds - ttl for apc cache values
                 
-				"exec_sphinx" => false, // Should be set to false in multiple data centers environments
+				"exec_sphinx" => true, // Should be set to false in multiple data centers environments
                 
                 'user_login_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
                 'user_login_max_wrong_attempts' => 5000,
