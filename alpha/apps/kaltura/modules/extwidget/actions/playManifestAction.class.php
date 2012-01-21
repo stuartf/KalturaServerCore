@@ -389,6 +389,7 @@ class playManifestAction extends kalturaAction
 						if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
 						{
 							$url = $this->getFlavorHttpUrl($flavorAsset);
+							$url = str_replace(" ", "%20", $url);
 							header("location:$url");
 							die;
 						}
