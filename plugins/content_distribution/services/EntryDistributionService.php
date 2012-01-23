@@ -30,8 +30,7 @@ class EntryDistributionService extends KalturaBaseService
 	 */
 	function addAction(KalturaEntryDistribution $entryDistribution)
 	{
-		$entryDistribution->validatePropertyNotNull("entryId");
-		$entryDistribution->validatePropertyNotNull("distributionProfileId");
+		$entryDistribution->validateForInsert();
 					
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->distributionProfileId);
 		if (!$dbDistributionProfile)
