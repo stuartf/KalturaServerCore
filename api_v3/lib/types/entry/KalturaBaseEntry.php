@@ -330,6 +330,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"partnerData", 
 	 	"downloadUrl",
 	 	"licenseType",
+	 	"searchText",
 	 	"version",
 	 	"thumbnailUrl",
 	 	"accessControlId",
@@ -392,34 +393,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	protected function getSearchText($obj)
-	{
-		$displayInSearch = $obj->getDisplayInSearch();
-		
-		$words = "";
-		$fields_to_use = $obj->getColumnNames();
-		foreach ( $fields_to_use  as $field )
-		{
-			$field_str = $obj->getByName ( $field , BasePeer::TYPE_FIELDNAME );
-			$words .= " " . $field_str;
-		}
-			
-		$extra_invisible_data = null;
-			
-		$extra_invisible_data = "_MEDIA_TYPE_" . $obj->getMediaType(); 
-		$type = $obj->getType();
-		// add the SEARCH_ENTRY_TYPE_RC to the words
-		if ( $type == entryType::MIX )
-			$extra_invisible_data .= " " . mySearchUtils::SEARCH_ENTRY_TYPE_RC ;
-
-		$prepared_text = mySearchUtils::prepareSearchText ( $words );
-			
-		$partner_id = $obj->getPartnerId();
-		
-		// if res == 1 - only for partner , if == 2 - also for kaltura network
-		return mySearchUtils::addPartner($partner_id, $prepared_text, $displayInSearch, $extra_invisible_data);
-	}
-	
 	public function fromObject($sourceObject)
 	{
 		if(!$sourceObject)
@@ -431,8 +404,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->endDate = $sourceObject->getEndDate(null);
 		
 		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
-		
-		$this->searchText = $this->getSearchText($sourceObject);		
 	}
 	
 	public function validateObjectsExist()
