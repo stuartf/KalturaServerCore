@@ -86,6 +86,8 @@ class KalturaResponseCacher
 		{
 			if(preg_match('/[\d]+:ks/', $key))
 			{
+				if (!$ks && strpos($value, ':result') === false)
+					$ks = $value;
 				unset($params[$key]);
 			}
 		}
