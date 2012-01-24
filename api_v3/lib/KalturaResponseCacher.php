@@ -10,13 +10,13 @@ class KalturaResponseCacher
 	// this request named warm cache request will block other such requests for WARM_CACHE_TTL seconds
 
 	// header to mark the request is due to cache warming. the header holds the original request protocol http/https
-        const WARM_CACHE_HEADER = "X-KALTURA-WARM-CACHE";
+	const WARM_CACHE_HEADER = "X-KALTURA-WARM-CACHE";
 
 	// interval before cache expiry in which to try and warm the cache
 	const WARM_CACHE_INTERVAL = 60;
 
 	// time in which a warm cache request will block another request from warming the cache
-        const WARM_CACHE_TTL = 10;
+	const WARM_CACHE_TTL = 10;
 
 	protected $_params = array();
 	protected $_cacheFilePrefix = "cache_v3-";
@@ -68,6 +68,7 @@ class KalturaResponseCacher
 			{
 				if ($matches[1] > time())
 				{
+					self::disableCache();
 					return;
 				}
 			}
@@ -76,6 +77,7 @@ class KalturaResponseCacher
 		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
 		if ($isAdminLogin || isset($params['nocache']))
 		{
+			self::disableCache();
 			return;
 		}
 		
@@ -84,7 +86,6 @@ class KalturaResponseCacher
 		{
 			if(preg_match('/[\d]+:ks/', $key))
 			{
-				$ks = $value;
 				unset($params[$key]);
 			}
 		}
@@ -110,18 +111,20 @@ class KalturaResponseCacher
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
-		if (!in_array($ksData["partnerId"], kConf::get('v3cache_include_referrer_in_key')))
+		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		foreach ($this->_params as $key => $value)
 		{
-			foreach ($this->_params as $key => $value)
-			{
-				if (strpos($key, 'contextDataParams:referrer') !== false)
-				{
-					unset($this->_params[$key]);
-					break;
-				}
-			}
-		}
+			if (strpos($key, 'contextDataParams:referrer') === false)
+				continue;
 
+			if (in_array($ksData["partnerId"], kConf::get('v3cache_include_referrer_in_key')))
+				$this->_params[$key] = parse_url($value, PHP_URL_HOST);
+			else
+				unset($this->_params[$key]);
+				
+			break;
+		}
+		
 		ksort($this->_params);
 
 		$this->_cacheKey = md5( http_build_query($this->_params) );
@@ -139,7 +142,7 @@ class KalturaResponseCacher
 	{
 		self::$_useCache = array();
 	}
-	
+
 	/**
 	 * This functions checks if a certain response resides in cache.
 	 * In case it dose, the response is returned from cache and a response header is added.
@@ -371,6 +374,7 @@ class KalturaResponseCacher
 		}
 		catch(Exception $e){
 			KalturaLog::err($e->getMessage());
+			self::disableCache();
 			return false;
 		}
 		
@@ -397,19 +401,17 @@ class KalturaResponseCacher
 			
 			if ($matches == count($ignoreParams))
 				return true;
+        }
+        
+		if ($ks->isAdmin() ||
+			($ks->valid_until && $ks->valid_until < time()) ||	 // if ks has expired dont cache response
+			($ks->user !== "0" && $ks->user !== null)) // $uid will be null when no session
+		{
+			self::disableCache();
+			return false;
 		}
-        
-        
-		if ($ks->isAdmin())
-			return false;
-	
-		if ($ks->valid_until && $ks->valid_until < time()) // if ks has expired dont cache response
-			return false;
-	
-		if ($ks->user === "0" || $ks->user === null) // $uid will be null when no session
-			return true;
-			
-		return false;
+		
+		return true;
 	}
 	
 	private function getKsData()
@@ -462,71 +464,70 @@ class KalturaResponseCacher
 	// so in the case the warmup request failed another one can be ran after 10 seconds.
 	// finalize IP passing (use getRemoteAddr code)
 	// can the warm cache header get received via a warm request passed from the other DC?
-        private function warmCache($key)
-        {
-                // require apc for checking whether warmup is already in progress
-                if (!function_exists('apc_fetch'))
-                        return;
+	private function warmCache($key)
+	{
+		// require apc for checking whether warmup is already in progress
+		if (!function_exists('apc_fetch'))
+		return;
 
-                $key = "cache-warmup-$key";
+		$key = "cache-warmup-$key";
 
-                // abort warming if a previous warmup started less than 10 seconds ago
-                if (apc_fetch($key) !== false)
-                        return;
+		// abort warming if a previous warmup started less than 10 seconds ago
+		if (apc_fetch($key) !== false)
+			return;
 
-                // flag we are running a warmup for the current request
-                apc_store($key, true, self::WARM_CACHE_TTL);
+		// flag we are running a warmup for the current request
+		apc_store($key, true, self::WARM_CACHE_TTL);
 
-                $uri = $_SERVER["REQUEST_URI"];
+		$uri = $_SERVER["REQUEST_URI"];
 
-                $fp = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
+		$fp = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
 
-                if ($fp === false)
-                {
-                        error_log("warmCache - Couldn't open a socket [".$uri."]", 0);
-                        return;
-                }
+		if ($fp === false)
+		{
+			error_log("warmCache - Couldn't open a socket [".$uri."]", 0);
+			return;
+		}
 
-                $method = $_SERVER["REQUEST_METHOD"];
+		$method = $_SERVER["REQUEST_METHOD"];
 
-                $out = "$method $uri HTTP/1.1\r\n";
+		$out = "$method $uri HTTP/1.1\r\n";
 
-                $sentHeaders = self::getRequestHeaders();
-                $sentHeaders["Connection"] = "Close";
+		$sentHeaders = self::getRequestHeaders();
+		$sentHeaders["Connection"] = "Close";
 
 		// mark request as a warm cache request in order to disable caching and pass the http/https protocol (the warmup always uses http)
 		$sentHeaders[self::WARM_CACHE_HEADER] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-				
 
-                // if the request wasn't proxied pass the ip on the X-FORWARDED-FOR header
-                if (!isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-                {
-                        $sentHeaders["X-FORWARDED-FOR"] = $_SERVER['REMOTE_ADDR'];
-                        $sentHeaders["X-FORWARDED-SERVER"] = kConf::get('remote_addr_header_server');
-                }
+		// if the request wasn't proxied pass the ip on the X-FORWARDED-FOR header
+		if (!isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+		{
+			$sentHeaders["X-FORWARDED-FOR"] = $_SERVER['REMOTE_ADDR'];
+			$sentHeaders["X-FORWARDED-SERVER"] = kConf::get('remote_addr_header_server');
+		}
 
-                foreach($sentHeaders as $header => $value)
-                {
-                        $out .= "$header:$value\r\n";
-                }
+		foreach($sentHeaders as $header => $value)
+		{
+			$out .= "$header:$value\r\n";
+		}
 
-                $out .= "\r\n";
+		$out .= "\r\n";
 
-                if ($method == "POST")
-                {
-                                $postParams = array();
-                                foreach ($_POST as $key => &$val) {
-                                        if (is_array($val)) $val = implode(',', $val);
-                                        {
-                                                $postParams[] = $key.'='.urlencode($val);
-                                        }
-                                }
+		if ($method == "POST")
+		{
+			$postParams = array();
+			foreach ($_POST as $key => &$val) {
+				if (is_array($val)) $val = implode(',', $val);
+				{
+					$postParams[] = $key.'='.urlencode($val);
+				}
+			}
 
-                                $out .= implode('&', $postParams);
-                }
+			$out .= implode('&', $postParams);
+		}
 
-                fwrite($fp, $out);
-                fclose($fp);
-        }
+		fwrite($fp, $out);
+		fclose($fp);
+	}
 
 }
