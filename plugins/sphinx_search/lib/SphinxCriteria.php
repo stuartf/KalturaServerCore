@@ -332,7 +332,6 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		foreach ($this->orderByClause as $orderByClause){
 			$orders[] = $orderByClause;
-			$setLimit = false;
 		}
 		
 		if(count($orders))
@@ -557,7 +556,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		$objects = array();
 		foreach ($this->fetchedIds as $fetchedId)
-			$objects[] = $sortedResult[$fetchedId];
+			if (array_key_exists($fetchedId, $sortedResult))
+				$objects[] = $sortedResult[$fetchedId];
 		
 	}
 	
