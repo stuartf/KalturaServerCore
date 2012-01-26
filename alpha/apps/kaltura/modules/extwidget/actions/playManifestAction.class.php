@@ -717,7 +717,10 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
-			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
+			$codecs = "";
+			if ($bitrate && $bitrate <= 64000)
+				$codecs = ', CODECS="mp4a.40.5"';
+			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."$codecs\n";
 			$content .= $flavor['url']."\n";
 		}
 
