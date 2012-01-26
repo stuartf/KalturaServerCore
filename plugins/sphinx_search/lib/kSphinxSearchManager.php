@@ -118,7 +118,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($object));
+		$this->saveToSphinx($object);
 		return true;
 	}
 	
