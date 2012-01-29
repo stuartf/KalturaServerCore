@@ -61,6 +61,8 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
+				$entry->addFlavorParamsId($oldAsset->getFlavorParamsId());
+				
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
@@ -106,6 +108,7 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 			foreach ($newAssetsByTypes as $newAsset)
 			{
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
+				$entry->addFlavorParamsId($newAsset->getFlavorParamsId());
 				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
 			}
 		}
@@ -114,7 +117,8 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
 		$entry->setConversionQuality($tempEntry->getConversionQuality());
 		$entry->setReplacingEntryId(null);
-		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
+		$entry->setReplacementStatus(entryReplacementStatus::NONE);
+		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 			
 		myEntryUtils::deleteEntry($tempEntry);

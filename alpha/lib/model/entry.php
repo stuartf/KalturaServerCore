@@ -2202,8 +2202,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		else
 			$flavorParamIdsArray = array();
 			
-		$flavorParamIdsArray = array_unique($flavorParamIdsArray);
 		$flavorParamIdsArray[] = $v;
+		$flavorParamIdsArray = array_unique($flavorParamIdsArray);
 		$flavorParamIds = implode(",", $flavorParamIdsArray);
 		$this->setFlavorParamsIds($flavorParamIds);
 	}
