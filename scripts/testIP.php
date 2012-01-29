@@ -12,5 +12,5 @@ $myLocator = new myIPGeocoder();
 
 $countryAndRegion = $myLocator->iptocountryAndCode( $argv[1] );
 
-print_r("country and region: " .$countryAndRegion, true);
+echo print_r("country and region: " .$countryAndRegion, true);
 
