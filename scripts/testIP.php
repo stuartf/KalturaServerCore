@@ -10,7 +10,7 @@ if ($argc < 2)
 
 $myLocator = new myIPGeocoder();
 
-$country = $myLocator->iptocountry( $argv[1] );
+$countryAndRegion = $myLocator->iptocountryAndCode( $argv[1] );
 
-echo "country: $country";
+echo "country: $countryAndRegion";
 
