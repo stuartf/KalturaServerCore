@@ -1416,6 +1416,17 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
+	public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
+	{
+	    KalturaLog::debug("Remote storage file deletion finished for fileysnc ID:[ ". $data->getSrcFileSyncId() ."]");
+	    
+	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+		$fileSync->save();
+		
+		return $dbBatchJob;
+	}
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertProfileJobData $data
