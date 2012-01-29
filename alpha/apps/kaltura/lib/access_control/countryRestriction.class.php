@@ -75,11 +75,17 @@ class countryRestriction extends baseRestriction
 	function isValid()
 	{
 		if ($this->type == self::COUNTRY_RESTRICTION_TYPE_ALLOW_LIST)
+		{
 			return $this->matchCountry();
+		}
 		else if ($this->type == self::COUNTRY_RESTRICTION_TYPE_RESTRICT_LIST)
+		{
 			return !$this->matchCountry();
+		}
 		else
+		{
 			return false;
+		}
 	}
 	
 	/**
@@ -93,6 +99,7 @@ class countryRestriction extends baseRestriction
 		$country = $ipGeo->iptocountry($ip);
 		$country = trim(strtolower($country), " \n\r\t");
 		$countryList = explode(",", strtolower($this->countryList));
+		KalturaLog::info("User's country by IP: $country, partner's country list: $countryList");
 		return (in_array($country, $countryList));
 	}
 }
