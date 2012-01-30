@@ -26,6 +26,8 @@ try
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
 	
+	kCurrentContext::$partner_id = $syndicationFeedRenderer->syndicationFeed->partnerId;
+	
 	if (isset($entryId))
 		$syndicationFeedRenderer->addEntryAttachedFilter($entryId);
 		
