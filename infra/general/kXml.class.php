@@ -1,4 +1,32 @@
 <?php
+
+/** 
+ * @package infra
+ * @subpackage utils
+ */
+class XSLTErrorCollector
+{
+	public $errors = array();
+	
+	public function __construct()
+	{
+		set_error_handler(array($this, "errorHandler"));
+	}
+
+	public function restoreErrorHandler()
+	{
+		restore_error_handler();
+	}
+	
+	public function errorHandler($errNo, $errStr, $errFile, $errLine)
+	{
+		$startPos = strpos($errStr, ': ');
+		if ($startPos !== false)
+			$errStr = substr($errStr, $startPos + 2);
+		$this->errors[] = $errStr;
+	}
+}
+
 /** 
  * @package infra
  * @subpackage utils
@@ -16,7 +44,7 @@ class kXml
 	//strip invalid xml characters 
 	public static function stripXMLInvalidChars($value) {
 		return preg_replace ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', "", $value );
-	}	
+	}
 	
 	public static function getLibXmlErrorDescription($xml)
 	{
@@ -321,7 +349,7 @@ class kXml
 	 * @param array $xsltParams
 	 * @return string  
 	 */
-	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array())
+	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array(), &$xsltErrors = array())
 	{
 					
 		$xml = new DOMDocument();
@@ -344,9 +372,14 @@ class kXml
 			$proc->setParameter( '', $key, $value);
 		}		
 	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
-		$proc->importStyleSheet($xsl);
+		@$proc->importStyleSheet($xsl);
 		
-		$xml = $proc->transformToDoc($xml);
+		$errorHandler = new XSLTErrorCollector();
+		
+		$xml = @$proc->transformToDoc($xml);
+		
+		$errorHandler->restoreErrorHandler();	
+		$xsltErrors = $errorHandler->errors;
 
 		if(!$xml)
 		{
@@ -367,4 +400,5 @@ class kXml
 		$to   = array ('<',		'>',	'"');
 		return str_replace($from, $to, $encodeXml);
 	}
+	
 }

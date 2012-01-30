@@ -308,8 +308,9 @@ class MetadataService extends KalturaBaseService
 		$metadataFilter->attachToCriteria($c);
 		$count = MetadataPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria($c);
 		$list = MetadataPeer::doSelect($c);
 		
 		$response = new KalturaMetadataListResponse();
@@ -438,7 +439,14 @@ class MetadataService extends KalturaBaseService
         	XsltParameterName::KALTURA_CURRENT_TIMESTAMP => time(),
         );
         
-        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams);
+        $xsltErrors = array();
+        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams, $xsltErrors);
+        
+        if (!empty($xsltErrors))
+        {
+        	throw new KalturaAPIException("XSLT_VALIDATION_ERROR,XSLT validation error [%s]", implode(',', $xsltErrors));
+        }
+        
         if ($xmlDataTransformed)
             return $xmlDataTransformed;
         
