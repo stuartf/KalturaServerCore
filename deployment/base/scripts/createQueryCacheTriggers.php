@@ -288,7 +288,7 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 			}
 			$curKey = 'concat(' . implode(', ', $curKey) . ')';
 			
-			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(NOW()));";
+			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(NOW()), 90000);";
 		}
 		
 		if (count($triggerBody) > 1)
