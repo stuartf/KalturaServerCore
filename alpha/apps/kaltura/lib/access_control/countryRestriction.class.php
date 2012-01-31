@@ -99,7 +99,7 @@ class countryRestriction extends baseRestriction
 		$country = $ipGeo->iptocountry($ip);
 		$country = trim(strtolower($country), " \n\r\t");
 		$countryList = explode(",", strtolower($this->countryList));
-		KalturaLog::info("User's country by IP:". $country.", partner's country list:". strtolower($this->countryList));
+		KalturaLog::info("User's IP: ".$ip.", user's country by IP:". $country.", partner's country list:". strtolower($this->countryList));
 		return (in_array($country, $countryList));
 	}
 }
