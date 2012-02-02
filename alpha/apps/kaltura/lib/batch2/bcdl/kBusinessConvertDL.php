@@ -61,6 +61,8 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
+				//in situations were the flavor was created but failed to be converted it param id wont be added to the entry's flavor_params_ids field. so now when replacing the
+				//old entry's flavors with the temporery entry's flavors we should add their params ids to the entry's flavor_params_ids field.
 				$entry->addFlavorParamsId($oldAsset->getFlavorParamsId());
 				
 				/* @var $newAsset asset */
@@ -77,7 +79,8 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 				$oldAsset->setContainerFormat($newAsset->getContainerFormat());
 				$oldAsset->setSize($newAsset->getSize());
 				$oldAsset->setFileExt($newAsset->getFileExt());
-					
+				$oldAsset->setTags($newAsset->getTags());
+				$oldAsset->setDescription($newAsset->getDescription());
 				$oldAsset->incrementVersion();
 				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$oldAsset->save();
@@ -87,6 +90,14 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 				
 				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
 				
+				$newFlavorMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($newAsset->getId());
+				if($newFlavorMediaInfo)
+				{
+					$oldFlavorNewMediaInfo = $newFlavorMediaInfo->copy();
+					$oldFlavorNewMediaInfo->setFlavorAssetId($oldAsset->getId());
+					$oldFlavorNewMediaInfo->setFlavorAssetVersion($oldAsset->getVersion());
+					$oldFlavorNewMediaInfo->save();
+				}
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
 			}	
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
