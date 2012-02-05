@@ -609,8 +609,9 @@ class kFlowHelper
 		// save the data changes to the db
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
-		
-		if($thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+
+		$entry = $thumbAsset->getentry();
+		if($entry && $entry->getCreateThumb() && $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
 			$entry = $dbBatchJob->getEntry(false, false);
 			if(!$entry)

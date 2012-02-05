@@ -174,6 +174,9 @@ class BatchService extends KalturaBaseService
 			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bulkUploadResult->entryId);
 				
+			if($bulkUploadResult->thumbnailUrl)
+				$entry->setCreateThumb(false);
+				
 			$entry->setBulkUploadId($bulkUploadResult->bulkUploadJobId);
 			$entry->save();
 			
@@ -233,7 +236,16 @@ class BatchService extends KalturaBaseService
 		)
 			return;
 			
-		myEntryUtils::updateThumbnailFromFile($bulkUploadResult->getEntry(), $bulkUploadResult->getThumbnailUrl());
+		try 
+		{
+			myEntryUtils::updateThumbnailFromFile($bulkUploadResult->getEntry(), $bulkUploadResult->getThumbnailUrl());
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return;
+		}
+		
 		$bulkUploadResult->setThumbnailSaved(true);
 		$bulkUploadResult->save();
 	}
