@@ -81,7 +81,10 @@ class KAsyncConvert extends KBatchBase
 	
 	protected function getMaxJobsEachRun()
 	{
-		return 1;
+		if(!$this->taskConfig->maxJobsEachRun)
+			return 1;
+		
+		return $this->taskConfig->maxJobsEachRun;
 	}
 	
 	public function run($jobs = null)
