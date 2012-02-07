@@ -115,7 +115,7 @@ class kConf extends kConfLocal
 				"editors_flex_wrapper_version" => 'v1.01',
 				"kdp_wrapper_version" => 'v11.0',
 				"kdp3_wrapper_version" => 'v34.0',
-				"html5_version" => 'v1.6.6',
+				"html5_version" => 'v1.6.7',
 				"clipapp_version" => 'v1.0.5',
 				"kmc_secured_login" => false,
 				
@@ -245,6 +245,10 @@ class kConf extends kConfLocal
 				
 				'default_streamer_type' => 'http',
 				'default_media_protocol' => 'http',
+				
+				'video_file_ext' => array('flv','asf','qt','mov','mpg','mpeg','avi','wmv','mp4','m4v','3gp','vob','f4v','mkv','mxf','mts'),
+				'image_file_ext' => array('jpg','jpeg','bmp','png','gif','tif','tiff'),
+				'audio_file_ext' => array('flv','asf','wmv','qt','mov','mpg','avi','mp3','wav','mp4','wma','3gp','vob','amr'),
 			)
 		);
 		
