@@ -461,11 +461,11 @@ class kFlowHelper
 		{
 			if($createThumb || $extractMedia)
 			{
-				$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
+				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 				if($flavorAsset->getIsOriginal())
-					$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE;
+					$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
 					
-				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset, $data->getCustomData());
+				kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset, $data->getCustomData());
 			}
 			else // no need to run post convert
 			{
@@ -894,9 +894,9 @@ class kFlowHelper
 			$ismContent = str_replace("src=\"$oldName\"", "src=\"$newName\"", $ismContent);
 		
 			// creating post convert job (without thumb)
-			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
-			kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
-			
+			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
+
 			$finalFlavors[] = $flavor;
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
 		}
@@ -1201,8 +1201,8 @@ class kFlowHelper
 		}
 		
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
-				
-		if($dbBatchJob->getJobSubType() == BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE)
+
+		if($data->getPostConvertAssetType() == BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE)
 		{
 			$convertProfileJob = $dbBatchJob->getRootJob();
 			if($convertProfileJob->getJobType() == BatchJobType::CONVERT_PROFILE)

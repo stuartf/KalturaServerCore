@@ -44,9 +44,14 @@ class kPostConvertJobData extends kConvartableJobData
 	 * @var int
 	 */
 	private $thumbBitrate;
-	
-	
+
 	/**
+	 * Source, destination flavor or source in bypass (only source configured in the profile)
+	 *
+	 * @var int
+	 */
+	private $postConvertAssetType;
+
 	/**
 	 * @var string
 	 */
@@ -163,6 +168,22 @@ class kPostConvertJobData extends kConvartableJobData
 			return $flavorParamsOutput->getReadyBehavior();
 			
 		return null;
+	}
+
+	/**
+	 * @param $postConvertAssetType the $postConvertAssetType to set
+	 */
+	public function setPostConvertAssetType($postConvertAssetType)
+	{
+		$this->postConvertAssetType = $postConvertAssetType;
+	}
+
+	/**
+	 * @return the $postConvertAssetType
+	 */
+	public function getPostConvertAssetType()
+	{
+		return $this->postConvertAssetType;
 	}
 
 	/**
