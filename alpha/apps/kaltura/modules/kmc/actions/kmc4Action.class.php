@@ -72,6 +72,7 @@ class kmc4Action extends kalturaAction
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
 			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
+			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
