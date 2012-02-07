@@ -33,10 +33,13 @@ abstract class KBaseThumbnailMaker
 		$returnValue = null;
 		$output = system( $cmd , $returnValue );
 		KalturaLog::debug("Returned value: '$returnValue'");
-		
+
 		if($returnValue)
 			return false;
 			
+		if($this->parseOutput($output)!=true)
+			return false;
+		
 		return true;
 	}
 	
@@ -44,4 +47,9 @@ abstract class KBaseThumbnailMaker
 	 * @return string
 	 */
 	protected abstract function getCommand();
+
+	/**
+	 * @return int
+	 */
+	protected abstract function parseOutput($output);
 }
