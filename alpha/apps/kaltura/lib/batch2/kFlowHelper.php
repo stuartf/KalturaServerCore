@@ -1355,19 +1355,6 @@ class kFlowHelper
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleBulkUploadAborted(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
-        {
-		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 66, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
-		return $dbBatchJob;
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
 	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
         {
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
