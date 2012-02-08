@@ -132,19 +132,19 @@ class KAsyncConvert extends KBatchBase
 			}
 			catch(KalturaException $kex)
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
+				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 			catch(kTemporaryException $ktex)
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
+				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
 			catch(KalturaClientException $kcex)
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
+				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
 			catch(Exception $ex)
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 		}
 			
