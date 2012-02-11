@@ -1712,7 +1712,7 @@ class kFlowHelper
 				return;
 			}
 				
-			$currentReadyBehavior = self::getReadyBehavior($dbAsset, $profile);
+			$currentReadyBehavior = kBusinessPostConvertDL::getReadyBehavior($dbAsset, $profile);
 			if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 				kBatchManager::updateEntry($dbAsset->getEntryId(), entryStatus::ERROR_IMPORTING);
 			
