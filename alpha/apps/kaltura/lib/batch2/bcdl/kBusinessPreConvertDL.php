@@ -35,6 +35,47 @@ class kBusinessPreConvertDL
 		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAssetId, $mediaInfoId, $parentJob, $lastEngineType);
 	}
 	
+	
+	/**
+	 * 
+	 * Decide from which asset grab the thumbnail.
+	 * @param string $sourceAssetId
+	 * @param string $sourceParamsId
+	 * @param string $entryId
+	 * @return flavorAsset
+	 */
+	private static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	{
+		if($sourceAssetId)
+		{
+			$srcAsset = assetPeer::retrieveById($sourceAssetId);
+			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				return $srcAsset;
+		}
+		
+		if($sourceParamsId)
+		{
+			KalturaLog::debug("Look for flavor params [$sourceParamsId]");
+			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
+			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				return $srcAsset;
+		}
+					
+		KalturaLog::debug("Look for original flavor of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			return $srcAsset;
+					
+			
+		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
+		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			return $srcAsset;
+			
+		return null;
+	}
+	
+	
 	/**
 	 * decideThumbGenerate is the decision layer for a single thumbnail generation 
 	 * 
@@ -43,36 +84,13 @@ class kBusinessPreConvertDL
 	 * @param BatchJob $parentJob
 	 * @return thumbAsset 
 	 */
-	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false)
+	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false, $srcAsset = null)
 	{
-		$srcAsset = null;
-		if($sourceAssetId)
-		{
-			$srcAsset = assetPeer::retrieveById($sourceAssetId);
+		if (is_null($srcAsset)){
+			$srcAsset = self::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entry->getId());
+			if (is_null($srcAsset))
+				throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
 		}
-		else 
-		{
-			if($destThumbParams->getSourceParamsId())
-			{
-				KalturaLog::debug("Look for flavor params [" . $destThumbParams->getSourceParamsId() . "]");
-				$srcAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getSourceParamsId());
-			}
-					
-			if(is_null($srcAsset))
-			{
-				KalturaLog::debug("Look for original flavor");
-				$srcAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
-			}
-					
-			if (is_null($srcAsset) || $srcAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			{
-				KalturaLog::debug("Look for highest bitrate flavor");
-				$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
-			}
-		}
-		
-		if (is_null($srcAsset))
-			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
 			
 		$errDescription = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
