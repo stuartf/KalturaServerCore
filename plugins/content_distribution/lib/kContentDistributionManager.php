@@ -124,6 +124,8 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
+			return null;
 		$dc = kDataCenterMgr::getCurrentDcId();
 		$readyForSubmit = self::prepareDistributionJob($entryDistribution, $distributionProfile, $dc);
 		if(!$readyForSubmit)
@@ -514,7 +516,7 @@ class kContentDistributionManager
 				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		}
 		
-		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
+		if(!$returnValue && $submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
