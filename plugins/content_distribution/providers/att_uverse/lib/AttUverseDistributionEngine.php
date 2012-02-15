@@ -86,7 +86,7 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		{
 			$thumbnailDestFilePath = $this->getRemoteFilePath($thumbLocalPath, $distributionProfile->ftpPath);
 			$this->uploadAssetsFiles($ftpManager, $thumbnailDestFilePath, $thumbLocalPath);				
-			$remoteThumbnailFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$videoDestFilePath;			
+			$remoteThumbnailFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$thumbnailDestFilePath;			
 		}
 		//save thumnail assets on provider data to use in the service
 		$providerData->remoteThumbnailFileUrls = serialize($remoteThumbnailFileUrls);
