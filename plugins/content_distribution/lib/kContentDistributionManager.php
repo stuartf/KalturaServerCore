@@ -559,7 +559,7 @@ class kContentDistributionManager
 			        {
 			            $foundThumbParams = true;
 			            KalturaLog::log("Adding thumbnail [" . $autoCreateThumb . "] to entry [" . $entryDistribution->getEntryId() . "]");
-					    kBusinessPreConvertDL::decideThumbGenerate($entry, $autoCreateThumb); 
+					    kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams); 
 					    break;
 			        }
 			    }
