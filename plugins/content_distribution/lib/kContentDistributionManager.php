@@ -555,7 +555,7 @@ class kContentDistributionManager
 			    {
 			        $thumbParams = assetParamsPeer::retrieveByPK($autoCreateThumb);
 			        
-			        if ($thumbParams->getWidth() == $requiredDimensions[0] && $thumbParams->getWidth() == $requiredDimensions[1])
+			        if ($thumbParams->getWidth() == (int)$requiredDimensions[0] && $thumbParams->getWidth() == (int)$requiredDimensions[1])
 			        {
 			            $foundThumbParams = true;
 			            KalturaLog::log("Adding thumbnail [" . $autoCreateThumb . "] to entry [" . $entryDistribution->getEntryId() . "]");
