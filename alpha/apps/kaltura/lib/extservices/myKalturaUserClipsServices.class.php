@@ -101,7 +101,9 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 					"url" => $entry->getDataUrl() , 
 					"tags" => $entry->getTags() ,
 					"title" => $entry->getName() , 
-					"description" => $entry->getDescription() );
+					"description" => $entry->getDescription() ,
+					"flash_playback_type" => $entry->getMediaTypeName() , 
+				);
 					
 				if ( $should_add_thumbs )
 				{
