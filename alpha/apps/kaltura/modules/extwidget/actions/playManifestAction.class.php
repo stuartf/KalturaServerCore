@@ -565,7 +565,7 @@ class playManifestAction extends kalturaAction
 						
 						$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
 						$urlManager->setClipTo($this->clipTo);
-						
+						$urlManager->setContainerFormat($flavorAsset->getContainerFormat());
 						if($flavorAsset->getFileExt() === null) // if the extension is missig use the one from the actual path
         					$urlManager->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
         				else
