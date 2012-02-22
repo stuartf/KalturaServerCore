@@ -1156,6 +1156,10 @@ class myPartnerUtils
  		$toPartner->setAdminLoginUsersQuota($fromPartner->getAdminLoginUsersQuota());
  		$toPartner->save();
  		
+		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner 		
+ 		self::copyPermissions($fromPartner, $toPartner);
+ 		self::copyUserRoles($fromPartner, $toPartner);
+
  		kEventsManager::raiseEvent(new kObjectCopiedEvent($fromPartner, $toPartner));
  		
  		self::copyAccessControls($fromPartner, $toPartner);
@@ -1167,9 +1171,6 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
- 		
- 		self::copyUserRoles($fromPartner, $toPartner);
- 		self::copyPermissions($fromPartner, $toPartner);
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
