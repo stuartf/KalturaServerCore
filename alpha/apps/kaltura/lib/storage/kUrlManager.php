@@ -179,18 +179,18 @@ class kUrlManager
 	
 		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+			if ($storageProfile->getRTMPPrefix())
+			{
+			    $url = $storageProfile->getRTMPPrefix()."/". $url;
+			}
+			
 			if (($this->extention && strtolower($this->extention) != 'flv' ||
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
 				{
 				    $url = "mp4:$url";
 				}
             
-			$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
-			if ($storageProfile->getRTMPPrefix())
-			{
-			    $url = $storageProfile->getRTMPPrefix()."/". $url;
-			}
-				
 			// when serving files directly via RTMP fms doesnt expect to get the file extension				
 			$url = str_replace('.mp4', '', str_replace('.flv','',$url));
 		}
