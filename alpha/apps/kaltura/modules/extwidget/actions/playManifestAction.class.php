@@ -719,7 +719,7 @@ class playManifestAction extends kalturaAction
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
 			$codecs = "";
 			if ($bitrate && $bitrate <= 64000)
-				$codecs = ', CODECS="mp4a.40.2"';
+				$codecs = ',CODECS="mp4a.40.2"';
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."$codecs\n";
 			$content .= $flavor['url']."\n";
 		}
@@ -940,7 +940,7 @@ class playManifestAction extends kalturaAction
 		
 		if($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
 		{
-			header("Content-Type: text/plain; charset=UTF-8");
+			header("Content-Type: application/x-mpegurl");
 		}
 		else
 		{
