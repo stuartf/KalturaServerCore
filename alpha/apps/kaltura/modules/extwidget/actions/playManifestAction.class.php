@@ -610,6 +610,7 @@ class playManifestAction extends kalturaAction
 						
 						$urlManager->setClipTo($this->clipTo);
 						$urlManager->setFileExtension($flavorAsset->getFileExt());
+						$urlManager->setContainerFormat($flavorAsset->getContainerFormat());
 						$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_RTMP);
 						$url = $urlManager->getFlavorAssetUrl($flavorAsset);
 						$url = preg_replace('/^\//', '', $url);
