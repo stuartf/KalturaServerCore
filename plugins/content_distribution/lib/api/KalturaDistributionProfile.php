@@ -124,6 +124,12 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 	 */
 	public $sunsetDefaultOffset;
 	
+	/**
+	 * The best Kaltura data center to be used to execute the distribution job
+	 * @var int
+	 */
+	public $recommendedDcForExecute;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -146,6 +152,7 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 		'requiredFlavorParamsIds',
 		'sunriseDefaultOffset',
 		'sunsetDefaultOffset',
+		'recommendedDcForExecute',
 	 );
 		 
 	public function getMapBetweenObjects()

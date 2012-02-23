@@ -103,7 +103,7 @@ class kContentDistributionManager
 			return true;
 		
 		// check if all files exist on any of the remote dcs
-		$otherDcs = kDataCenterMgr::getAllDcs();
+		$otherDcs = kDataCenterMgr::getAllDcs(true);
 		foreach($otherDcs as $remoteDc)
 		{
 			$remoteDcId = $remoteDc['id'];
@@ -126,7 +126,10 @@ class kContentDistributionManager
 	{
 		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
 			return null;
-		$dc = kDataCenterMgr::getCurrentDcId();
+		
+		$dc = $distributionProfile->getRecommendedDcForExecute();
+		if(is_null($dc))
+			$dc = kDataCenterMgr::getCurrentDcId();
 		$readyForSubmit = self::prepareDistributionJob($entryDistribution, $distributionProfile, $dc);
 		if(!$readyForSubmit)
 			KalturaLog::err("File syncs might be missing, it might work");
@@ -202,7 +205,9 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
-		$dc = kDataCenterMgr::getCurrentDcId();
+		$dc = $distributionProfile->getRecommendedDcForExecute();
+		if(is_null($dc))
+			$dc = kDataCenterMgr::getCurrentDcId();
 		$readyForSubmit = self::prepareDistributionJob($entryDistribution, $distributionProfile, $dc);
 		if(!$readyForSubmit)
 			KalturaLog::err("File syncs might be missing, it might work");
