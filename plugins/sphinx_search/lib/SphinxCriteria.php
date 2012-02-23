@@ -149,7 +149,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
 		$sphinxIdField = $this->getSphinxIdField();
-		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
+		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker=none, max_matches=$maxMatches";
 
 		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
 
@@ -218,6 +218,32 @@ abstract class SphinxCriteria extends KalturaCriteria
 		}
 	}
 	
+	/**
+	 * This function is responsible to sort the fields by their priority.
+	 * Fields that cut more results, should be first so the query will be faster. 
+	 */
+	protected static function sortFieldsByPriority($fieldA,$fieldB) 
+	{
+		if($fieldA == $fieldB)
+			return 0;
+		
+		$fieldsWithPriorities = kConf::get("fields_with_priorities_in_sphinx");
+		
+		$priorityA = 0;
+		$priorityB = 0;
+		
+		$aFieldName = substr($fieldA,strpos($fieldA,".") + 1);
+		$bFieldName = substr($fieldB,strpos($fieldB,".") + 1);
+		
+		if(array_key_exists($aFieldName, $fieldsWithPriorities)) 
+			$priorityA = $fieldsWithPriorities[$aFieldName];
+		
+		if(array_key_exists($bFieldName, $fieldsWithPriorities))
+			$priorityB = $fieldsWithPriorities[$bFieldName];
+		
+		return ($priorityB - $priorityA);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
 	 */
@@ -243,8 +269,10 @@ abstract class SphinxCriteria extends KalturaCriteria
 			return;
 		}
 		
+		$conditionMap = $this->getMap();
+		uksort($conditionMap, array('SphinxCriteria','sortFieldsByPriority'));
 		// go over all criterions and try to move them to the sphinx
-		foreach($this->getMap() as $field => $criterion)
+		foreach($conditionMap as $field => $criterion)
 		{
 			if(!($criterion instanceof SphinxCriterion))
 			{

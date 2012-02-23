@@ -246,6 +246,8 @@ class kConf extends kConfLocal
 				'default_streamer_type' => 'http',
 				'default_media_protocol' => 'http',
 				
+				'fields_with_priorities_in_sphinx' => array('PARTNER_ID' => 1),
+				
 				'video_file_ext' => array('flv','asf','qt','mov','mpg','mpeg','avi','wmv','mp4','m4v','3gp','vob','f4v','mkv','mxf','mts'),
 				'image_file_ext' => array('jpg','jpeg','bmp','png','gif','tif','tiff'),
 				'audio_file_ext' => array('flv','asf','wmv','qt','mov','mpg','avi','mp3','wav','mp4','wma','3gp','vob','amr'),

@@ -3,6 +3,7 @@
 class SphinxCriterion extends KalturaCriterion
 {
 	const MAX_IN_VALUES = 150;
+	protected static $NOT_NULL_FIELDS = array("created_at","updated_at");
 	
 	protected function hasOr()
 	{
@@ -76,6 +77,27 @@ class SphinxCriterion extends KalturaCriterion
 		return null;
 	}
 	
+	protected function generateAggregatedCondition($sphinxField, $value,$queryHasOr, $aggregatedStr, $singleStr)
+	{
+		$values = implode(',', $value);
+		
+		if ($queryHasOr)
+		{
+			return "$aggregatedStr ($sphinxField , $values)";
+		}
+		else
+		{
+			if(count($value) > 1)
+			{
+				return "$sphinxField $aggregatedStr($values)";
+			}
+			else
+			{
+				return "$sphinxField $singleStr $values";
+			}
+		}
+	}
+	
 	protected function getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr)
 	{
 		$thisClause = array();
@@ -95,19 +117,7 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				if ($queryHasOr)
-				{
-					$inConditions = array();
-					foreach($value as $val)
-						 $inConditions[] = "$sphinxField = $val";
-	
-					$thisClause[] = implode(' OR ', $inConditions);
-				}
-				else 
-				{
-					$values = implode(',', $value);
-					$thisClause[] = "$sphinxField in($values)";
-				}
+				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value,$queryHasOr, "in", "=");
 				break;
 				
 			case Criteria::NOT_IN:
@@ -122,11 +132,8 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				$notInConditions = array();
-				foreach($value as $val)
-					 $notInConditions[] = "$sphinxField <> $val";
-
-				$thisClause[] = implode(' AND ', $notInConditions);
+				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value,$queryHasOr, "not in", "<>");
+				
 				break;
 				
 			case Criteria::ISNULL:
@@ -135,8 +142,9 @@ class SphinxCriterion extends KalturaCriterion
 				
 			case Criteria::LESS_THAN:
 			case Criteria::LESS_EQUAL:
-				if($type == IIndexable::FIELD_TYPE_DATETIME && $value > 0)
-					$thisClause[] = "$sphinxField <> 0";
+				if($type == IIndexable::FIELD_TYPE_DATETIME && $value > 0) 
+					if(!in_array($sphinxField, self::$NOT_NULL_FIELDS))
+						$thisClause[] = "$sphinxField <> 0";
 				// fallthrough
 				
 			default:
@@ -162,6 +170,7 @@ class SphinxCriterion extends KalturaCriterion
 			
 		$field = $this->getTable() . '.' . $this->getColumn();
 		
+		// Can apply criterion
 		KalturaLog::debug("Applies criterion [$field] queryHasOr=[$queryHasOr]");
 	
 		$comparison = $this->getComparison();
@@ -182,6 +191,7 @@ class SphinxCriterion extends KalturaCriterion
 		$sphinxField	= $this->criteria->getSphinxFieldName($field);
 		$type			= $this->criteria->getSphinxFieldType($sphinxField);
 		
+		// Update value & comparison in case of id field
 		if($field == $this->criteria->getIdField())
 		{
 			if($comparison == Criteria::EQUAL)
@@ -203,6 +213,7 @@ class SphinxCriterion extends KalturaCriterion
 		$valStr = print_r($value, true);
 		KalturaLog::debug("Attach criterion[$field] as sphinx field[$sphinxField] of type [$type] and comparison[$comparison] for value[$valStr]");
 		
+		// update comparison in case of null
 		if (is_null($value)){
 			if ($comparison == Criteria::EQUAL)
 				$comparison = Criteria::ISNULL;
@@ -210,6 +221,7 @@ class SphinxCriterion extends KalturaCriterion
 				$comparison = Criteria::ISNOTNULL;
 		}
 		
+		// update value in case of Date
 		if (is_string($value)) { // needed since otherwise the switch statement doesn't work as expected otherwise
 			switch($value)
 			{
@@ -280,6 +292,7 @@ class SphinxCriterion extends KalturaCriterion
 			
 		if ($thisClause && !$depth)
 		{
+			// Reduce null
 			$expSimplifications = array(
 				"(($sphinxField <> 0 AND $sphinxField <= $value) OR ($sphinxField = 0))"		=> "$sphinxField <= $value",
 				"(($sphinxField <> 0 AND $sphinxField < $value) OR ($sphinxField = 0))"			=> "$sphinxField < $value",
@@ -289,6 +302,7 @@ class SphinxCriterion extends KalturaCriterion
 			{
 				KalturaLog::debug("Simplifying expression [$thisClause] => [{$expSimplifications[$thisClause]}]");
 				
+				// We move it to the 'where' since where is allegedly faster than in the condition.
 				$whereClause[] = $expSimplifications[$thisClause];
 				$thisClause = null;
 			}
@@ -296,6 +310,7 @@ class SphinxCriterion extends KalturaCriterion
 		
 		if ($thisClause)
 		{
+			// We will get here of query has or and it wasn't a simplified date condition
 			$conditionClause = $thisClause;
 		}
 		
