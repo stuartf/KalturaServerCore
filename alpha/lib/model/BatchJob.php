@@ -153,7 +153,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				  
 				$dc = kDataCenterMgr::getCurrentDcId(); 
 				
-                if ($this->getEntryId())
+                if (0 && $this->getEntryId())
                 {
                 	$srcflavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->getEntryId());
                     if ($srcflavorAsset)
@@ -168,7 +168,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
                     {
                         $dc = kDataCenterMgr::getDCByObjectId($this->getEntryId(), true);
                     }
-		    	}
+		}
 		    	kalturaLog::debug("setting the job's DC to [$dc]");
 				$this->setDc ( $dc );
 			}		
