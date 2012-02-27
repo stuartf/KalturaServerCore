@@ -7,7 +7,7 @@
  * @package api
  * @subpackage services
  */
-class KalturaAssetService extends KalturaBaseService
+abstract class KalturaAssetService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
