@@ -259,11 +259,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $autoModerateEntryFilter;
 	
-	/**
-	 * @var string
-	 */
-	public $logoutUrl;
-	
 	
 	private static $map_between_objects = array
 	(
@@ -315,7 +310,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"internalUse",
 		"defaultLiveStreamEntrySourceType",
 		"liveStreamProvisionParams",
-		"logoutUrl",
 	);
 
 	public function getMapBetweenObjects()
