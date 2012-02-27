@@ -120,6 +120,6 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 	    }
 	    
-	    return $this->getAction($$assetId);
+	    return $this->getAction($assetId);
 	}
 }
