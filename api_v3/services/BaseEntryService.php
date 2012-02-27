@@ -795,4 +795,46 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 		}		
 		return $result;
 	}
+	
+	/**
+	 * @action export
+	 * Action for manually exporting an entry
+	 * @param string $entryId
+	 * @param int $storageProfileId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	public function exportAction ( $entryId , $storageProfileId )
+	{
+	    if (!$entryId || $entryId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
+	    }
+	    
+	    if (!$storageProfileId || $storageProfileId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
+	    }
+	    
+	    $dbEntry = entryPeer::retrieveByPK($entryId);
+	    if (!$dbEntry)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+	    }
+	    
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
+	    if (!$dbStorageProfile)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	    }
+	    
+	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
+	    
+	    //TODO: implement export errors
+	    
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+	    return $entry;
+	    
+	}
 }
