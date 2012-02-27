@@ -176,14 +176,14 @@ class BulkUploadService extends KalturaBaseService
 		}	
 	}
 	
-	/**
+	/** 
 	 * Aborts the bulk upload and all its child jobs
 	 * 
 	 * @action abort
 	 * @param int $id job id
 	 * @return KalturaBulkUpload
 	 */
-	function abortAction($id)
+	function abortAction($id) 
 	{
 	    $c = new Criteria();
 	    $c->addAnd(BatchJobPeer::ID, $id);
@@ -193,8 +193,13 @@ class BulkUploadService extends KalturaBaseService
 		
 		if (!$batchJob)
 		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
+		
+		if (!in_array($batchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
+		{
+		    throw new KalturaAPIException(KalturaErrors::CANNOT_ABORT_BULKUPLOAD_UNFINISHED_JOB, $id);
+		}
 		    
-		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
+		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD);
 		
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJob);
