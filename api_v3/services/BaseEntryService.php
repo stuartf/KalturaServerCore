@@ -802,7 +802,7 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 	 * @param string $entryId
 	 * @param int $storageProfileId
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
 	{
@@ -813,7 +813,7 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 	    
 	    if (!$storageProfileId || $storageProfileId == "")
 	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
+	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, -1);
 	    }
 	    
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
@@ -825,7 +825,7 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
 	    if (!$dbStorageProfile)
 	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
 	    $storageExporter = new kStorageExporter();
