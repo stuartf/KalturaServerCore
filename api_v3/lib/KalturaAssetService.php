@@ -97,17 +97,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */
 	protected function exportAction ( $assetId , $storageProfileId )
-	{
-	    if (!$assetId || $assetId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, -1);
-	    }
-	    
-	    if (!$storageProfileId || $storageProfileId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, -1);
-	    }
-	    
+	{	    
 	    $dbAsset = assetPeer::retrieveById($assetId);
 	    if (!$dbAsset)
 	    {

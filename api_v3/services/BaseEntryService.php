@@ -801,25 +801,15 @@ public function getContextData($entryId, KalturaEntryContextDataParams $contextD
 	 * Action for manually exporting an entry
 	 * @param string $entryId
 	 * @param int $storageProfileId
-	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
-	{
-	    if (!$entryId || $entryId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
-	    }
-	    
-	    if (!$storageProfileId || $storageProfileId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, -1);
-	    }
-	    
+	{	    
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    if (!$dbEntry)
 	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
 	    
 	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
