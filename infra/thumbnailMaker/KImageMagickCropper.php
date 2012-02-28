@@ -264,9 +264,12 @@ KalturaLog::info("orientation=$orientation");
 					break;
 			}
 		}
-
+		
 		if(!count($attributes))
 			return null;
+
+		if ($width && $height)
+		    $attributes[] = "-resize ' ".$width ."x" . $height. "!'";
 			
 		$options = implode(' ', $attributes);
 		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
