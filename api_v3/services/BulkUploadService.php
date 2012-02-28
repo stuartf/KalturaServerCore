@@ -199,7 +199,7 @@ class BulkUploadService extends KalturaBaseService
 		    throw new KalturaAPIException(KalturaErrors::CANNOT_ABORT_BULKUPLOAD_UNFINISHED_JOB, $id);
 		}
 		    
-		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD);
+		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
 		
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJob);
