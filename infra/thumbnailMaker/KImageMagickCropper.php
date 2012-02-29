@@ -164,7 +164,7 @@ KalturaLog::info("orientation=$orientation");
 				case self::RESIZE:
 					$w = $width ? $width : '';
 					$h = $height ? $height : '';
-					$attributes[] = "-resize {$w}x{$h}";
+					$attributes[] = "-resize '{$w}x{$h}!'";
 					break;
 					
 				case self::RESIZE_WITH_PADDING:
@@ -201,14 +201,14 @@ KalturaLog::info("orientation=$orientation");
 						
 						$bgcolor = sprintf('%06x', $bgcolor);
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
-						$attributes[] = "-resize {$w}x{$h}";
+						$attributes[] = "-resize '{$w}x{$h}!'";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
 					{
 						$w = $width ? $width : '';
 						$h = $height ? $height : '';
-						$attributes[] = "-resize {$w}x{$h}";
+						$attributes[] = "-resize '{$w}x{$h}!'";
 					}
 					break;
 					
@@ -260,7 +260,7 @@ KalturaLog::info("orientation=$orientation");
 						
 					$attributes[] = $gravity;	
 					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
-					$attributes[] = "-resize {$w}x{$h}";
+					$attributes[] = "-resize '{$w}x{$h}!'";
 					break;
 			}
 		}
@@ -268,9 +268,6 @@ KalturaLog::info("orientation=$orientation");
 		if(!count($attributes))
 			return null;
 
-		if ($width && $height)
-		    $attributes[] = "-resize ' ".$width ."x" . $height. "!'";
-			
 		$options = implode(' ', $attributes);
 		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
 	}
