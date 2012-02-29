@@ -284,7 +284,7 @@ class kQueryCache
 			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
 			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 0, 
-				self::CACHED_QUERIES_EXPIRY_SEC + self::KEYS_EXPIRY_MARGIN))
+				self::CACHED_QUERIES_EXPIRY_SEC + self::INVALIDATION_KEYS_EXPIRY_MARGIN))
 			{
 				KalturaLog::err("kQueryCache: failed to update invalidation key");
 			}
