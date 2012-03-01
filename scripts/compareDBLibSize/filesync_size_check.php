@@ -3,8 +3,8 @@
 $working_dc = 0;
 # Init
 $dc = array('pa','ny');
-$filePath_src = dirname(__FILE__).'\src_'.$dc[$working_dc].'.txt';
-$filePath_log = dirname(__FILE__).'\output.log';
+$filePath_src = dirname(__FILE__).'/src_'.$dc[$working_dc].'.txt';
+$filePath_log = dirname(__FILE__).'/output.log';
 function log_insert($fptr,$str) {
 	fwrite($fptr,date('M-d-Y H:i:s').'|'.$str."\r\n");
 }
