@@ -1,6 +1,6 @@
 <?php
 # Parameteres
-$working_dc = 1;
+$working_dc = 0;
 # Init
 $dc = array('pa','ny');
 $filePath_src = dirname(__FILE__).'/src_'.$dc[$working_dc].'.txt';
