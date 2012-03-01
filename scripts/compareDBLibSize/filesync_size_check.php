@@ -13,11 +13,13 @@ $fLogPtr = fopen($filePath_log,'w') or die("Error opening file: $filePath_log");
 $fileLines = file($filePath_src) or die("Error opening file: $filePath_src");
 foreach($fileLines as $line) {
 	$lineComponent = explode('|',$line);
-	$dbSize = $lineComponent[0];
-	clearstatcache();
-	$hddSize = filesize('/web'.$lineComponent[1]);
-	if ($dbSize != $hddSize)
-		log_insert($fLogPtr,'fileSync ID|'.trim($lineComponent[2]).'|Delta|'.($dbSize - $hddSize));
+	if(file_exists($lineComponent[1])) {
+		clearstatcache();
+		$hddSize = filesize('/web'.$lineComponent[1]);
+		if ($dbSize != $hddSize)
+			log_insert($fLogPtr,'fileSync ID|'.trim($lineComponent[2]).'|Delta|'.($dbSize - $hddSize));
+		$dbSize = $lineComponent[0];
+	}
 }
 
 fclose($fLogPtr);
