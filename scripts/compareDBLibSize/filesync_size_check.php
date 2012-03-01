@@ -15,9 +15,6 @@ foreach($fileLines as $line) {
 	$lineComponent = explode('|',$line);
 	$dbSize = $lineComponent[0];
 	$hddSize = filesize('/web'.$lineComponent[1]);
-	#debug
-	echo "dbSize = $dbSize | hddSize = $hddSize | D = ".($dbSize - $hddSize);
-	##
 	if ($dbSize != $hddSize)
 		log_insert($fLogPtr,'fileSync ID|'.trim($lineComponent[2]).'|Delta|'.($dbSize - $hddSize));
 }
