@@ -20,9 +20,6 @@ foreach($fileLines as $line) {
 	##
 	if ($dbSize != $hddSize)
 		log_insert($fLogPtr,'fileSync ID|'.trim($lineComponent[2]).'|Delta|'.($dbSize - $hddSize));
-	#debug
-	passthru('pause');
-	##
 }
 
 fclose($fLogPtr);
