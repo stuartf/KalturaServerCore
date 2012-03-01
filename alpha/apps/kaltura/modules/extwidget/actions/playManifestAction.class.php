@@ -832,16 +832,28 @@ class playManifestAction extends kalturaAction
 		
 		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
 		{ 
-			$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
-			if ($flavorParamId || $flavorParamId === "0")
+			$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
+			if ($flavorParamIds !== null)
 			{
-				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
-				if(!$flavorAsset)
+				$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entry->getId(), explode(",", $flavorParamIds));
+				if (!$this->flavorIds || count($this->flavorIds) == 0)
 				{
 					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				}
+			}
+			else
+			{
+				$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
+				if ($flavorParamId || $flavorParamId === "0")
+				{
+					$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
+					if(!$flavorAsset)
+					{
+						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+					}
 				
-				$this->flavorId = $flavorAsset->getId();
+					$this->flavorId = $flavorAsset->getId();
+				}
 			}
 		}	
 		
