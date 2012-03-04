@@ -265,6 +265,7 @@ class kContentDistributionManager
  		$jobData->setEntryDistributionId($entryDistribution->getId());
  		$jobData->setProviderType($distributionProfile->getProviderType());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());
+ 		$jobData->setMediaFiles($entryDistribution->getMediaFiles());
  		
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($entryDistribution->getEntryId());

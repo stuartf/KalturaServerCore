@@ -260,7 +260,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionSubmitJobUpdated(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getRemoteId() || ($data->getResults() && $data->getSentData()))
+		if($data->getRemoteId() || $data->getResults() || $data->getSentData() || $data->getMediaFiles())
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
@@ -322,7 +322,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionUpdateJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getResults() && $data->getSentData())
+		if($data->getResults() || $data->getSentData() || $data->getMediaFiles())
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
@@ -336,6 +336,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($data->getSentData())
 				$entryDistribution->incrementUpdateDataVersion();
+				
+			if($data->getMediaFiles())
+				$entryDistribution->setMediaFiles($data->getMediaFiles());
 				
 			$entryDistribution->save();
 			
@@ -378,7 +381,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionEnableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getResults() && $data->getSentData())
+		if($data->getResults() || $data->getSentData())
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
@@ -454,7 +457,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionDisableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getResults() && $data->getSentData())
+		if($data->getResults() || $data->getSentData())
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
@@ -510,7 +513,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionDeleteJobUpdated(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getResults() && $data->getSentData())
+		if($data->getResults() || $data->getSentData())
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
