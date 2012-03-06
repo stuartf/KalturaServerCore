@@ -439,7 +439,10 @@ class ThumbAssetService extends KalturaAssetService
 		
 		KalturaLog::debug("entryKuserId [$entryKuserId], thisKuserId [$thisKuserId], isNotAdmin [$isNotAdmin ]");
 
-		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
+		if(	$isNotAdmin && 
+			!$this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, $entry->getId()) && 
+			!is_null($entryKuserId) && 
+			$entryKuserId != $thisKuserId)  
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
 			
 		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
