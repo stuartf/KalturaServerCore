@@ -432,19 +432,7 @@ class ThumbAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
 									
 		$this->checkIfUserAllowedToUpdateEntry($entry);
-		
-		$entryKuserId = $entry->getKuserId();
-		$thisKuserId = $this->getKuser()->getId();
-		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
-		
-		KalturaLog::debug("entryKuserId [$entryKuserId], thisKuserId [$thisKuserId], isNotAdmin [$isNotAdmin ]");
-
-		if(	$isNotAdmin && 
-			!$this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, $entry->getId()) && 
-			!is_null($entryKuserId) && 
-			$entryKuserId != $thisKuserId)  
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
-			
+					
 		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
