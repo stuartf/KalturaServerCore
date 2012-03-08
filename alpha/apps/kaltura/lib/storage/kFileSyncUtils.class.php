@@ -248,6 +248,9 @@ public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key 
 			KalturaLog::log(__METHOD__." - $temp_file_path file doesnt exist");	
 		}
 		
+		clearstatcache();
+		KalturaLog::log("File size before move " . filesize($temp_file_path));
+				
 		if($copyOnly)
 		{
 			$success = copy($temp_file_path, $targetFullPath);
@@ -259,6 +262,9 @@ public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key 
 		
 		if($success)
 		{
+			clearstatcache();
+			KalturaLog::log("File size after move " . filesize($targetFullPath));
+			
 			if(!$existsFileSync)
 				self::createSyncFileForKey($target_key, $strict, false, $cacheOnly);
 		}
