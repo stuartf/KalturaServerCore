@@ -215,13 +215,13 @@ class widget extends Basewidget
 	   	if ( $width <= 0 ) $width = 400;
 	   	
 	   	$seo_visible = "";
-	   	
+   		$seo_hidden = "";
+   		
 	   	if ($templatePartnerId) // dont include seo links for white label partners
 	   	{
 	   		$player_name = 'player_' . (int)microtime(true);
-	   		$seo_hidden = "";
 	   	}
-	   	else
+	   	else if ($partner->getIgnoreSeoLinks())
 	   	{
 		   	$seo_hidden = '<a href="http://corp.kaltura.com">video platform</a>' .
 		   		'<a href="http://corp.kaltura.com/video_platform/video_management">video management</a>' .
