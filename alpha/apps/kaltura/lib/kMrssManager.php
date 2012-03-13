@@ -240,7 +240,7 @@ class kMrssManager
 		$mediaParams = array(
 			'format' => $flavorAsset->getContainerFormat(),
 			'videoBitrate' => $flavorAsset->getBitrate(),
-            'fileSize' => $flavorAsset->getSize() * 1024, // mrss spec is in bytes
+			'fileSize' => $flavorAsset->getSize() * 1024, // mrss spec is in bytes
 			'videoCodec' => $flavorAsset->getVideoCodecId(),
 			'audioBitrate' => 0,
 			'audioCodec' => '',
