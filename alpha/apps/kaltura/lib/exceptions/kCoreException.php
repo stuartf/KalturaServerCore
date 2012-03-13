@@ -4,11 +4,27 @@
  */
 class kCoreException extends Exception
 {
-	public function __construct($message, $code)
+	/**
+	 * Exception additional data
+	 * @var string
+	 */
+	private $data;
+	
+	public function __construct($message, $code, $data = null)
 	{
-		KalturaLog::err($message);
+		KalturaLog::err('Message: '. $message .' \nCode: '.$code);
 		$this->message = $message;
 		$this->code = $code;
+		$this->data = $data;
+	}
+	
+	/**
+	 * Exception additional data
+	 * @return string
+	 */
+	public function getData()
+	{
+		return $this->data;
 	}
 	
 	const INVALID_QUERY = "INVALID_QUERY";
@@ -29,7 +45,13 @@ class kCoreException extends Exception
 	
 	const OBJECT_TYPE_NOT_FOUND = "OBJECT_TYPE_NOT_FOUND";
 	
+	const OBJECT_API_TYPE_NOT_FOUND = "OBJECT_API_TYPE_NOT_FOUND";
+	
 	const SOURCE_FILE_NOT_FOUND = "SOURCE_FILE_NOT_FOUND";
 	
 	const FILE_NOT_FOUND = "FILE_NOT_FOUND";
+	
+	const ACCESS_CONTROL_CANNOT_DELETE_PARTNER_DEFAULT = "ACCESS_CONTROL_CANNOT_DELETE_PARTNER_DEFAULT";
+	
+	const ACCESS_CONTROL_CANNOT_DELETE_USED_PROFILE = "ACCESS_CONTROL_CANNOT_DELETE_USED_PROFILE";
 }

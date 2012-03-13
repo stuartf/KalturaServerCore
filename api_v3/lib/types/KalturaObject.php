@@ -58,7 +58,14 @@ class KalturaObject
             if (is_callable($getter_callback))
             {
                 $value = call_user_func($getter_callback);
-                if($properties[$this_prop]->isDynamicEnum())
+                
+                if($properties[$this_prop]->isArray() && is_array($value))
+                {
+                	$class = $properties[$this_prop]->getType();
+                	if(method_exists($class, 'fromDbArray'))
+	                	$value = call_user_func(array($class, 'fromDbArray'), $value);
+                }
+                elseif($properties[$this_prop]->isDynamicEnum())
                 {
 					$propertyType = $properties[$this_prop]->getType();
 					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
@@ -100,16 +107,19 @@ class KalturaObject
 		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
-		 	if ( is_numeric( $this_prop) ) $this_prop = $object_prop;
-			if (in_array($this_prop, $props_to_skip)) continue;
+		 	if ( is_numeric( $this_prop) ) 
+		 		$this_prop = $object_prop;
+			if (in_array($this_prop, $props_to_skip)) 
+				continue;
 			
 			$value = $this->$this_prop;
-			if (is_null($value)) continue;
+			if (is_null($value)) 
+				continue;
 				
 			$propertyInfo = $typeReflector->getProperty($this_prop);
 			if (!$propertyInfo)
 			{
-	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($this) . "]");
 	            continue;
 			}
 			
@@ -117,13 +127,17 @@ class KalturaObject
 			{
 				$value = null;
 			}
+			elseif ($value instanceof KalturaTypedArray)
+			{
+				$value = $value->toObjectsArray();
+			}
 			elseif ($propertyInfo->isDynamicEnum())
 			{
 				$propertyType = $propertyInfo->getType();
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
-			elseif (! kXml::isXMLValidContent($value) )
+			elseif (is_string($value) && ! kXml::isXMLValidContent($value) )
 			{
 				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 			}
@@ -132,7 +146,7 @@ class KalturaObject
 			if (is_callable($setter_callback))
 		 	    call_user_func_array( $setter_callback , array ($value ) );
 	 	    else 
-            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [" . get_class($this) . "]");
 		}
 		return $object_to_fill;		
 	}

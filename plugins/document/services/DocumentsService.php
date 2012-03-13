@@ -406,7 +406,7 @@ class DocumentsService extends KalturaEntryService
 		
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();	
 					
 		$flavorAsset = null;
@@ -454,7 +454,7 @@ class DocumentsService extends KalturaEntryService
 					
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;

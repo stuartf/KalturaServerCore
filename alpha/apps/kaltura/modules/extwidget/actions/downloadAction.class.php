@@ -22,7 +22,7 @@ class downloadAction extends sfAction
 			
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 			
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload($entry, $ksStr);
 		
 		$flavorAsset = null;
@@ -126,7 +126,7 @@ class downloadAction extends sfAction
 		return $syncKey;
 	}
 	
-    private static function encodeUrl($url)
+	private static function encodeUrl($url)
 	{
 		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
 	}
