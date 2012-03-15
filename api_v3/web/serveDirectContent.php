@@ -29,8 +29,8 @@ if ($entry && $entry->getPartnerId() == 396071)
 
 $pos = strpos($scriptUrl, "/content");
 $fullPath = realpath(myContentStorage::getFSContentRootPath().substr($scriptUrl, $pos));
-$mimeType = mime_content_type($fullPath);
+$mimeType = null;//mime_content_type($fullPath);
 
 KalturaLog::log("dump: [$fullPath] mimeType: [mimeType]");
 
-kFile::dumpFile($fullPath, $mimeType);
+kFile::dumpFile($fullPath);//, $mimeType);
