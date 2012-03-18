@@ -179,6 +179,11 @@ class kUrlManager
 	
 		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		{
+		    $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+		    if ($storageProfile->getRTMPPrefix())
+			{
+			    $url = $storageProfile->getRTMPPrefix()."/". $url;
+			}
 			if (($this->extention && strtolower($this->extention) != 'flv' ||
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
 				$url = "mp4:$url";
