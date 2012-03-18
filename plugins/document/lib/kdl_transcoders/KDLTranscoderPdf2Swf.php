@@ -47,7 +47,7 @@ class KDLTranscoderPdf2Swf extends KDLOperatorBase
 				$cmdStr .= '-s poly2bitmap';
 			}
 		}
-		$cmdStr .= KDLCmdlinePlaceholders::InFileName.
+		$cmdStr .= $extra . KDLCmdlinePlaceholders::InFileName.
 		           ' -o '.KDLCmdlinePlaceholders::OutFileName;
 		
 		return trim($cmdStr);
