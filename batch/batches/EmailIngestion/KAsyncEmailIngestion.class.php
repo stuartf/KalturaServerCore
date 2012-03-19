@@ -479,7 +479,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 	    
 	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
 	    
-		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($filename));
+		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($filename), null, null, -1);
 		
 		return $this->getClient()->doMultiRequest();
     }
