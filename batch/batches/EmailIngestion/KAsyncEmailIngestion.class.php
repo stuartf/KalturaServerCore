@@ -147,6 +147,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 				$pass      = $params->pass;
 				$options   = $params->options;
 				$maxMails  = $params->maxMailsPerRun;
+				$mailboxId = $params->mailboxIdentifier;
 			}
 			catch (Exception $e) {
 				KalturaLog::crit("Cannot find all required parameters from config file for mailbox number [$mailboxNumber]");
@@ -203,7 +204,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 				
 				
 				// validate partner and get email profile
-				$email_profiles = $this->validePartnerAndGetProfile(array($curMail->header->fromadd), $user.'@'.$host);
+				$email_profiles = $this->validePartnerAndGetProfile(array($curMail->header->fromadd), $mailboxId);
 				if (!$email_profiles) {
 					// error validating partner
 					KalturaLog::err('Partner validation failed for ['.$curMail->header->msgid."] on [$user@$host] from [".$curMail->header->fromadd.'] with subject ['.$curMail->header->subject.']');
