@@ -406,9 +406,9 @@ class KAsyncEmailIngestion extends KBatchBase {
 			// upload file to the kaltura server
 			// ---------------------------------
 			try {
-				$requestResults = $this->createUploadTokenAndUpload($profile, $filename);
+				$token = $this->createUploadTokenAndUpload($profile, $filename);
 				
-				list ($token, $upload) = $requestResults;
+//				list ($token, $upload) = $requestResults;
 			}
 			catch (Exception $e) {
 				$token = null;
@@ -467,11 +467,12 @@ class KAsyncEmailIngestion extends KBatchBase {
      */
     private function createUploadTokenAndUpload (KalturaEmailIngestionProfile $profile, $filename)
     {
+        $filename = realpath($filename);
         KalturaLog::debug("using profile: ". $profile->id ."and filename: $filename");
         
         $this->impersonate($profile->partnerId);
 			    
-	    $this->getClient()->startMultiRequest();
+//	    $this->getClient()->startMultiRequest();
 	    
 	    $uploadToken = new KalturaUploadToken(); 
 	    
@@ -481,9 +482,11 @@ class KAsyncEmailIngestion extends KBatchBase {
 	    
 	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
 	    
-		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($filename), null, null, -1);
+		$uploadToken = $this->getClient()->uploadToken->upload($uploadToken->id, $filename, null, null, -1);
 		
-		return $this->getClient()->doMultiRequest();
+//		return $this->getClient()->doMultiRequest();
+
+		return $uploadToken;
     }
 
 
