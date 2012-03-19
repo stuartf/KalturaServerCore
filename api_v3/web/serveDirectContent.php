@@ -24,7 +24,8 @@ $entryId =  substr($basename,0,2).$entryId;
 
 KalturaLog::log("url: [$scriptUrl] entryId: [$entryId]");
 $entry = entryPeer::retrieveByPk($entryId);
-if ($entry && $entry->getPartnerId() == 396071)
+$partners = array(295942,325802,325822,336291,336301,336311,372651,373051,373061,395871,395891,395911,395921,396031,396041,396061,396071,396081,486891,870161,870171,870181,870191,870211,444991,470781,477471,506041,525511,525791,585831,595571,762871,762901,762921,764021,764031,764041,794862,86452,782152,779962,782601,859791,506041);
+if ($entry && in_array($entry->getPartnerId(), $partners))
 	KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 
 $pos = strpos($scriptUrl, "/content");
