@@ -467,6 +467,8 @@ class KAsyncEmailIngestion extends KBatchBase {
      */
     private function createUploadTokenAndUpload ($profile, $filename)
     {
+        KalturaLog::debug("using profile: $profile and filename: $filename");
+        
         $this->impersonate($profile->partnerId);
 			    
 	    $this->getClient()->startMultiRequest();
@@ -479,7 +481,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 	    
 	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
 	    
-		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($uploadToken->fileName), null, null, -1);
+		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($filename), null, null, -1);
 		
 		return $this->getClient()->doMultiRequest();
     }
