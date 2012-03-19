@@ -41,7 +41,7 @@ class myCache
 			catch (Exception $e) {
 				$res = false;
 			}
-			KalturaLog::debug("myCache: connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("memcache_host"));
+			KalturaLog::debug("myCache ($namespace): connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("memcache_host"));
 			if ( !$res )
 			{
 				kLog::log( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
