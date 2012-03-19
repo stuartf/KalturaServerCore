@@ -465,9 +465,9 @@ class KAsyncEmailIngestion extends KBatchBase {
      * @param KalturaEmailIngestionProfile $profile
      * @param string $filename
      */
-    private function createUploadTokenAndUpload ($profile, $filename)
+    private function createUploadTokenAndUpload (KalturaEmailIngestionProfile $profile, $filename)
     {
-        KalturaLog::debug("using profile: $profile and filename: $filename");
+        KalturaLog::debug("using profile: ". $profile->id ."and filename: $filename");
         
         $this->impersonate($profile->partnerId);
 			    
