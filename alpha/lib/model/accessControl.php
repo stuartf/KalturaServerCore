@@ -198,11 +198,11 @@ class accessControl extends BaseaccessControl
 	/**
 	 * @return array<kRule>
 	 */
-	public function getRulesArray()
+	public function getRulesArray($migrate = false)
 	{
 		$rules = array();
 		$rulesString = $this->getRules();
-		if($rulesString)
+		if($rulesString && !$migrate)
 		{
 			try
 			{
@@ -216,7 +216,7 @@ class accessControl extends BaseaccessControl
 		} 
 		
 		// TODO - remove after full migration
-		if(!count($rules))
+		if(!count($rules) || $migrate)
 		{
 			if (!is_null($this->getSiteRestrictType()))
 				$rules[] = new kAccessControlSiteRestriction($this);
@@ -225,10 +225,15 @@ class accessControl extends BaseaccessControl
 				$rules[] = new kAccessControlCountryRestriction($this);
 				
 			if (!is_null($this->getKsRestrictPrivilege()))
-				$rules[] = new kAccessControlSessionRestriction($this);
+			{
+				if($this->getPrvRestrictPrivilege())
+					$rules[] = new kAccessControlPreviewRestriction($this);
+				else
+					$rules[] = new kAccessControlSessionRestriction($this);
+			}
 				
-			if (!is_null($this->getPrvRestrictPrivilege()))
-				$rules[] = new kAccessControlPreviewRestriction($this);
+//			if (!is_null($this->getPrvRestrictPrivilege()))
+//				$rules[] = new kAccessControlPreviewRestriction($this);
 				
 			if (!is_null($this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME)))
 				$rules[] = new kAccessControlIpAddressRestriction($this);
