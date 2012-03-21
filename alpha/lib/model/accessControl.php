@@ -156,7 +156,7 @@ class accessControl extends BaseaccessControl
 		if ($scope->getKs() && ($scope->getKs() instanceof ks) && $scope->getKs()->isAdmin())
 			return true;
 		
-		$disableCache = true;
+		$disableCache = false;
 		
 		$rules = $this->getRulesArray();
 		foreach($rules as $rule)
@@ -164,8 +164,8 @@ class accessControl extends BaseaccessControl
 			/* @var $rule kRule */
 			$fulfilled = $rule->applyContext($context);
 				 
-			if(!$rule->shouldDisableCache())
-				$disableCache = false;
+			if($rule->shouldDisableCache())
+				$disableCache = true;
 				
 			if($fulfilled && $rule->getStopProcessing())
 				break;
