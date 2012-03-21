@@ -87,7 +87,7 @@ class kLevel3UrlManager extends kUrlManager
 	public function getFileSyncUrl(FileSync $fileSync)
 	{
 		$url = parent::getFileSyncUrl($fileSync);
-		if ($fileSync->getPartnerId() === 666132 && kString::beginsWith($url, "mp4:"))
+		if (in_array($fileSync->getPartnerId(), array(666132,628012,357521,560751)) && kString::beginsWith($url, "mp4:"))
 			$url .= ".mp4";
 		
 	    // if level3 tokenized url is used for http, generate token string
