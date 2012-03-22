@@ -266,19 +266,15 @@ class thumbnailAction extends sfAction
 						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
 						if ($origFlavorAsset) {
 							$syncKey = $origFlavorAsset->getSyncKey ( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+							$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey ( $syncKey, false );
 							
-							list($readyFileSync,$isLocal) = kFileSyncUtils::getReadyFileSyncForKey( $syncKey, TRUE, FALSE );
-							if ($readyFileSync) {
-								if ($isLocal) {
-									KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
-									KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
-								}
-								//Ready fileSync is on the other DC - dumping
-								kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+							if ($remoteFileSync && $remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) {
+								KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
+								KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 							}
-							throw new kFileSyncException('No ready fileSync found on any DC',kFileSyncException::FILE_NOT_FOUND);
 						}
-						// problem could be due to replication lag
+						// problem could be due to replocation lag
+						kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 					}
 				}
 			} 
