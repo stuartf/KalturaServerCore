@@ -11,9 +11,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	 * @var KalturaPdfFlavorParamsOutput
 	 */
 	private $flavorParamsOutput;
-
-	//old office files prefix
-	const OLD_OFFICE_SIGNATURE = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
 	
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
@@ -58,20 +55,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		else {
 			KalturaLog::notice('Could not rename input file ['.$inFilePath.'] with a unique name ['.$tmpUniqInFilePath.']');
 			$realInFilePath = realpath($inFilePath);
-		}
-		
-	    $filePrefix = file_get_contents ( $realInFilePath, false, null, 0, strlen ( self::OLD_OFFICE_SIGNATURE ) );
-		$path_info = pathinfo ( $realInFilePath );
-		$ext = $path_info ['extension'];
-		$newOfficeExtensions = Array ('pptx', 'docx', 'xlsx' );
-		//checks if $realInFilePath is an old office document with a new extension ('pptx|docx|xlsx')
-		//if $realInFilePath is not the fileSync itself ($uniqueName = true) , rename the file by removing the 'x' from the extension.		
-		if ($uniqueName && in_array ( $ext, $newOfficeExtensions ) && $filePrefix == self::OLD_OFFICE_SIGNATURE) {
-			$RealInFilePathWithoutX = substr ( $realInFilePath, 0, - 1 );
-			if (rename ( $realInFilePath, $RealInFilePathWithoutX )){
-				KalturaLog::notice("renamed file [$realInFilePath] to [$RealInFilePathWithoutX]");
-				$realInFilePath = $RealInFilePathWithoutX;
-			}
 		}
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
