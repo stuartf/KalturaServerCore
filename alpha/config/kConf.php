@@ -42,7 +42,7 @@ class kConf extends kConfLocal
 
 		     	//xslt_enabled_php_functions.can be used in as a parameter in registerPHPFunctions
 			    "xslt_enabled_php_functions" =>array(
-			       	 'date'),
+			       	 'date', 'gmdate'),
 			
 				// actions that can be cached although an admin ks is used
 				// due to bad integration by the partner
