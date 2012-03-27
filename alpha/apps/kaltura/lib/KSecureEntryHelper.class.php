@@ -118,9 +118,9 @@ class KSecureEntryHelper
 		return $preview;
 	}
 	
-	public function validateForPlay($validateModeration = true)
+	public function validateForPlay()
 	{
-	    if ($validateModeration)
+	    if ($this->contexts != array(accessControlContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
 	    }

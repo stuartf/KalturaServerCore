@@ -162,7 +162,7 @@ class thumbnailAction extends sfAction
 			$referrer = ""; // base64_decode can return binary data
 		$ksStr = $this->getRequestParameter("ks");
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::THUMBNAIL);
-		$securyEntryHelper->validateForPlay(false);
+		$securyEntryHelper->validateForPlay();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
 		if ($rel_width != -1) {
