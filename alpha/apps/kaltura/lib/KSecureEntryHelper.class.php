@@ -118,9 +118,12 @@ class KSecureEntryHelper
 		return $preview;
 	}
 	
-	public function validateForPlay()
+	public function validateForPlay($validateModeration = true)
 	{
-		$this->validateModeration();
+	    if ($validateModeration)
+	    {
+		    $this->validateModeration();
+	    }
 		$this->validateScheduling();
 		$this->validateAccessControl();
 	}
