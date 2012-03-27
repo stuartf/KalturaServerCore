@@ -32,7 +32,7 @@ class serveFlavorAction extends kalturaAction
 //		}
 //		else
 //		{
-//			$securyEntryHelper->validateForPlay($entry, $ks);
+//			$securyEntryHelper->validateForPlay();
 //		}
 			
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());

@@ -915,7 +915,7 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			$securyEntryHelper->validateForPlay($this->entry, $ksStr);
+			$securyEntryHelper->validateForPlay();
 		}
 		
 		// grab seekFrom parameter and normalize url
