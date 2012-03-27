@@ -49,7 +49,6 @@ class kAuthenticatedCondition extends kCondition
                 if ($scope->getKs()->isAdmin())
                         return true;
 
-                KalturaLog::debug(print_r($this->privileges, true));
                 foreach($this->privileges as $privilege)
                 {
                         if(is_object($privilege))
