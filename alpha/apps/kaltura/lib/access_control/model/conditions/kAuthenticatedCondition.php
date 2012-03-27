@@ -55,16 +55,12 @@ class kAuthenticatedCondition extends kCondition
                         if(is_object($privilege))
                                 $privilege = $privilege->getValue();
 
-                        KalturaLog::debug("Checking: " . print_r($privilege, true));
-                        KalturaLog::debug("Entry: " . $scope->getEntryId());
                         if($scope->getKs()->verifyPrivileges($privilege, $scope->getEntryId()))
                         {
-                                KalturaLog::debug("OK: " . print_r($privilege, true));
                                 return true;
                         }
                 }
 
-                KalturaLog::debug("returned false");
                 return false;
         }
 }
