@@ -64,6 +64,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		$path_info = pathinfo ( $realInFilePath );
 		$ext = $path_info ['extension'];
 		$newOfficeExtensions = Array ('pptx', 'docx', 'xlsx' );
+		$ext =  strtolower($ext);
 		//checks if $realInFilePath is an old office document with a new extension ('pptx|docx|xlsx')
 		//if $realInFilePath is not the fileSync itself ($uniqueName = true) , rename the file by removing the 'x' from the extension.		
 		if ($uniqueName && in_array ( $ext, $newOfficeExtensions ) && $filePrefix == self::OLD_OFFICE_SIGNATURE) {
