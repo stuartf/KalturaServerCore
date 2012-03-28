@@ -68,6 +68,8 @@ class requestUtils
 	
 	public static function getCdnHost ($protocol = 'http')
 	{
+		if ($protocol == "https")
+			return "$protocol://".kConf::get("cdn_host_https");
 		return "$protocol://".kConf::get("cdn_host");
 	}
 	
