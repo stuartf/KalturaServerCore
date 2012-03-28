@@ -1664,6 +1664,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function setThumbHeight ( $v )		{	$this->putInCustomData ( "thumbHeight" , $v );	}
 	public function getThumbHeight (  )			{	return $this->getFromCustomData( "thumbHeight", null, 0 );	}
 	
+	public function setMarkedForDeletion ( $v )	{	$this->putInCustomData ( "markedForDeletion" , (bool) $v );	}
+	public function getMarkedForDeletion (  )	{	return (bool) $this->getFromCustomData( "markedForDeletion" ,null, false );	}
+		
 	public function setRootEntryId($v)
 	{
 		$this->putInCustomData("rootEntryId", $v);
