@@ -123,8 +123,8 @@ class KSecureEntryHelper
 	    if ($this->contexts != array(accessControlContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
+			$this->validateScheduling();
 	    }
-		$this->validateScheduling();
 		$this->validateAccessControl();
 	}
 	
