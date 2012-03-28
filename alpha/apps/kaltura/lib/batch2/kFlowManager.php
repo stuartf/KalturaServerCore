@@ -317,6 +317,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
 			}
+			
+			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
+			{
+				$jobEntry = $dbBatchJob->getEntry();
+				if($jobEntry->getMarkedForDeletion())
+					myEntryUtils::deleteEntry($jobEntry,null,true);
+			}
+			
 		}
 		catch ( Exception $ex )
 		{
