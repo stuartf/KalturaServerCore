@@ -37,6 +37,9 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
+		if (!$this->getKs() || $this->getKs()->isWidgetSession())
+				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+	
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
@@ -206,6 +209,9 @@ class MetadataService extends KalturaBaseService
 	 */	
 	function updateAction($id, $xmlData = null, $version = null)
 	{
+		if (!$this->getKs() || $this->getKs()->isWidgetSession())
+				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
@@ -359,6 +365,9 @@ class MetadataService extends KalturaBaseService
 	 */		
 	function deleteAction($id)
 	{
+		if (!$this->getKs() || $this->getKs()->isWidgetSession())
+				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		
 		if(!$dbMetadata)
@@ -381,6 +390,9 @@ class MetadataService extends KalturaBaseService
 	 */		
 	function invalidateAction($id, $version = null)
 	{
+		if (!$this->getKs() || $this->getKs()->isWidgetSession())
+				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
