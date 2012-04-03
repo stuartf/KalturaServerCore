@@ -65,7 +65,7 @@ class kBusinessPostConvertDL
 			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
 		
 		// don't validate in case of bypass, in case target flavor or media info are null 
-		if($postConvertAssetType && $targetFlavor && $productMediaInfo)
+		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo)
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo);
@@ -120,24 +120,18 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::err($e->getMessage());
 		}
-		KalturaLog::debug("profile [" . $profile->getId() . "]");
-								
+				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
+		if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
+			return;
 		
 		$rootBatchJob = null;
 		if($dbBatchJob)
 			$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob)
 			KalturaLog::debug("root batch job id [" . $rootBatchJob->getId() . "] type [" . $rootBatchJob->getJobType() . "]");
-		// update the root job end exit
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
-		{
-			KalturaLog::debug("finish remote convert root job");
-			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-			return $dbBatchJob;
-		}
-				
+		
 		// update the root job end exit
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
@@ -401,13 +395,6 @@ class kBusinessPostConvertDL
 		if($rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)
 			return false;
 
-		// failing a remote root job 
-		if($rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
-		{
-			kJobsManager::failBatchJob($rootBatchJob, "Convert job " . $dbBatchJob->getId() . " failed");
-			return false;
-		}
-			
 		// bulk download root job no need to handle 
 		if($rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
