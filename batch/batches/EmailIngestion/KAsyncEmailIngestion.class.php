@@ -147,6 +147,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 				$pass      = $params->pass;
 				$options   = $params->options;
 				$maxMails  = $params->maxMailsPerRun;
+				$mailboxId = $params->mailboxIdentifier;
 			}
 			catch (Exception $e) {
 				KalturaLog::crit("Cannot find all required parameters from config file for mailbox number [$mailboxNumber]");
@@ -203,7 +204,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 				
 				
 				// validate partner and get email profile
-				$email_profiles = $this->validePartnerAndGetProfile($curMail->header->toadd, $user.'@'.$host);
+				$email_profiles = $this->validePartnerAndGetProfile(array($curMail->header->fromadd), $mailboxId);
 				if (!$email_profiles) {
 					// error validating partner
 					KalturaLog::err('Partner validation failed for ['.$curMail->header->msgid."] on [$user@$host] from [".$curMail->header->fromadd.'] with subject ['.$curMail->header->subject.']');
@@ -341,13 +342,14 @@ class KAsyncEmailIngestion extends KBatchBase {
 		// loop through all attachments
 		// ----------------------------
 		$num = 1;
+		$errorMsg = "";
 		foreach ($mailData->attachments as $cur_attach) {
-			
+			 
 			if ($profile->maxAttachmentsPerMail && ($num > $profile->maxAttachmentsPerMail)) {
 				KalturaLog::info ('Mail msg ['.$mailData->header->msgid.'] has more than ['.$profile->maxAttachmentsPerMail.'] attachments - ignoring the rest.');
 				$problems_happened = true;
 				$failures->too_many_attachments = true;				
-				break; // quit adding attachments
+				break; // quit adding attachments 
 			}
 			
 			if (!$this->validateAttachment($cur_attach, $errorMsg)) {
@@ -404,13 +406,15 @@ class KAsyncEmailIngestion extends KBatchBase {
 			// upload file to the kaltura server
 			// ---------------------------------
 			try {
-				$tokenId = $this->getClient()->upload->upload(realpath($filename)); 
+				$token = $this->createUploadTokenAndUpload($profile, $filename);
+				
+//				list ($token, $upload) = $requestResults;
 			}
 			catch (Exception $e) {
-				$tokenId = null;
+				$token = null;
 				KalturaLog::err($e->getMessage());
 			}
-			if ($tokenId == null || !$tokenId) {
+			if ($token->id == null || !$token->id) {
 				KalturaLog::err("Error uploading [$filename] to the kaltura server.");
 				$problems_happened = true;
 				$failures->upload_failed = true;
@@ -424,14 +428,14 @@ class KAsyncEmailIngestion extends KBatchBase {
 			// create a new entry from the uploaded file
 			// -----------------------------------------
 			try {
-				$newEntry = $this->getClient()->EmailIngestionProfile->addMediaEntry($mediaEntry, $tokenId, $profile->id, $mailData->header->fromadd, $mailData->header->msgid);
+				$newEntry = $this->getClient()->EmailIngestionProfile->addMediaEntry($mediaEntry, $token->id, $profile->id, $mailData->header->fromadd, $mailData->header->msgid);
 			}
 			catch (Exception $e) {
 				$newEntry = null;
 				KalturaLog::err($e->getMessage());
 			}
 			if ($newEntry == null || !$newEntry) {
-				KalturaLog::err("Error adding entry from uploaded file [$filename], token [$tokenId].");
+				KalturaLog::err("Error adding entry from uploaded file [$filename], token [".$token->id."]");
 				$problems_happened = true;
 				$failures->add_entry_failed = true;
 				// delete the temporary file from the disk
@@ -455,7 +459,35 @@ class KAsyncEmailIngestion extends KBatchBase {
 		return !$problems_happened;
 	}
 
+	/**
+     * 
+     * Creates an upload token and uploads the file using the token.
+     * @param KalturaEmailIngestionProfile $profile
+     * @param string $filename
+     */
+    private function createUploadTokenAndUpload (KalturaEmailIngestionProfile $profile, $filename)
+    {
+        $filename = realpath($filename);
+        KalturaLog::debug("using profile: ". $profile->id ."and filename: $filename");
+        
+        $this->impersonate($profile->partnerId);
+			    
+//	    $this->getClient()->startMultiRequest();
+	    
+	    $uploadToken = new KalturaUploadToken(); 
+	    
+	    $uploadToken->fileName = $filename;
+	    
+	    $uploadToken->fileSize = filesize($filename);
+	    
+	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
+	    
+		$uploadToken = $this->getClient()->uploadToken->upload($uploadToken->id, $filename, null, null, -1);
+		
+//		return $this->getClient()->doMultiRequest();
 
+		return $uploadToken;
+    }
 
 
 
