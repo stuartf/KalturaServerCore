@@ -491,7 +491,7 @@ kmc.preview_embed = {
 		is_video = (is_video) ? is_video : false;
 
 		if(id != "multitab_playlist") {
-			name = (name) ? kmc.utils.escapeQuotes(name) : '';
+			//name = (name) ? $('<div />').text( name ).html() : '';
 			description = kmc.utils.escapeQuotes(description); 
 
 			if(kmc.vars.current_uiconf) { // set by kmc.mediator.selectContent called from appstudio's "select content" action
@@ -670,9 +670,9 @@ kmc.preview_embed = {
 		playlist_flashvars :	'playlistAPI.autoInsert=true&playlistAPI.kpl0Name={PL_NAME}' +
 		'&playlistAPI.kpl0Url=http%3A%2F%2F{HOST}%2Findex.php%2Fpartnerservices2%2Fexecuteplaylist%3Fuid%3D%26' +
 		'partner_id%3D{PARTNER_ID}%26subp_id%3D{PARTNER_ID}00%26format%3D8%26ks%3D%7Bks%7D%26playlist_id%3D{PLAYLIST_ID}',
-		kaltura_links :		'<a href="http://corp.kaltura.com">video platform</a> <a href="http://corp.kaltura.com/video_platform/video_management">' +
-		'video management</a> <a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> ' +
-		'<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a>',
+		kaltura_links :		'<a href="http://corp.kaltura.com/products/video-platform-features">Video Platform</a> <a href="http://corp.kaltura.com/Products/Features/Video-Management">' +
+		'Video Management</a> <a href="http://corp.kaltura.com/Video-Solutions">Video Solutions</a> ' +
+		'<a href="http://corp.kaltura.com/Products/Features/Video-Player">Video Player</a>',
 		media_seo_info :	'<a rel="media:thumbnail" href="http://{CDN_HOST}/p/{PARTNER_ID}/sp/{PARTNER_ID}00/thumbnail{ENTRY_ID}/width/120/height/90/bgcolor/000000/type/2"></a> ' +
 		'<span property="dc:description" content="{DESCRIPTION}"></span><span property="media:title" content="{NAME}"></span> ' +
 		'<span property="media:width" content="{WIDTH}"></span><span property="media:height" content="{HEIGHT}"></span> ' +
@@ -713,13 +713,13 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{MEDIA}", "video");
 		embed_code = embed_code.replace(/{HEIGHT}/gi,uiconf_details.height);
 		embed_code = embed_code.replace(/{WIDTH}/gi,uiconf_details.width);
-		embed_code = embed_code.replace(/{HOST}/gi,kmc.vars.host2);
+		embed_code = embed_code.replace(/{HOST}/gi,kmc.vars.host);
 		embed_code = embed_code.replace(/{CACHE_ST}/gi,cache_st);
 		embed_code = embed_code.replace(/{UICONF_ID}/gi,uiconf_id);
 		embed_code = embed_code.replace(/{PARTNER_ID}/gi,kmc.vars.partner_id);
 		embed_code = embed_code.replace("{PLAYLIST_ID}",id);
 		embed_code = embed_code.replace("{PL_NAME}",name);
-		embed_code = embed_code.replace(/{SERVICE_URL}/gi,kmc.vars.service_url2);
+		embed_code = embed_code.replace(/{SERVICE_URL}/gi,kmc.vars.service_url);
 		embed_code = embed_code.replace("{ALT}", ((kmc.vars.whitelabel || kmc.vars.ignore_seo_links) ? "" : kmc.preview_embed.embed_code_template.kaltura_links));
 		embed_code = embed_code.replace("{CDN_HOST}",kmc.vars.cdn_host);
 		embed_code = embed_code.replace("{NAME}", name);
@@ -803,22 +803,15 @@ kmc.preview_embed = {
 		if( !entry_flavors ) { return false; }
 		for(var i=0; i<entry_flavors.length; i++) {
 			var asset = entry_flavors[i];
-			// Add iPad Akamai flavor to iPad flavor Ids list
-			if( asset.tags.indexOf('ipadnew') != -1 ){
+			
+			if( asset.tags.indexOf('applembr') != -1 ){
 				return true;
 			}
 
-			// Add iPhone Akamai flavor to iPad&iPhone flavor Ids list
-			if( asset.tags.indexOf('iphonenew') != -1 ){
-				return true;
-			}
-
-			// Check the tags to read what type of mp4 source
 			if( asset.tags.indexOf('ipad') != -1 ){
 				return true;
 			}
 
-			// Check for iPhone src
 			if( asset.tags.indexOf('iphone') != -1 ){
 				return true;
 			}
@@ -1068,8 +1061,10 @@ kmc.user = {
 			// In order to get the iframe content height the modal must be visible
 			kmc.layout.modal.show();
 			// Get iframe content height & update iframe
-			var iframe_height = $("#support")[0].contentWindow.document.body.scrollHeight;
-			$("#support").height( iframe_height );
+			if( ! kmc.vars.support_frame_height ) {
+				kmc.vars.support_frame_height = $("#support")[0].contentWindow.document.body.scrollHeight;
+			}
+			$("#support").height( kmc.vars.support_frame_height );
 			// Re-position the modal box
 			kmc.layout.modal.position();
 		});
@@ -1077,7 +1072,7 @@ kmc.user = {
 
 	logout: function() {
 		var message = kmc.functions.checkForOngoingProcess();
-		if( message ) { alert('message'); return false; }
+		if( message ) { alert( message ); return false; }
 		var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
 		expiry = expiry.toGMTString();
 		document.cookie = "pid=; expires=" + expiry + "; path=/";
