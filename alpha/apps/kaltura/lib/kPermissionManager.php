@@ -495,11 +495,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
 			if (!$roleIds)
 			{
-				if ($ks->isWidgetSession()){
-					//there is only one partner widget role defined in the system
-                    $roleIds = self::$operatingPartner->getWidgetSessionRoleId();
-				}
-				elseif (self::$adminSession) {
+				if (self::$adminSession) {
 					// there is only one partner admin role defined in the system
 					$roleIds = self::$operatingPartner->getAdminSessionRoleId();
 				}
