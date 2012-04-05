@@ -132,7 +132,7 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 			
-		myEntryUtils::deleteEntry($tempEntry,null,true);
+		myEntryUtils::deleteEntry($tempEntry);
 	}
 	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
