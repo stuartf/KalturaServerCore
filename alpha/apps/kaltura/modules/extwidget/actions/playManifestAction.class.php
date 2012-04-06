@@ -881,7 +881,7 @@ class playManifestAction extends kalturaAction
 		$this->validateStorageId();
 		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
-		if(!$this->protocol)
+		if(!$this->protocol || $this->protocol === "null")
 			$this->protocol = StorageProfile::PLAY_FORMAT_HTTP;
 		
 		$this->format = $this->getRequestParameter ( "format" );
