@@ -2166,10 +2166,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		$this->is_categories_modified = false;
 	}
 	
-	public function isScheduledNow()
+	public function isScheduledNow($time = null)
 	{
-		$startDateCheck = (!$this->getStartDate() || $this->getStartDate(null) <= time());
-		$endDateCheck = (!$this->getEndDate() || $this->getEndDate(null) >= time());
+		if(is_null($time))
+			$time = time();
+			
+		$startDateCheck = (!$this->getStartDate() || $this->getStartDate(null) <= $time);
+		$endDateCheck = (!$this->getEndDate() || $this->getEndDate(null) >= $time);
 		return $startDateCheck && $endDateCheck;
 	}
 	
