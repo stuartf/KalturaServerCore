@@ -345,20 +345,24 @@ class KalturaResponseCacher
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
 		{
 			$pattern = '/\/ks\/[a-zA-Z0-9=]+/';
-			$response = preg_replace($pattern, '', $response);
-			$cachedResponse = preg_replace($pattern, '', $cachedResponse);
-		
+			$response = preg_replace($pattern, 'KS', $response);
+			$cachedResponse = preg_replace($pattern, 'KS', $cachedResponse);
+
+			$pattern = '/s:\d+:/';
+			$response = preg_replace($pattern, 's::', $response);
+			$cachedResponse = preg_replace($pattern, 's::', $cachedResponse);
+			
 			$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
 			switch($format)
 			{
 				case KalturaResponseType::RESPONSE_TYPE_XML:
 					$pattern = '/<executionTime>[0-9\.]+<\/executionTime>/';
-					$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
+					$testResult = (preg_replace($pattern, 'ET', $cachedResponse) == preg_replace($pattern, 'ET', $response));
 					break;
 					
 				case KalturaResponseType::RESPONSE_TYPE_JSONP:
 					$pattern = '/^[^\(]+/';
-					$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
+					$testResult = (preg_replace($pattern, 'CB', $cachedResponse) == preg_replace($pattern, 'CB', $response));
 					break;
 				
 				default:
