@@ -447,8 +447,8 @@ class KalturaResponseCacher
 		}
 		
 		// get caching conditions
-		$cacheExpiry = @file_get_contents($this->_cacheExpiryFilePath);
-		$conditions = @file_get_contents($this->_cacheConditionsFilePath);
+		$cacheExpiry = self::safeFileGetContents($this->_cacheExpiryFilePath);
+		$conditions = self::safeFileGetContents($this->_cacheConditionsFilePath);
 
 		// check the expiry
 		if (!$cacheExpiry)
@@ -464,10 +464,10 @@ class KalturaResponseCacher
 		{
 			// cached response is expired
 			@unlink($this->_cacheDataFilePath);
-			@unlink($this->_cacheHeadersFilePath);
 			@unlink($this->_cacheLogFilePath);
-			@unlink($this->_cacheExpiryFilePath);
-			@unlink($this->_cacheConditionsFilePath);
+			self::safeUnlink($this->_cacheHeadersFilePath);
+			self::safeUnlink($this->_cacheExpiryFilePath);
+			self::safeUnlink($this->_cacheConditionsFilePath);
 			return false;
 		}
 			
@@ -717,4 +717,20 @@ class KalturaResponseCacher
 		fclose($fp);
 	}
 
+	// This function avoids the 'file does not exist' warning
+	private static function safeFileGetContents($fileName)
+	{
+		if (!file_exists($fileName))
+			return null;
+		return @file_get_contents($fileName);
+	}
+
+	// This function avoids the 'file does not exist' warning
+	private static function safeUnlink($fileName)
+	{
+		if (!file_exists($fileName))
+			return;
+		@unlink($fileName);
+	}
+	
 }
