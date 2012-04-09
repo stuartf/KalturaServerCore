@@ -123,7 +123,7 @@ class KalturaResponseCacher
 		$this->setKS($ks);
 
 		self::$_activeInstances[$this->_instanceId] = $this;
-		$this->_cacheStatus = self::CACHE_STATUS_ENABLED;
+		$this->_cacheStatus = self::CACHE_STATUS_ACTIVE;
 	}
 	
 	public function setKS($ks)
