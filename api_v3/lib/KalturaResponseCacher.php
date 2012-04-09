@@ -369,7 +369,7 @@ class KalturaResponseCacher
 			if ($testResult)
 				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
 			else
-				KalturaLog::log('conditional cache check: FAILED');		// we would have used the cache, but the response buffers do not match
+				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
 		}
 		
 		if(!is_null($contentType)) {
