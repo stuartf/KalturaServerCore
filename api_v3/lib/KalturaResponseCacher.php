@@ -333,38 +333,45 @@ class KalturaResponseCacher
 			
 		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
 		
+		$cachedResponse = null;						// XXXXXXX TODO: remove this
 		if ($this->_wouldHaveUsedCondCache)			// XXXXXXX TODO: remove this
 		{
 			$cachedResponse = @file_get_contents($this->_cacheDataFilePath);
-			// compare the calculated $response to the previously stored $cachedResponse
-			if ($cachedResponse)
-			{
-				$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
-				switch($format)
-				{
-					case KalturaResponseType::RESPONSE_TYPE_XML:
-						$pattern = '/<executionTime>[0-9\.]+<\/executionTime>/';
-						$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
-						break;
-						
-					case KalturaResponseType::RESPONSE_TYPE_JSONP:
-						$pattern = '/^[^\(]+/';
-						$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
-						break;
-					
-					default:
-						$testResult = ($cachedResponse == $response);
-						break;
-				}
-				
-				if ($testResult)
-					KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
-				else
-					KalturaLog::log('conditional cache check: FAILED');		// we would have used the cache, but the response buffers do not match
-			}
 		}
 		
 		file_put_contents($this->_cacheDataFilePath, $response);
+		
+		// compare the calculated $response to the previously stored $cachedResponse
+		if ($cachedResponse)			// XXXXXXX TODO: remove this
+		{
+			$pattern = '/\/ks\/[a-zA-Z0-9=]+/';
+			$response = preg_replace($pattern, '', $response);
+			$cachedResponse = preg_replace($pattern, '', $cachedResponse);
+		
+			$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
+			switch($format)
+			{
+				case KalturaResponseType::RESPONSE_TYPE_XML:
+					$pattern = '/<executionTime>[0-9\.]+<\/executionTime>/';
+					$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
+					break;
+					
+				case KalturaResponseType::RESPONSE_TYPE_JSONP:
+					$pattern = '/^[^\(]+/';
+					$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
+					break;
+				
+				default:
+					$testResult = ($cachedResponse == $response);
+					break;
+			}
+			
+			if ($testResult)
+				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
+			else
+				KalturaLog::log('conditional cache check: FAILED');		// we would have used the cache, but the response buffers do not match
+		}
+		
 		if(!is_null($contentType)) {
 			$this->createDirForPath($this->_cacheHeadersFilePath);
 			file_put_contents($this->_cacheHeadersFilePath, $contentType);
