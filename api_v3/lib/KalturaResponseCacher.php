@@ -351,6 +351,10 @@ class KalturaResponseCacher
 			$pattern = '/s:\d+:/';
 			$response = preg_replace($pattern, 's::', $response);
 			$cachedResponse = preg_replace($pattern, 's::', $cachedResponse);
+
+			$pattern = '/kaltura_player_\d+/';
+			$response = preg_replace($pattern, 'KP', $response);
+			$cachedResponse = preg_replace($pattern, 'KP', $cachedResponse);
 			
 			$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
 			switch($format)
