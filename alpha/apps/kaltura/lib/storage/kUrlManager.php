@@ -51,7 +51,7 @@ class kUrlManager
 	 * @param string $cdnHost
 	 * @return kUrlManager
 	 */
-	public static function getUrlManagerByCdn($cdnHost)
+	public static function getUrlManagerByCdn($cdnHost, $partner = null)
 	{
 		$class = 'kUrlManager';
 		
@@ -63,6 +63,19 @@ class kUrlManager
 		{
 			$class = $urlManagers[$cdnHost]["class"];
 			$params = @$urlManagers[$cdnHost]["params"];
+			if ($partner && kConf::hasParam("url_managers_override"))
+			{
+				$overrides = kConf::get("url_managers_override");
+				$partnerId = $partner->getId();
+				if (array_key_exists($partnerId, $overrides))
+				{
+					$overrides = $overrides[$partnerId];
+					if (array_key_exists($cdnHost, $overrides))
+					{
+						$params = array_merge($params, $overrides[$cdnHost]["params"]);
+					}
+				}
+			}
 		}
 			
 		KalturaLog::log("Uses url manager [$class]");
