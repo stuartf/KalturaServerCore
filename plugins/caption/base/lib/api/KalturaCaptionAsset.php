@@ -102,7 +102,8 @@ class KalturaCaptionAsset extends KalturaAsset
 			}
 		}
 		
-		if ($this->format === null)
+		if ($this->format === null &&
+			$object_to_fill->getContainerFormat() === null)		// not already set by setFromAssetParams
 		{
 			$this->format = KalturaCaptionType::SRT;
 		}
