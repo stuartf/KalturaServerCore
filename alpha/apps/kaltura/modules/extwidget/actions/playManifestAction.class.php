@@ -357,7 +357,7 @@ class playManifestAction extends kalturaAction
 		if($partner && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 
-		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
+		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $partner);
 		$urlManager->setClipTo($this->clipTo);
 		$urlManager->setSeekFromTime($this->seekFrom);
 		$urlManager->setDomain($this->cdnHost);
