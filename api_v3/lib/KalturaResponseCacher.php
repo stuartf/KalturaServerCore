@@ -377,7 +377,16 @@ class KalturaResponseCacher
 			if ($testResult)
 				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
 			else
+			{
 				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
+				
+				$outputFileBase = '/tmp/condCache/' . $this->_cacheKey;
+				@$this->createDirForPath($outputFileBase);
+				$cachedFileName = $outputFileBase . '-cached';
+				$nonCachedFileName = $outputFileBase . '-new';
+				@file_put_contents($cachedFileName, $cachedResponse);
+				@file_put_contents($nonCachedFileName, $response);
+			}
 		}
 		
 		if(!is_null($contentType)) {
