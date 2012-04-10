@@ -529,7 +529,7 @@ class KalturaResponseCacher
 	
 	private static function getMaxInvalidationTime($invalidationKeys)
 	{
-		if (!class_exists('Memcache'))
+		if (!kConf::get("query_cache_enabled") || !class_exists('Memcache'))
 			return null;
 		
 		$memcache = new Memcache;	
