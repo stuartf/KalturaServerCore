@@ -219,6 +219,10 @@ class KalturaResponseCacher
 			{
 				$processingTime = microtime(true) - $startTime;
 				header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
+
+				// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes from cache
+				// for single requests, the next line has no effect
+				self::disableConditionalCache();
 				return $response;
 			}
 		}
