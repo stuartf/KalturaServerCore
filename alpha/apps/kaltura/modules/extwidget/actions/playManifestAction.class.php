@@ -535,6 +535,8 @@ class playManifestAction extends kalturaAction
 				}
 			}
 		}
+		
+		return $flavorAssets;
 	}
 	
 	/**
