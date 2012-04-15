@@ -382,7 +382,7 @@ class CaptionAssetService extends KalturaBaseService
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName, $entryId);
 	}
 	
 	/**
@@ -465,7 +465,7 @@ class CaptionAssetService extends KalturaBaseService
 			
 		$fileName = $captionAsset->getEntryId()."_" . $captionAsset->getId() . ".$ext";
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName, $captionAsset->getEntryId());
 	}
 	
 	/**

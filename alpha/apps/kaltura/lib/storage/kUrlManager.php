@@ -39,19 +39,19 @@ class kUrlManager
 	/**
 	 * @var int
 	 */
-	protected $storageProfileId = null;
+	protected $storageProfileId = null;	
 	
 	/**
 	 * @var string
 	 */
-	protected $playbackContext = null;
-	
+	protected $entryId = null;
 	
 	/**
 	 * @param string $cdnHost
+	 * @param string $entryId
 	 * @return kUrlManager
 	 */
-	public static function getUrlManagerByCdn($cdnHost, $partner = null)
+	public static function getUrlManagerByCdn($cdnHost, $entryId)
 	{
 		$class = 'kUrlManager';
 		
@@ -63,10 +63,11 @@ class kUrlManager
 		{
 			$class = $urlManagers[$cdnHost]["class"];
 			$params = @$urlManagers[$cdnHost]["params"];
-			if ($partner && kConf::hasParam("url_managers_override"))
+			$entry = entryPeer::retrieveByPK($entryId);
+			if ($entry && kConf::hasParam("url_managers_override"))
 			{
 				$overrides = kConf::get("url_managers_override");
-				$partnerId = $partner->getId();
+				$partnerId = $entry->getPartnerId();
 				if (array_key_exists($partnerId, $overrides))
 				{
 					$overrides = $overrides[$partnerId];
@@ -84,9 +85,10 @@ class kUrlManager
 	
 	/**
 	 * @param int $storageProfileId
+	 * @param string $entryId
 	 * @return kUrlManager
 	 */
-	public static function getUrlManagerByStorageProfile($storageProfileId)
+	public static function getUrlManagerByStorageProfile($storageProfileId, $entryId)
 	{
 		$class = 'kUrlManager';
 		$params = null;
@@ -180,10 +182,45 @@ class kUrlManager
 	}
 	
 	/**
+	 * @param string $entryId
+	 */
+	public function setEntryId($entryId)
+	{
+		$this->entryId = $entryId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		return $this->entryId;
+	}
+
+	/**
+	 * @param FileSync $fileSync
+	 * @param bool $tokenizeUrl
+	 * @return string
+	 */
+	public function getFileSyncUrl(FileSync $fileSync, $tokenizeUrl = true)
+	{
+		$url = $this->doGetFileSyncUrl($fileSync);
+		if ($tokenizeUrl)
+		{
+			$tokenizer = $this->getTokenizer();
+			if ($tokenizer)
+			{
+				$url = $tokenizer->tokenizeSingleUrl($url);
+			}
+		}
+		return $url;
+	}
+	
+	/**
 	 * @param FileSync $fileSync
 	 * @return string
 	 */
-	public function getFileSyncUrl(FileSync $fileSync)
+	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
@@ -222,7 +259,7 @@ class kUrlManager
 	 * @param thumbAsset $thumbAsset
 	 * @return string
 	 */
-	public function getThumbnailAssetUrl(thumbAsset $thumbAsset)
+	protected function doGetThumbnailAssetUrl(thumbAsset $thumbAsset)
 	{
 		$thumbAssetId = $thumbAsset->getId();
 		$partnerId = $thumbAsset->getPartnerId();
@@ -241,24 +278,37 @@ class kUrlManager
 
 	/**
 	 * @param asset $asset
+	 * @param bool $tokenizeUrl
 	 * @return string
 	 */
-	public function getAssetUrl(asset $asset)
+	public function getAssetUrl(asset $asset, $tokenizeUrl = true)
 	{
+		$url = null;
+		
 		if($asset instanceof thumbAsset)
-			return $this->getThumbnailAssetUrl($asset);
-			
+			$url = $this->doGetThumbnailAssetUrl($asset);
+		
 		if($asset instanceof flavorAsset)
-			return $this->getFlavorAssetUrl($asset);
+		{
+			$url = $this->doGetFlavorAssetUrl($asset);
+			if ($tokenizeUrl)
+			{
+				$tokenizer = $this->getTokenizer();
+				if ($tokenizer)
+				{
+					$url = $tokenizer->tokenizeSingleUrl($url);
+				}
+			}
+		}
 			
-		return null;
+		return $url;
 	}
 	
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	public function getFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $flavorAsset->getentry()->getSubpId();
@@ -332,24 +382,11 @@ class kUrlManager
 		return false;
 	}
 	
-	
 	/**
-     * @return the $playbackContext
-     */
-    public function getPlaybackContext ()
-    {
-        return $this->playbackContext;
-    }
-
-	/**
-     * @param string $playbackContext
-     */
-    public function setPlaybackContext ($playbackContext)
-    {
-        $this->playbackContext = $playbackContext;
-    }
-
-	
-	
-
+	 * @return kUrlTokenizer
+	 */
+	public function getTokenizer()
+	{
+		return null;
+	}
 }

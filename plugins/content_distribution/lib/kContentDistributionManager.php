@@ -83,7 +83,7 @@ class kContentDistributionManager
 				if(!is_null($assetObjects[$assetId]['downloadUrl']) && $fileSync->getDc() != $distributionProfile->getRecommendedStorageProfileForDownload())
 					continue;
 				
-				$downloadUrl = $fileSync->getExternalUrl();
+				$downloadUrl = $fileSync->getExternalUrl($entryDistribution->getEntryId());
 				if(!$downloadUrl)
 					continue;
 				

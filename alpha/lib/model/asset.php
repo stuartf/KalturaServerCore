@@ -340,7 +340,7 @@ class asset extends Baseasset implements ISyncableFile
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $this->getEntryId());
 		$urlManager->setFileExtension($this->getFileExt());
 		
 		$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
@@ -393,7 +393,7 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		
 		if($serveRemote && $fileSync)
-			return $fileSync->getExternalUrl();
+			return $fileSync->getExternalUrl($this->getEntryId());
 		
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn);
 	}

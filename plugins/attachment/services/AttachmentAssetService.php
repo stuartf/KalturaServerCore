@@ -412,7 +412,7 @@ class AttachmentAssetService extends KalturaBaseService
 		if (!$fileName)	
 			$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
-		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName, $attachmentAsset->getEntryId());
 	}
 
 	/**

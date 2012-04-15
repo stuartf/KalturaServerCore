@@ -562,7 +562,7 @@ class KalturaSyndicationFeedRenderer
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $flavorAsset->getEntryId());
 		$urlManager->setFileExtension($flavorAsset->getFileExt());
 		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		
@@ -590,9 +590,9 @@ class KalturaSyndicationFeedRenderer
 		$this->protocol = StorageProfile::PLAY_FORMAT_HTTP;
 		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId, $this->protocol);
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
+		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
-		$url = $urlManager->getFlavorAssetUrl($flavorAsset);
+		$url = $urlManager->getAssetUrl($flavorAsset);
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
 			

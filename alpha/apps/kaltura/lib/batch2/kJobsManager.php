@@ -258,7 +258,7 @@ class kJobsManager
 		{
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
 				$localPath = $fileSync->getFullPath();
-			$remoteUrl = $fileSync->getExternalUrl();
+			$remoteUrl = $fileSync->getExternalUrl($entry->getId());
 		}
 		
 		// increment entry version
@@ -343,7 +343,7 @@ class kJobsManager
 		kFileSyncUtils::file_put_contents($syncKey, $xml);
 		
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
-		$remoteUrl = $fileSync->getExternalUrl();
+		$remoteUrl = $fileSync->getExternalUrl($entry->getId());
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$commandLines = array(
@@ -415,7 +415,7 @@ class kJobsManager
 					$flavorAsset->save();
 				
 					$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
-					$url = $fileSync->getExternalUrl();
+					$url = $fileSync->getExternalUrl($flavorAsset->getEntryId());
 					return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset, null, null, true);
 				}
 			
@@ -424,7 +424,7 @@ class kJobsManager
 		
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
 				$localPath = $fileSync->getFullPath();
-			$remoteUrl = $fileSync->getExternalUrl();
+			$remoteUrl = $fileSync->getExternalUrl($flavorAsset->getEntryId());
 		}
 		else
 		{
@@ -444,7 +444,7 @@ class kJobsManager
 			}
 			
 			$localPath = $fileSync->getFilePath();
-			$remoteUrl = $fileSync->getExternalUrl();
+			$remoteUrl = $fileSync->getExternalUrl($flavorAsset->getEntryId());
 		}
 		
 		// creates convert data
@@ -585,7 +585,7 @@ class kJobsManager
 			kFileSyncUtils::file_put_contents($syncKey, $config);
 			
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
-			$remoteUrl = $fileSync->getExternalUrl();
+			$remoteUrl = $fileSync->getExternalUrl($flavor->getEntryId());
 			$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			
 			$convertData->setConfigLocalPath($localPath);
@@ -626,7 +626,7 @@ class kJobsManager
 		{
 			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 			{
-				$url = $fileSync->getExternalUrl();
+				$url = $fileSync->getExternalUrl($entryId);
 				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
 				if($originalAsset instanceof flavorAsset)
 				{
@@ -661,7 +661,7 @@ class kJobsManager
 			}
 		}
 		$localPath = $fileSync->getFullPath();
-		$remoteUrl = $fileSync->getExternalUrl();
+		$remoteUrl = $fileSync->getExternalUrl($entryId);
 		
 		// creates convert data
 		$data = new kCaptureThumbJobData();
@@ -960,7 +960,7 @@ class kJobsManager
 						if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 						{
 							KalturaLog::debug("Creates import job for remote file sync");
-							$url = $syncFile->getExternalUrl();
+							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
 									continue;
 						}
