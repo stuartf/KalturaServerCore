@@ -48,7 +48,7 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
 		$startTime = time();
-		foreach($flavorsUrls as &$flavor)
+		foreach($flavors as &$flavor)
 		{			    
 			$bareUrl = $baseUrl.'/'.ltrim($flavor["url"],'/');
 			$decoratedUrl = self::decorateUrl($bareUrl, $this->secret, $startTime, $this->window, $this->useDummyHost);
