@@ -698,7 +698,7 @@ class playManifestAction extends kalturaAction
 				$url = $urlManager->getFileSyncUrl($fileSync, false);
 				$url = ltrim($url, "/");
 				
-				$flavors[] = $this->getFlavorAssetInfo($flavorAsset, $url);
+				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
 			}
 		}
 		
@@ -731,7 +731,7 @@ class playManifestAction extends kalturaAction
 				$url = $urlManager->getAssetUrl($flavorAsset, false);
 				$url = ltrim($url, "/");
 				
-				$flavors[] = $this->getFlavorAssetInfo($flavorAsset, $url);
+				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
 			}
 		}
 		
