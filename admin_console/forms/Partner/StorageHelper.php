@@ -31,6 +31,7 @@ class Form_Partner_StorageHelper
 			'kAkamaiUrlManager' => 'Akamai CDN',
 			'kLevel3UrlManager' => 'Level 3 CDN',
 			'AlldigitalUrlManager' => 'Alldigital CDN',
+			'kMirrorImageUrlManager' => 'Mirror Image CDN',
 		);
 		$form->getElement('urlManagerClass')->setMultiOptions($arr);
 	}
