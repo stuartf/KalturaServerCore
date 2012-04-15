@@ -80,7 +80,7 @@ class kUrlManager
 		}
 			
 		KalturaLog::log("Uses url manager [$class]");
-		return new $class(null, $params);
+		return new $class(null, $params, $entryId);
 	}
 	
 	/**
@@ -101,13 +101,14 @@ class kUrlManager
 		}
 			
 		KalturaLog::log("Uses url manager [$class]");
-		return new $class($storageProfileId, $params);
+		return new $class($storageProfileId, $params, $entryId);
 	}
 	
-	public function __construct($storageProfileId = null, $params = null)
+	public function __construct($storageProfileId = null, $params = null, $entryId = null)
 	{
 		$this->storageProfileId = $storageProfileId;
 		$this->params = $params ? $params : array();
+		$this->entryId = $entryId;
 	}
 	
 	/**
