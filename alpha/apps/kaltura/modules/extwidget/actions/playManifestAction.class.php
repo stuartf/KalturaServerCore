@@ -702,6 +702,7 @@ class playManifestAction extends kalturaAction
 			}
 		}
 		
+		$partner = $this->entry->getPartner();
 		if (!$this->storageId || 
 			(!count($flavors) && $partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)) 
 		{
@@ -909,14 +910,13 @@ class playManifestAction extends kalturaAction
 	{
 		$duration = $this->entry->getDurationInt();		
 		$syncKey = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$manifestInfo = $this->getSmoothStreamUrl($syncKey, $urlPrefix);
+		$manifestInfo = $this->getSmoothStreamUrl($syncKey);
 
 		$renderer = new kSilverLightManifestRenderer();
 		$renderer->entryId = $this->entryId;
 		$renderer->tokenizer = $this->tokenizer;
 		$renderer->flavor = $manifestInfo;
 		$renderer->duration = $duration;
-		$renderer->urlPrefix = $urlPrefix;
 		return $renderer;
 	}
 	
