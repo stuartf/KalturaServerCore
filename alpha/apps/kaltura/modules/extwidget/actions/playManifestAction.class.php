@@ -1125,6 +1125,7 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case "url":
+				$this->format = "http"; // build url for an http delivery
 				$renderer = $this->serveUrl();
 				break;
 				
