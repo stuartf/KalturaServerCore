@@ -429,7 +429,8 @@ class myReportsMgr
 					self::$type_map[$report_type] ,  
 					self::$flavor_map[$report_flavor] , 
 					$add_search_text , 
-					$object_ids ? true : false );
+					$object_ids ? true : false,
+					$input_filter );
 			}
 			else
 			{
