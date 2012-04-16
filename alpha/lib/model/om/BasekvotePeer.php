@@ -268,9 +268,8 @@ abstract class BasekvotePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
-	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults, Criteria $criteria)
+	public static function filterSelectResults(&$selectResults)
 	{
 	}
 	
@@ -320,37 +319,36 @@ abstract class BasekvotePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = kvotePeer::prepareCriteriaForSelect($criteria);
+		$criteria = kvotePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect, 
+			$criteria, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'kvotePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			kvotePeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			kvotePeer::filterSelectResults($cachedResult);
 			kvotePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = kvotePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
-		if($criteriaForSelect instanceof KalturaCriteria)
-			$criteriaForSelect->applyResultsSort($queryResult);
-		
-		kvotePeer::filterSelectResults($queryResult, $criteria);
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($queryResult);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
+		kvotePeer::filterSelectResults($queryResult);
 		kvotePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -405,6 +403,7 @@ abstract class BasekvotePeer {
 		
 		return self::$s_criteria_filter;
 	}
+	
 	 
 	/**
 	 * Creates default criteria filter
@@ -452,7 +451,7 @@ abstract class BasekvotePeer {
 		// attach default criteria
 		kvotePeer::attachCriteriaFilter($criteria);
 		
-		// select the connection for the query
+		// set the connection to slave server
 		$con = kvotePeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
@@ -1656,15 +1655,6 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
-	}
-	
-	/**
-	 * Return array of columns that should change only if there is a real change.
-	 * @return array
-	 */
-	public static function getAtomicColumns()
-	{
-		return array();
 	}
 
 	/**
