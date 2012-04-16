@@ -317,7 +317,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 	public static function addKvote ( kvote $kvote , $delta_rank )
 	{
 		$entry = $kvote->getEntry();
-		$res = self::incEntryVotes ( $entry , $delta_rank );
+		$res = self::modifyEntryVotes($entry, $kvote->getRank(), KVoteStatus::VOTED);
 		return $res; 
 	}
 
