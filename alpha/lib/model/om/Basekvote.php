@@ -50,6 +50,12 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $rank;
 
 	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -78,6 +84,12 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -96,6 +108,17 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function getColumnsOldValues()
 	{
 		return $this->oldColumnsValues;
+	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
 	}
 
 	/**
@@ -146,6 +169,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function getRank()
 	{
 		return $this->rank;
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
 	}
 
 	/**
@@ -316,6 +349,29 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // setRank()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     kvote The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[kvotePeer::STATUS]))
+			$this->oldColumnsValues[kvotePeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = kvotePeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -401,7 +457,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->kuser_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->rank = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -411,7 +468,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 6; // 6 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kvote object", $e);
@@ -577,6 +634,11 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -626,6 +688,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = kvotePeer::doInsert($this, $con);
@@ -636,8 +699,13 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += kvotePeer::doUpdate($this, $con);
+					$affectedObjects = kvotePeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -679,7 +747,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -691,7 +761,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	{
     	$this->setCreatedAt(time());
     	
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -707,6 +777,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -728,8 +799,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -777,7 +848,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**
@@ -918,6 +989,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				return $this->getRank();
 				break;
 			case 5:
+				return $this->getStatus();
+				break;
+			case 6:
 				return $this->getCreatedAt();
 				break;
 			default:
@@ -946,7 +1020,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$keys[2] => $this->getEntryId(),
 			$keys[3] => $this->getKuserId(),
 			$keys[4] => $this->getRank(),
-			$keys[5] => $this->getCreatedAt(),
+			$keys[5] => $this->getStatus(),
+			$keys[6] => $this->getCreatedAt(),
 		);
 		return $result;
 	}
@@ -994,6 +1069,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				$this->setRank($value);
 				break;
 			case 5:
+				$this->setStatus($value);
+				break;
+			case 6:
 				$this->setCreatedAt($value);
 				break;
 		} // switch()
@@ -1025,7 +1103,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setKuserId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setRank($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
 	}
 
 	/**
@@ -1042,6 +1121,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kvotePeer::ENTRY_ID)) $criteria->add(kvotePeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(kvotePeer::KUSER_ID)) $criteria->add(kvotePeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(kvotePeer::RANK)) $criteria->add(kvotePeer::RANK, $this->rank);
+		if ($this->isColumnModified(kvotePeer::STATUS)) $criteria->add(kvotePeer::STATUS, $this->status);
 		if ($this->isColumnModified(kvotePeer::CREATED_AT)) $criteria->add(kvotePeer::CREATED_AT, $this->created_at);
 
 		return $criteria;
@@ -1104,6 +1184,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		$copyObj->setKuserId($this->kuser_id);
 
 		$copyObj->setRank($this->rank);
+
+		$copyObj->setStatus($this->status);
 
 		$copyObj->setCreatedAt($this->created_at);
 

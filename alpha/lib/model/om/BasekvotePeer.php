@@ -26,7 +26,7 @@ abstract class BasekvotePeer {
 	const TM_CLASS = 'kvoteTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 7;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -45,6 +45,9 @@ abstract class BasekvotePeer {
 
 	/** the column name for the RANK field */
 	const RANK = 'kvote.RANK';
+
+	/** the column name for the STATUS field */
+	const STATUS = 'kvote.STATUS';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'kvote.CREATED_AT';
@@ -65,11 +68,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'Rank', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'rank', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::RANK, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'rank', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'Rank', 'Status', 'CreatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'rank', 'status', 'createdAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::RANK, self::STATUS, self::CREATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'rank', 'status', 'created_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -79,11 +82,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'Rank' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'rank' => 4, 'createdAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::RANK => 4, self::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'rank' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'Rank' => 4, 'Status' => 5, 'CreatedAt' => 6, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'rank' => 4, 'status' => 5, 'createdAt' => 6, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::RANK => 4, self::STATUS => 5, self::CREATED_AT => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'rank' => 4, 'status' => 5, 'created_at' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -158,6 +161,7 @@ abstract class BasekvotePeer {
 		$criteria->addSelectColumn(kvotePeer::ENTRY_ID);
 		$criteria->addSelectColumn(kvotePeer::KUSER_ID);
 		$criteria->addSelectColumn(kvotePeer::RANK);
+		$criteria->addSelectColumn(kvotePeer::STATUS);
 		$criteria->addSelectColumn(kvotePeer::CREATED_AT);
 	}
 
@@ -264,8 +268,9 @@ abstract class BasekvotePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +320,37 @@ abstract class BasekvotePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = kvotePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = kvotePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'kvotePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			kvotePeer::filterSelectResults($cachedResult);
+			kvotePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			kvotePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = kvotePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		kvotePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		kvotePeer::filterSelectResults($queryResult);
 		kvotePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +405,6 @@ abstract class BasekvotePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter
@@ -447,7 +452,7 @@ abstract class BasekvotePeer {
 		// attach default criteria
 		kvotePeer::attachCriteriaFilter($criteria);
 		
-		// set the connection to slave server
+		// select the connection for the query
 		$con = kvotePeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
@@ -1651,6 +1656,15 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
+	}
+	
+	/**
+	 * Return array of columns that should change only if there is a real change.
+	 * @return array
+	 */
+	public static function getAtomicColumns()
+	{
+		return array();
 	}
 
 	/**
