@@ -321,20 +321,33 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 		return $res; 
 	}
 
+	public static function modifyEntryVotesBykVote (kvote $kvote)
+	{
+		$entry = $kvote->getEntry();
+		$res = self::modifyEntryVotes($entry, $kvote->getRank(), $kvote->getStatus());
+		return $res; 
+	}
+
 	// - will update votes , total_rank & rank
 	// if the ebtry is of type roughcut -0 will update the kshow's rank too
-	private static function incEntryVotes ( entry $entry , $delta_rank )
+	private static function modifyEntryVotes ( entry $entry , $delta_rank, $kvoteStatus )
 	{
 		$res = array();
 		
 		$votes = $entry->getVotes();
 		if ( self::shouldModify ( $entry , entryPeer::VOTES ) );
 		{
-			self::inc ( $votes );
+		    if ($kvoteStatus == KVoteStatus::VOTED)
+			    self::inc ($votes);
+			else 
+			    self::dec($votes);
 			$entry->setVotes( $votes );
 				
 			$total_rank = $entry->getTotalRank();
-			self::inc ( $total_rank , $delta_rank );
+			if ($kvoteStatus == KVoteStatus::VOTED)
+			    self::inc ($total_rank, $delta_rank);
+			else 
+			    self::dec($total_rank, $delta_rank);
 			$entry->setTotalRank( $total_rank );
 				
 			$res ["entry"] = $entry;
@@ -360,7 +373,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 		}
 		return $res;
 	}
-
+	
 
 	// TODO - might be duplicates in the list- try to avoid redundant saves
 	// (although won't commit to DB because there will be no internal dirty flags)
