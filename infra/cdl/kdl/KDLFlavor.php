@@ -402,7 +402,7 @@ $sourceDur=0;
 		if($sourceDur>0 && $sourceDur<$target->_clipStart+$target->_clipDur) {
 			$target->_clipDur=0;
 		}
-		
+		$target->_container->_duration = $sourceDur;
 $target->_video = null;
 		if($this->_video!="") {
 			if($source->_video!="" && ($target->_container && !($target->_container->_id==KDLContainerTarget::MP3 || $target->_container->_id==KDLContainerTarget::WMA))){
@@ -538,6 +538,14 @@ $target->_video = null;
 			}
 			else {
 			$targetVid->_gop = KDLConstants::DefaultGOP;
+			}
+		}
+		else if(isset($flavorVid->_isGopInSec) && $flavorVid->_isGopInSec>0) {
+			if(isset($targetVid->_frameRate)){
+				$targetVid->_gop = round($targetVid->_frameRate*$targetVid->_frameRate);
+			}
+			else {
+				$targetVid->_gop = KDLConstants::DefaultGOP;
 			}
 		}
 
@@ -854,40 +862,10 @@ KalturaLog::log(__METHOD__."==>\n");
 	/* ---------------------------
 	 * SetTranscoderCmdLineGenerator
 	 */
-	public function SetTranscoderCmdLineGenerator($inFile=KDLCmdlinePlaceholders::InFileName, $outFile=KDLCmdlinePlaceholders::OutFileName)
+	public function SetTranscoderCmdLineGenerator(KDLFlavor $design)
 	{
-		$cmdLine = new KDLTranscoderCommand($inFile,$outFile, $this);
+		$cmdLine = new KDLTranscoderCommand($design, $this);
 
-/*
-		if($this->_video){
-			$cmdLine->_vidId = $this->_video->_id;
-			$cmdLine->_vidBr = $this->_video->_bitRate;
-			$cmdLine->_vidWid = $this->_video->_width;
-			$cmdLine->_vidHgt = $this->_video->_height;
-			$cmdLine->_vidFr = $this->_video->_frameRate;
-			$cmdLine->_vidGop = $this->_video->_gop;
-			$cmdLine->_vid2pass = $this->_isTwoPass;
-			$cmdLine->_vidRotation = $this->_video->_rotation;
-			$cmdLine->_vidScanType = $this->_video->_scanType;
-		}
-		else
-			$cmdLine->_vidId="none";
-			
-		if($this->_audio){
-			$cmdLine->_audId = $this->_audio->_id;
-			$cmdLine->_audBr = $this->_audio->_bitRate;
-			$cmdLine->_audCh = $this->_audio->_channels;
-			$cmdLine->_audSr = $this->_audio->_sampleRate;
-		}
-		else
-		$cmdLine->_audId="none";
-			
-		if($this->_container){
-			$cmdLine->_conId = $this->_container->_id;
-		}
-		else
-		$cmdLine->_conId="none";
-*/
 		return $cmdLine;
 	}
 
