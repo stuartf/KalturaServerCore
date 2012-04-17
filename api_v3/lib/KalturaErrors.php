@@ -37,9 +37,6 @@ class KalturaErrors extends APIErrors
 	// %s - action name, %s - service name
 	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS,Action \"%s\" does not exists for service \"%s\"";
 	
-	// %s - action name
-	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN,Action \"%s\" is forbidden for use";
-	
 	// %s - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER,Missing parameter \"%s\"";
 	
