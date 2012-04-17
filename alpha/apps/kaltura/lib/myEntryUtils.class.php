@@ -351,8 +351,6 @@ class myEntryUtils
 		if ( $entry->getStatus() == entryStatus::DELETED || $entry->getStatus() == entryStatus::BLOCKED  )
 			return ; // don't do this twice !
 		
-		#14802
-		#following was added in the fix, as well as the function's third argument.
 		if ($onlyIfAllJobsDone) {
 			KalturaLog::DEBUG("onlyIfAllJobsDone = ". (int)$onlyIfAllJobsDone);
 			$dbEntryBatchJobs = BatchJobPeer::retrieveByEntryId($entry->getId());
