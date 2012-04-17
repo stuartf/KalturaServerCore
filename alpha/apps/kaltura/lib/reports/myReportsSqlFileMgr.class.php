@@ -40,7 +40,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 					$type_str , 
 					$flavor_str , 
 					$add_search_text ? "" : "_" . self::NO_TEXT_SUFFIX , 
-					"" );
+					"",
+					$has_filter);
 		
 				if ( $config === null )
 				{
@@ -78,7 +79,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				elseif ( count($parts) == 2 )
 				{
 					// use the configuraiton of some other report_type and other flavor - use false as $no_text_indicator
-					return self::getSqlFilePathImpl ( $parts[0] , $parts[1] , true , $object_ids , $recursion_count );
+					return self::getSqlFilePathImpl ( $parts[0] , $parts[1] , true , $object_ids , $input_filter, $recursion_count );
 				}
 			}
 			else
