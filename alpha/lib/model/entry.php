@@ -1669,6 +1669,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		$this->putInCustomData("rootEntryId", $v);
 	}
 	
+	public function setMarkedForDeletion ( $v )	{	$this->putInCustomData ( "markedForDeletion" , (bool) $v );	}
+	public function getMarkedForDeletion (  )	{	return (bool) $this->getFromCustomData( "markedForDeletion" ,null, false );	}
+		
+	
 	public function getRoots()
 	{
 		// the prefix required becaue combined sphinx match is rrequired, 
