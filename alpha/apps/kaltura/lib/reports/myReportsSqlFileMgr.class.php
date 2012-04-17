@@ -232,8 +232,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		else
 			throw new Exception ( "Cannot find mapping for [$type_str]" );
 			
-		if (!($has_filter) && isset($report_type_mapping[$flavor_str . "_" . NO_FILTER_SUFFIX])) {
-			return $report_type_mapping[$flavor_str . "_" . NO_FILTER_SUFFIX];					
+		if (!($has_filter) && isset($report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX])) {
+			return $report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX];					
 		}
 
 		if ( $no_text )
