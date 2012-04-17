@@ -131,8 +131,7 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
-			
-		myEntryUtils::deleteEntry($tempEntry);
+		myEntryUtils::deleteEntry($tempEntry,null,true);
 	}
 	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
