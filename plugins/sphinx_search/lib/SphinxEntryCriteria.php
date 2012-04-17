@@ -33,7 +33,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::ACCESS_CONTROL_ID => 'access_control_id',
 		entryPeer::MODERATION_COUNT => 'moderation_count',
 		entryPeer::RANK => 'rank',
-		entryPeer::TOTAL_RANK => 'total_rank',
 		entryPeer::PLAYS => 'plays',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
 		'entry.REPLACEMENT_STATUS' => 'replacement_status',
@@ -62,7 +61,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::ACCESS_CONTROL_ID => 'access_control_id',
 		entryPeer::MODERATION_COUNT => 'moderation_count',
 		entryPeer::RANK => 'rank',
-		entryPeer::TOTAL_RANK => 'total_rank',
 		entryPeer::PLAYS => 'plays',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
 		
@@ -105,7 +103,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'access_control_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'rank' => IIndexable::FIELD_TYPE_INTEGER,
-	    'total_rank' => IIndexable::FIELD_TYPE_INTEGER,
 		'plays' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 		'replacement_status' => IIndexable::FIELD_TYPE_INTEGER,
