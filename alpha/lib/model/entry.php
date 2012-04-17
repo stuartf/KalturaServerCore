@@ -2510,7 +2510,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'access_control_id' => 'accessControlId',
 			'moderation_count' => 'moderationCount',
 			'rank' => 'rank',
-		    'total_rank' => 'total_rank',
+		    'total_rank' => 'totalRank',
 			'plays' => 'plays',
 			'partner_sort_value' => 'partnerSortValue',
 			'replacement_status' => 'replacementStatus',
