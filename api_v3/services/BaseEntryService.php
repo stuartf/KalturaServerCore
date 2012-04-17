@@ -684,7 +684,7 @@ class BaseEntryService extends KalturaEntryService
 			$accessControlScope = $accessControl->getScope();
             $contextDataParams->toObject($accessControlScope);
             $accessControlScope->setEntryId($entryId);
-			$result->isAdmin = $accessControlScope->getKs()->isAdmin();
+			$result->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
             
 			$dbResult = new kEntryContextDataResult();
 			if($accessControl->applyContext($dbResult) && $disableCache)
