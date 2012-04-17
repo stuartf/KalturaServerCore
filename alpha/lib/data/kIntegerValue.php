@@ -22,4 +22,13 @@ class kIntegerValue extends kValue
 	{
 		$this->value = $value;
 	}
+	
+	/**
+	 * @param accessControlScope $scope
+	 * @return bool
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return false;
+	}
 }

@@ -21,4 +21,12 @@ abstract class kStringField extends kStringValue
 	{
 		return $this->getFieldValue();
 	}
+
+	/* (non-PHPdoc)
+	 * @see kStringValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return true;
+	}
 }

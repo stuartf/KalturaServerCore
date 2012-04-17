@@ -104,4 +104,28 @@ abstract class kMatchCondition extends kCondition
 		KalturaLog::debug("No match found, condition is false");
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCondition::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		foreach($values as $value)
+		{
+			if (is_object($value) && $value->shouldDisableCache($scope))
+			{
+				return true;
+			}
+		}
+		return $this->shouldFieldDisableCache($scope);
+	}
+
+	/**
+	 * @param accessControlScope $scope
+	 * @return bool
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return true;
+	}
 }

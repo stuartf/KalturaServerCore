@@ -21,4 +21,12 @@ abstract class kIntegerField extends kIntegerValue
 	{
 		return $this->getFieldValue();
 	}
+
+	/* (non-PHPdoc)
+	 * @see kIntegerValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return true;
+	}
 }
