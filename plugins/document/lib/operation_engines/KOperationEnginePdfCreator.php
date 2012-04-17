@@ -115,7 +115,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		$totalSleepTime = 0;
 		$sleepSeconds = 3;
 		$tmpFile = realpath($tmpFile);
-		while (!rename($tmpFile, $this->outFilePath) && $totalSleepTime < $this->$outputFileMoveTimeoutSec) {
+		while (!rename($tmpFile, $this->outFilePath) && $totalSleepTime < $this->outputFileMoveTimeoutSec) {
 			sleep($sleepSeconds);
 			$totalSleepTime += $sleepSeconds;
 			clearstatcache();
