@@ -139,7 +139,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			$fileUnlockInterval = self::DEFAULT_FILE_UNLOCK_INTERVAL; 
 		}
 		$tmpFile = realpath($tmpFile);
-		while (!rename($tmpFile, $this->outFilePath) && $fileUnlockRetries < 0) {
+		while (!rename($tmpFile, $this->outFilePath) && $fileUnlockRetries > 0) {
 			sleep($fileUnlockInterval);
 			$fileUnlockRetries--;
 			clearstatcache();
