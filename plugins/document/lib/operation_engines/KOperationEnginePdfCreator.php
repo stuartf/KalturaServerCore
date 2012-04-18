@@ -12,20 +12,25 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	 */
 	private $flavorParamsOutput;
 	
-	
 	/**
-	 * the max time for the actual conversion to finish. during this time we try to rename the output file.
-	 * @var int
+	 * The task's configuration.
+	 * @var KSchedularTaskConfig
 	 */
-	private $outputFileMoveTimeoutSec;
+	private $taskConfiguration;
 	
 	//old office files prefix
 	const OLD_OFFICE_SIGNATURE = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
 	
+	//this will be the default value if the parameter is not set in the task's configuration
+	const DEFAULT_FILE_UNLOCK_RETRIES = 100;
+	
+	//this will be the default value if the parameter is not set in the task's configuration
+	const DEFAULT_FILE_UNLOCK_INTERVAL = 3;
+	
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
 		parent::configure($taskConfig, $data, $client);
-		$outputFileMoveTimeoutSec = $taskConfig->params->outputFileMoveTimeoutSec;
+		$this->taskConfiguration = $taskConfig;
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
 		KalturaLog::debug("document : this [". print_r($this, true)."]"); 
 	}
@@ -96,8 +101,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
-		$sleepTimes = 10;
-		$sleepSeconds = 2;
+		$sleepTimes = $this->taskConfiguration->fileExistReties;
+		$sleepSeconds = $this->taskConfiguration->fileExistInterval;
 		while (!file_exists(realpath($tmpFile)) && $sleepTimes > 0) {
 			sleep($sleepSeconds);
 			$sleepTimes--;
@@ -111,13 +116,18 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		
-		//TODO: RENAME - will not be needed once PDFCreator can work with a configurations file	
-		$totalSleepTime = 0;
-		$sleepSeconds = 3;
+		$fileUnlockRetries = $this->taskConfiguration->params->fileUnlockRetries ;
+		if(!$fileUnlockRetries){
+			$fileUnlockRetries = self::DEFAULT_FILE_UNLOCK_RETRIES;
+		}
+		$fileUnlockInterval = $this->taskConfiguration->params->fileUnlockInterval;
+		if(!$fileUnlockInterval){
+			$fileUnlockInterval = self::DEFAULT_FILE_UNLOCK_INTERVAL; 
+		}
 		$tmpFile = realpath($tmpFile);
-		while (!rename($tmpFile, $this->outFilePath) && $totalSleepTime < $this->outputFileMoveTimeoutSec) {
-			sleep($sleepSeconds);
-			$totalSleepTime += $sleepSeconds;
+		while (!rename($tmpFile, $this->outFilePath) && $fileUnlockRetries < 0) {
+			sleep($fileUnlockInterval);
+			$fileUnlockRetries--;
 			clearstatcache();
 		}
 		
