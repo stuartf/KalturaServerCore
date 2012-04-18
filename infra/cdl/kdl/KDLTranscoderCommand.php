@@ -38,13 +38,13 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 			return true;
 
 		if($this->_id==KDLTranscoders::FFMPEG_AUX) {
-			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
+			$transcoder = new KDLOperatorFfmpeg($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
 		
 		if($this->_id==KDLTranscoders::FFMPEG) {
-			$transcoder = new KDLOperatorFfmpeg($this->_id);
+			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
