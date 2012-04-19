@@ -342,8 +342,40 @@ class KalturaResponseCacher
 		{
 			$cachedResponse = @file_get_contents($this->_cacheDataFilePath);
 		}
+
+		if(!is_null($contentType)) {
+			$this->createDirForPath($this->_cacheHeadersFilePath);
+			file_put_contents($this->_cacheHeadersFilePath, $contentType);
+		}
+
+		if ($cacheMode == self::CACHE_MODE_CONDITIONAL)
+		{
+			// save the cache conditions
+			$conditions = array(array_unique($this->_invalidationKeys), $this->_invalidationTime);
+			file_put_contents($this->_cacheConditionsFilePath, serialize($conditions));
+		}
+		else
+		{
+			// store specific expiry shorter than the default one
+			if ($this->_expiry == $this->_defaultExpiry)
+			{
+				if (kConf::hasParam("v3cache_expiry"))
+				{
+					$expiryArr = kConf::get("v3cache_expiry");
+					if (array_key_exists($this->_ksPartnerId, $expiryArr))
+						$this->_expiry = $expiryArr[$this->_ksPartnerId];
+				}
+			}
+
+			if ($this->_expiry != $this->_defaultExpiry)
+				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
+		}
 		
-		file_put_contents($this->_cacheDataFilePath, $response);
+		// write the cached response to a temporary file and then rename, to prevent any
+		// other running instance of apache from picking up a partially written response
+		$tempDataFilePath = tempnam(dirname($this->_cacheDataFilePath), basename($this->_cacheDataFilePath));
+		file_put_contents($tempDataFilePath, $response);
+		rename($tempDataFilePath, $this->_cacheDataFilePath);
 		
 		// compare the calculated $response to the previously stored $cachedResponse
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
@@ -391,34 +423,6 @@ class KalturaResponseCacher
 				@file_put_contents($cachedFileName, $cachedResponse);
 				@file_put_contents($nonCachedFileName, $response);
 			}
-		}
-		
-		if(!is_null($contentType)) {
-			$this->createDirForPath($this->_cacheHeadersFilePath);
-			file_put_contents($this->_cacheHeadersFilePath, $contentType);
-		}
-
-		if ($cacheMode == self::CACHE_MODE_CONDITIONAL)
-		{
-			// save the cache conditions
-			$conditions = array(array_unique($this->_invalidationKeys), $this->_invalidationTime);
-			file_put_contents($this->_cacheConditionsFilePath, serialize($conditions));
-		}
-		else
-		{
-			// store specific expiry shorter than the default one
-			if ($this->_expiry == $this->_defaultExpiry)
-			{
-				if (kConf::hasParam("v3cache_expiry"))
-				{
-					$expiryArr = kConf::get("v3cache_expiry");
-					if (array_key_exists($this->_ksPartnerId, $expiryArr))
-						$this->_expiry = $expiryArr[$this->_ksPartnerId];
-				}
-			}
-
-			if ($this->_expiry != $this->_defaultExpiry)
-				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
 		}
 	}
 
