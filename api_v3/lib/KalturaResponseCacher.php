@@ -443,6 +443,9 @@ class KalturaResponseCacher
 
 	private function hasCache()
 	{
+		if (!$this->isKSValid())
+			return false;					// ks not valid, do not return from cache
+	
 		// if the request is for warming the cache, disregard the cache and run the request
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
 
@@ -496,9 +499,6 @@ class KalturaResponseCacher
 		// check the invalidation conditions
 		if ($conditions)
 		{
-			if (!$this->isKSValid())
-				return false;					// ks not valid, should not return from cache since the response may contain sensitive data
-		
 			list($invalidationKeys, $cachedInvalidationTime) = unserialize($conditions);
 			$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
 			if ($invalidationTime === null)		
