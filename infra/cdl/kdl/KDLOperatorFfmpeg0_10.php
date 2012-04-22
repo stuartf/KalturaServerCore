@@ -63,6 +63,7 @@ $forcedKF=0;
 							// this var will be used as a flag for further stages,
 			break;
 		}
+$forcedKF=null;	// Disable FORCED KF - due to large record size
 //print_r($target); die;
 		if(isset($forcedKF) and isset($vid->_gop) && isset($vid->_frameRate) && $vid->_frameRate>0){
 			$forcedKF=null;
