@@ -110,6 +110,8 @@ abstract class kMatchCondition extends kCondition
 	 */
 	public function shouldDisableCache($scope)
 	{
+		$values = $this->getStringValues();
+
 		foreach($values as $value)
 		{
 			if (is_object($value) && $value->shouldDisableCache($scope))
