@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__file__) . '../../../../../infra/akamai/token/StreamTokenFactory.php');
+require(dirname(__file__) . '/../../../../../../infra/akamai/token/StreamTokenFactory.php');
 
 class kAkamaiRtmpUrlTokenizer extends kUrlTokenizer
 {
