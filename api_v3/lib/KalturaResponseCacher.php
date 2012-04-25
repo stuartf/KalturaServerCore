@@ -4,6 +4,10 @@ require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.cla
 
 class KalturaResponseCacher
 {
+	// copied from KalturaResponseType
+	const RESPONSE_TYPE_XML = 2;
+	const RESPONSE_TYPE_PHP = 3;
+
 	// warm cache constatns
 	// cache warming is used to maintain continous use of the request caching while preventing a load once the cache expires
 	// during WARM_CACHE_INTERVAL before the cache expiry a single request will be allowed to get through and renew the cache
@@ -58,7 +62,7 @@ class KalturaResponseCacher
 
 	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
 	protected static $_nextInstanceId = 0;
-		
+
 	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
 	{
 		$this->_instanceId = self::$_nextInstanceId;  
@@ -78,6 +82,8 @@ class KalturaResponseCacher
 		if (!$params) {
 			$params = requestUtils::getRequestParams();
 		}
+		
+		self::handleSessionStart($params);
 		
 		foreach(kConf::get('v3cache_ignore_params') as $name)
 			unset($params[$name]);
@@ -514,6 +520,18 @@ class KalturaResponseCacher
 		return true;
 	}
 	
+	static function getAdminSecret($partnerId)
+	{
+		if (!function_exists('apc_fetch'))
+			return null;			// no APC - can't get the partner secret here (DB not initialized)
+		
+		$adminSecret = apc_fetch('partner_admin_secret_' . $partnerId);
+		if (!$adminSecret)
+			return null;			// admin secret not found in APC
+		
+		return $adminSecret;
+	}
+	
 	private function isKSValid()
 	{
 		if (!$this->_ksRealStr || !$this->_ksHash)
@@ -522,10 +540,7 @@ class KalturaResponseCacher
 		if ($this->_ksValidUntil && $this->_ksValidUntil < time())
 			return false;			// KS is expired
 			
-		if (!function_exists('apc_fetch'))
-			return false;			// no APC - can't get the partner secret here (DB not initialized)
-		
-		$adminSecret = apc_fetch('partner_admin_secret_' . $this->_ksPartnerId);
+		$adminSecret = self::getAdminSecret($this->_ksPartnerId);
 		if (!$adminSecret)
 			return false;			// admin secret not found in APC, can't validate the KS
 			
@@ -750,4 +765,75 @@ class KalturaResponseCacher
 		@unlink($fileName);
 	}
 	
+	private static function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges)
+	{
+		$rand = microtime(true);
+		$expiry = time() + $expiry;
+		$fields = array (
+			$partnerId ,
+			$partnerId ,
+			$expiry ,
+			$type,
+			$rand ,
+			$userId ,
+			$privileges,
+			'',
+			'',
+		);
+		$info = implode ( ";" , $fields );
+
+		$signature = sha1( $adminSecretForSigning . $info );
+		$strToHash =  $signature . "|" . $info ;
+		$encoded_str = base64_encode( $strToHash );
+
+		return $encoded_str;
+	}
+
+	private static function handleSessionStart(&$params)
+	{
+		if (!isset($params['service']) || $params['service'] != 'session' ||
+			!isset($params['action']) || $params['action'] != 'start' ||
+			isset($params['multirequest']))
+		{
+			return;			// not a stand-alone call to session start
+		}
+		
+		if (!isset($params['type']) || $params['type'] != '2' ||
+			!isset($params['secret']) ||
+			!isset($params['partnerId']))
+		{
+			return;			// missing mandatory params or not admin session
+		}
+					
+		$format = isset($params['format']) ? isset($params['format']) : self::RESPONSE_TYPE_XML;
+		if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
+		{
+			return;			// the format is unsupported at this level
+		}
+		
+		$partnerId = $params['partnerId'];
+		$paramSecret = $params['secret'];
+		$adminSecret = self::getAdminSecret($partnerId);
+		if (!$adminSecret || $adminSecret != $paramSecret)
+		{
+			return;			// invalid admin secret
+		}
+
+		$userId = isset($params['userId']) ? $params['userId'] : '';
+		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
+		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
+		
+		$result = self::generateSession($paramSecret, $userId, $params['type'], $partnerId, $expiry, $privileges);
+		if ($format == self::RESPONSE_TYPE_XML)
+		{
+			header("Content-Type: text/xml");
+			echo "<xml><result>{$result}</result><executionTime>0</executionTime></xml>";
+			die;
+		}
+		else if ($format == self::RESPONSE_TYPE_PHP)
+		{
+			echo serialize($result);
+			die;
+		}
+	}
 }
