@@ -805,7 +805,7 @@ class KalturaResponseCacher
 			return;			// missing mandatory params or not admin session
 		}
 					
-		$format = isset($params['format']) ? isset($params['format']) : self::RESPONSE_TYPE_XML;
+		$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
 		if ($format != self::RESPONSE_TYPE_XML && $format != self::RESPONSE_TYPE_PHP)
 		{
 			return;			// the format is unsupported at this level
