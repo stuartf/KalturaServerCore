@@ -777,7 +777,7 @@ class playManifestAction extends kalturaAction
 		$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
 		$urlManager = $this->getUrlManagerByCdn($rtmpHost);
 		$this->tokenizer = $urlManager->getTokenizer();
-
+		
 		return $flavors;
 	}
 
@@ -1157,10 +1157,16 @@ class playManifestAction extends kalturaAction
 			{
 				$params = $optimizedPlayback[$partnerId];
 				if (isset($params['cache_playmanifest']) && $params['cache_playmanifest'])
-					requestUtils::sendCachingHeaders(60);
+					$renderer->cachingHeadersAge = 60;
 			}
 		}
 		
+		if (!$securyEntryHelper->shouldDisableCache())
+		{
+			$cache = kPlayManifestCacher::getInstance();
+			$cache->storeCache($renderer);
+		}
+
 		$renderer->output($playbackContext);
 	}
 }

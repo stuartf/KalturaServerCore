@@ -17,6 +17,11 @@ abstract class kManifestRenderer
 	public $tokenizer = null;
 	
 	/**
+	 * @var int
+	 */
+	public $cachingHeadersAge = null;
+	
+	/**
 	 * @return array<string>
 	 */
 	public function getHeaders()
@@ -49,9 +54,26 @@ abstract class kManifestRenderer
 		{
 			header($header);
 		}
+		
+		if ($this->cachingHeadersAge)
+		{
+			requestUtils::sendCachingHeaders($this->cachingHeadersAge);
+		}
 
 		echo $this->getBody();
 		die;
+	}
+	
+	public function getRequiredFiles()
+	{
+		$result = array(__file__);
+		if ($this->tokenizer)
+		{
+			$result[] = dirname(__file__) . '/storage/urlTokenizers/kUrlTokenizer.php';
+			$tokenizerClass = new ReflectionClass(get_class($this->tokenizer));
+			$result[] = $tokenizerClass->getFileName();
+		}
+		return $result;
 	}
 	
 	abstract protected function tokenizeUrls();

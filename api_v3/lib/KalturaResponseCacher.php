@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../alpha/config/kConf.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
 
 class KalturaResponseCacher
 {
@@ -44,9 +45,7 @@ class KalturaResponseCacher
 	protected $_cacheExpiryFilePath = "";
 	protected $_cacheConditionsFilePath = "";
 	protected $_ks = "";
-	protected $_ksHash = "";
-	protected $_ksRealStr = "";
-	protected $_ksValidUntil = "";
+	protected $_ksObj = null;
 	protected $_ksPartnerId = null;
 	protected $_defaultExpiry = 600;
 	protected $_expiry = 600;
@@ -135,12 +134,12 @@ class KalturaResponseCacher
 	public function setKS($ks)
 	{
 		$this->_ks = $ks;
-		
-		$ksData = $this->getKsData();
-		$this->_params["___cache___partnerId"] = $this->_ksPartnerId;
-		$this->_params["___cache___userId"] = $ksData["userId"];
-		$this->_params["___cache___ksType"] = $ksData["type"];
-		$this->_params["___cache___privileges"] = $ksData["privileges"];
+		$this->_ksObj = kSessionBase::getKSObject($ks);
+		$this->_ksPartnerId = ($this->_ksObj ? $this->_ksObj->partner_id : null);
+		$this->_params["___cache___partnerId"] =  $this->_ksPartnerId;
+		$this->_params["___cache___ksType"] = 	  ($this->_ksObj ? $this->_ksObj->type		 : null);
+		$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
+		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
@@ -449,7 +448,7 @@ class KalturaResponseCacher
 
 	private function hasCache()
 	{
-		if ($this->_ks && !$this->isKSValid())
+		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
 			return false;					// ks not valid, do not return from cache
 	
 		// if the request is for warming the cache, disregard the cache and run the request
@@ -520,46 +519,11 @@ class KalturaResponseCacher
 		return true;
 	}
 	
-	static function getAdminSecret($partnerId)
-	{
-		if (!function_exists('apc_fetch'))
-			return null;			// no APC - can't get the partner secret here (DB not initialized)
-		
-		$adminSecret = apc_fetch('partner_admin_secret_' . $partnerId);
-		if (!$adminSecret)
-			return null;			// admin secret not found in APC
-		
-		return $adminSecret;
-	}
-	
-	private function isKSValid()
-	{
-		if (!$this->_ksRealStr || !$this->_ksHash)
-			return false;			// no KS
-		
-		if ($this->_ksValidUntil && $this->_ksValidUntil < time())
-			return false;			// KS is expired
-			
-		$adminSecret = self::getAdminSecret($this->_ksPartnerId);
-		if (!$adminSecret)
-			return false;			// admin secret not found in APC, can't validate the KS
-			
-		if (sha1($adminSecret . $this->_ksRealStr) != $this->_ksHash)
-			return false;			// wrong KS signature
-			
-		return true;
-	}
-	
 	private static function getMaxInvalidationTime($invalidationKeys)
 	{
-		if (!kConf::get("query_cache_enabled") || !class_exists('Memcache'))
+		$memcache = kSessionBase::getKeysMemcache();
+		if (!$memcache)
 			return null;
-		
-		$memcache = new Memcache;	
-
-		$res = @$memcache->connect(kConf::get("global_keys_memcache_host"), kConf::get("global_keys_memcache_port"));
-		if (!$res)
-			return null;			// failed to connect to memcache
 
 		$cacheResult = $memcache->get($invalidationKeys);
 		if ($cacheResult === false)
@@ -633,24 +597,6 @@ class KalturaResponseCacher
 		return self::CACHE_MODE_NONE;
 	}
 	
-	private function getKsData()
-	{
-		$str = base64_decode($this->_ks, true);
-		
-		if (strpos($str, "|") === false)
-		{
-			$userId = null;
-			$type = null;
-			$privileges = null;
-		}
-		else
-		{
-			@list($this->_ksHash, $this->_ksRealStr) = @explode("|", $str, 2);
-			@list($this->_ksPartnerId, $dummy, $this->_ksValidUntil, $type, $dummy, $userId, $privileges) = @explode (";", $this->_ksRealStr);
-		}
-		return array("userId" => $userId, "type" => $type, "privileges" => $privileges );
-	}
-
 	private static function getRequestHeaderValue($headerName)
 	{
 		$headerName = "HTTP_".str_replace("-", "_", strtoupper($headerName));
@@ -765,30 +711,6 @@ class KalturaResponseCacher
 		@unlink($fileName);
 	}
 	
-	private static function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges)
-	{
-		$rand = microtime(true);
-		$expiry = time() + $expiry;
-		$fields = array (
-			$partnerId ,
-			$partnerId ,
-			$expiry ,
-			$type,
-			$rand ,
-			$userId ,
-			$privileges,
-			'',
-			'',
-		);
-		$info = implode ( ";" , $fields );
-
-		$signature = sha1( $adminSecretForSigning . $info );
-		$strToHash =  $signature . "|" . $info ;
-		$encoded_str = base64_encode( $strToHash );
-
-		return $encoded_str;
-	}
-
 	private static function handleSessionStart(&$params)
 	{
 		if (!isset($params['service']) || $params['service'] != 'session' ||
@@ -813,7 +735,7 @@ class KalturaResponseCacher
 		
 		$partnerId = $params['partnerId'];
 		$paramSecret = $params['secret'];
-		$adminSecret = self::getAdminSecret($partnerId);
+		$adminSecret = kSessionBase::getAdminSecretFromCache($partnerId);
 		if (!$adminSecret || $adminSecret != $paramSecret)
 		{
 			return;			// invalid admin secret
@@ -823,7 +745,7 @@ class KalturaResponseCacher
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
-		$result = self::generateSession($paramSecret, $userId, $params['type'], $partnerId, $expiry, $privileges);
+		$result = kSessionBase::generateSession($paramSecret, $userId, $params['type'], $partnerId, $expiry, $privileges);
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
