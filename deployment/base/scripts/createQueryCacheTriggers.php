@@ -185,6 +185,8 @@ function compareTriggerBodies($body1, $body2)
 
 function buildTriggerBody($invalidationKey, $triggerType)
 {
+	global $SPECIAL_TRIGGERS;
+
 	$tableName = $invalidationKey['table'];
 	$triggerBody = array();
 	foreach ($invalidationKey['keys'] as $curKeyStrings)
