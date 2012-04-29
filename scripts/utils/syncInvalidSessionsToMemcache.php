@@ -32,8 +32,8 @@ myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 $lastID = null;
 
 $memcache = new Memcache;	
-$memcache = @$memcache->connect($MC_HOST_NAME, $MC_PORT);
-if (!$memcache)
+$res = @$memcache->connect($MC_HOST_NAME, $MC_PORT);
+if (!$res)
 	die('Error: failed to connect to global memcache !');
 
 $setCount = 0;
