@@ -44,7 +44,7 @@ class kSessionBase
 		if (empty($encoded_str))
 			return null;
 
-		$ks = new ks();		
+		$ks = new kSessionBase();		
 		if (!$ks->parseKS($encoded_str))
 			return null;
 
