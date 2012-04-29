@@ -1,17 +1,10 @@
 <?php
 
-function getKeysMemcache()
-{
-	if (!kConf::get("query_cache_enabled") || !class_exists('Memcache'))
-		return null;
-	
-	$memcache = new Memcache;	
-	$res = @$memcache->connect(kConf::get("global_keys_memcache_host"), kConf::get("global_keys_memcache_port"));
-	if (!$res)
-		return null;			// failed to connect to memcache
+if ($argc < 3)
+	die("Usage:\n\tphp syncInvalidSessionsToMemcache <keys memcache host> <keys memcache port>\n");
 
-	return $memcache;
-}
+$MC_HOST_NAME = $argv[1];
+$MC_PORT = 	 	$argv[2];
 
 define('EXPIRY_TIME_MARGIN', 600);
 define('PAGE_SIZE', 1000);
@@ -38,7 +31,8 @@ myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 $lastID = null;
 
-$memcache = getKeysMemcache();
+$memcache = new Memcache;	
+$memcache = @$memcache->connect($MC_HOST_NAME, $MC_PORT);
 if (!$memcache)
 	die('Error: failed to connect to global memcache !');
 
