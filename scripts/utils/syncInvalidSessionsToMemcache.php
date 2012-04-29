@@ -46,6 +46,8 @@ for (;;)
 	$c->addAscendingOrderByColumn(invalidSessionPeer::ID);
 	$c->setLimit(PAGE_SIZE);
 	$results = invalidSessionPeer::doSelect($c);
+	if (!count($results))
+		break;
 
 	foreach ($results as $result)
 	{
