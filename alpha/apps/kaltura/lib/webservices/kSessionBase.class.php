@@ -22,9 +22,9 @@ class kSessionBase
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
 	
-	private $hash = null;
-	private $real_str = null;
-	private $original_str = "";
+	protected $hash = null;
+	protected $real_str = null;
+	protected $original_str = "";
 
 	public $partner_id = null;
 	public $partner_pattern = null;
@@ -128,7 +128,7 @@ class kSessionBase
 		return $memcache;
 	}
 	
-	private function isKSInvalidated()
+	protected function isKSInvalidated()
 	{
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
 			return null;			// cannot validate action limited KS at this level

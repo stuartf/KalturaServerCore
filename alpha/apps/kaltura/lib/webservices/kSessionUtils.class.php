@@ -277,7 +277,7 @@ class ks extends kSessionBase
 		}
 
 		$salt = $ks->getSalt();
-		if (self::hash ( $salt , $real_str ) != $this->hash )
+		if (self::hash ( $salt , $ks->real_str ) != $ks->hash )
 		{
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
 		}			
