@@ -94,6 +94,11 @@ class kSessionBase
 		return true;
 	}
 
+	public function isAdmin()
+	{
+		return $this->type >= self::TYPE_KAS;
+	}
+	
 	public function isWidgetSession()
 	{
 		return ($this->type == self::TYPE_KS) && ($this->user == 0) && ($this->privileges == "view:*");

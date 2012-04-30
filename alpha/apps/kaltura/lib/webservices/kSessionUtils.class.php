@@ -286,11 +286,6 @@ class ks extends kSessionBase
 		return $ks;
 	}
 
-	public function isAdmin()
-	{
-		return $this->type >= self::TYPE_KAS;
-	}
-	
 	public function getUniqueString()
 	{
 		return $this->partner_id . $this->rand;

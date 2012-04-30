@@ -53,7 +53,7 @@ class kPlayManifestCacher
 		{
 			$this->_ksValidated = true;
 		}
-		else if ($ksObj)
+		else if ($ksObj && !$ksObj->isAdmin())
 		{
 			$this->_ksValidated = $ksObj->tryToValidateKS();
 		}
