@@ -64,12 +64,16 @@ class kSessionBase
 			return false;
 		
 		list(
-			$this->partner_id, 
-			$this->partner_pattern, 
-			$this->valid_until, 
-			$this->type, 
-			$this->rand, 
+			$this->partner_id,
+			$this->partner_pattern,
+			$this->valid_until,
 		) = $parts;
+
+		if(isset($parts[3]))
+			$this->type = $parts[3];
+
+		if(isset($parts[4]))
+			$this->rand = $parts[4];
 		
 		if(isset($parts[5]))
 			$this->user = $parts[5];
