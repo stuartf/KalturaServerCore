@@ -60,7 +60,7 @@ class kSessionBase
 		list($hash , $real_str) = explode( "|" , $str , 2 );
 
 		$parts = explode(self::SEPARATOR, $real_str);
-		if (count($parts) < 5)
+		if (count($parts) < 3)
 			return false;
 		
 		list(
