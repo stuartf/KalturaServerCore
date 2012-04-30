@@ -85,19 +85,19 @@ class UverseClickToOrderService extends KalturaBaseService
 			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
 			$flavorAssetId = isset($flavorAssets[0]) ? $flavorAssets[0] : null;
 			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-			$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl() : $entry->getDownloadUrl();
+			//$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl() : $entry->getDownloadUrl();
+			$flavorUrl = $flavorAsset ? $this->getAssetUrl($flavorAsset) : $entry->getDownloadUrl();
 			
 			$thumbAssets = array_map('trim', explode(',', $entryDistribution->getThumbAssetIds()));
 			$thumbAssetId = isset($thumbAssets[0]) ? $thumbAssets[0] : null;
 			$thumbAsset = assetPeer::retrieveById($thumbAssetId);
-			$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl() : $entry->getThumbnailUrl();
+			//$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl() : $entry->getThumbnailUrl();
+			$thumbUrl = $thumbAsset ? $this->getAssetUrl($thumbAsset) : $entry->getThumbnailUrl();
 			
 			$relatedEntriesArray[$relatedEntryId][] = array(
 				'id' => $entry->getId(),
-				//'thumbnailUrl' => $this->getAssetUrl($thumbUrl),
-				//'downloadUrl' => $this->getAssetUrl($flavorUrl),
-				'thumbnailUrl' => $this->getAssetUrl($thumbAsset),
-				'downloadUrl' => $this->getAssetUrl($flavorAsset),
+				'thumbnailUrl' => $thumbUrl,
+				'downloadUrl' => $flavorUrl,
 			);
 			
 		}
