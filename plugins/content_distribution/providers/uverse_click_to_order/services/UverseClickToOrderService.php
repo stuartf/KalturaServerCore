@@ -94,8 +94,8 @@ class UverseClickToOrderService extends KalturaBaseService
 			
 			$relatedEntriesArray[$relatedEntryId][] = array(
 				'id' => $entry->getId(),
-				'thumbnailUrl' => $thumbUrl,
-				'downloadUrl' => $flavorUrl,
+				'thumbnailUrl' => $this->getAssetUrl($thumbUrl),
+				'downloadUrl' => $this->getAssetUrl($flavorUrl),
 			);
 			
 		}
@@ -145,5 +145,17 @@ class UverseClickToOrderService extends KalturaBaseService
 			$backgroundImageUrl = $backgroundImage->getThumbnailUrl().'/width/'.$width.'/height/'.$height;
 		}
 		return $backgroundImageUrl;
+	}
+	
+	private function getAssetUrl(asset $asset)
+	{
+		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
+		
+		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
+		$urlManager->setDomain($cdnHost);
+		$url = $urlManager->getAssetUrl($asset);
+		$url = $cdnHost . $url;
+		$url = preg_replace('/^https?:\/\//', '', $url);
+		return 'http://' . $url;
 	}
 }
