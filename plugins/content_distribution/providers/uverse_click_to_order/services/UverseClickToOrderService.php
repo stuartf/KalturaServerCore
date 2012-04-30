@@ -84,14 +84,12 @@ class UverseClickToOrderService extends KalturaBaseService
 			
 			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
 			$flavorAssetId = isset($flavorAssets[0]) ? $flavorAssets[0] : null;
-			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-			//$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl() : $entry->getDownloadUrl();
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);			
 			$flavorUrl = $flavorAsset ? $this->getAssetUrl($flavorAsset) : $entry->getDownloadUrl();
 			
 			$thumbAssets = array_map('trim', explode(',', $entryDistribution->getThumbAssetIds()));
 			$thumbAssetId = isset($thumbAssets[0]) ? $thumbAssets[0] : null;
-			$thumbAsset = assetPeer::retrieveById($thumbAssetId);
-			//$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl() : $entry->getThumbnailUrl();
+			$thumbAsset = assetPeer::retrieveById($thumbAssetId);			
 			$thumbUrl = $thumbAsset ? $this->getAssetUrl($thumbAsset) : $entry->getThumbnailUrl();
 			
 			$relatedEntriesArray[$relatedEntryId][] = array(
