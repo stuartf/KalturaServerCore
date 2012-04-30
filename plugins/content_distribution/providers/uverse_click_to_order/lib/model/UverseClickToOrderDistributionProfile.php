@@ -14,6 +14,14 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 		UverseClickToOrderDistributionField::ITEM_TITLE => 25,
 	);
 	
+	protected $inListOrNullValidation= array (
+		UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE => array(
+			'image', 
+			'video', 
+			'link'
+		),
+	);
+		
 	const CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH = 15;
 
 	/* (non-PHPdoc)
@@ -109,6 +117,7 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 			return $validationErrors;
 		}		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLengthCategoryName($allFieldValues[UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID], $action));
 		
 		return $validationErrors;
