@@ -19,7 +19,7 @@ abstract class kManifestRenderer
 	/**
 	 * @var int
 	 */
-	public $cachingHeadersAge = null;
+	public $cachingHeadersAge = 0;
 	
 	/**
 	 * @return array<string>
@@ -55,10 +55,7 @@ abstract class kManifestRenderer
 			header($header);
 		}
 		
-		if ($this->cachingHeadersAge)
-		{
-			requestUtils::sendCachingHeaders($this->cachingHeadersAge);
-		}
+		requestUtils::sendCachingHeaders($this->cachingHeadersAge);
 
 		echo $this->getBody();
 		die;
