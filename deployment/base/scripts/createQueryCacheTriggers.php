@@ -201,7 +201,7 @@ function buildTriggerBody($invalidationKey, $triggerType)
 		}
 		$curKey = 'concat(' . implode(', ', $curKey) . ')';
 		
-		$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";
+		$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";		// 90000 = slightly more than the cache expiry (1 day)
 	}
 	
 	$specialTriggerKey = "{$tableName}/{$triggerType}";
