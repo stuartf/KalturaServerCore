@@ -67,6 +67,22 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/UverseClickToOrderCategoryEntryId" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		//cateogry image width		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(UverseClickToOrderDistributionField::CATEGORY_IMAGE_WIDTH);
+		$fieldConfig->setUserFriendlyFieldName('Category image width');
+		$fieldConfig->setEntryMrssXslt('<xsl:text>101</xsl:text>');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		//category image height
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(UverseClickToOrderDistributionField::CATEGORY_IMAGE_HEIGHT);
+		$fieldConfig->setUserFriendlyFieldName('Category image height');
+		$fieldConfig->setEntryMrssXslt('<xsl:text>60</xsl:text>');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(UverseClickToOrderDistributionField::ITEM_TITLE);
