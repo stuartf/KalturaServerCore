@@ -94,8 +94,10 @@ class UverseClickToOrderService extends KalturaBaseService
 			
 			$relatedEntriesArray[$relatedEntryId][] = array(
 				'id' => $entry->getId(),
-				'thumbnailUrl' => $this->getAssetUrl($thumbUrl),
-				'downloadUrl' => $this->getAssetUrl($flavorUrl),
+				//'thumbnailUrl' => $this->getAssetUrl($thumbUrl),
+				//'downloadUrl' => $this->getAssetUrl($flavorUrl),
+				'thumbnailUrl' => $this->getAssetUrl($thumbAsset),
+				'downloadUrl' => $this->getAssetUrl($flavorAsset),
 			);
 			
 		}
