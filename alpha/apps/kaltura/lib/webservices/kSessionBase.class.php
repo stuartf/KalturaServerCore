@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../../../../../infra/general/kMemcacheManager.php');
+
 // NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
 class kSessionBase
 {
@@ -35,9 +37,6 @@ class kSessionBase
 	public $privileges = null;
 	public $master_partner_id = null;
 	public $additional_data = null;
-
-	protected static $keys_memcache_inited = false;
-	protected static $keys_memcache = null;
 	
 	public static function getKSObject($encoded_str)
 	{
@@ -116,33 +115,12 @@ class kSessionBase
 		return $adminSecret;
 	}
 	
-	static public function getKeysMemcache()
-	{
-		if (self::$keys_memcache_inited)
-		{
-			return self::$keys_memcache;
-		}
-		
-		self::$keys_memcache_inited = true;
-		
-		if (!kConf::get("query_cache_enabled") || !class_exists('Memcache'))
-			return null;
-		
-		$memcache = new Memcache;	
-		$res = @$memcache->connect(kConf::get("global_keys_memcache_host"), kConf::get("global_keys_memcache_port"));
-		if (!$res)
-			return null;			// failed to connect to memcache
-
-		self::$keys_memcache = $memcache;
-		return $memcache;
-	}
-	
 	protected function isKSInvalidated()
 	{
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
 			return null;			// cannot validate action limited KS at this level
 		
-		$memcache = self::getKeysMemcache();
+		$memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_GLOBAL_KEYS);
 		if (!$memcache)
 			return null;			// failed to connect to memcache or memcache not enabled
 

@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../alpha/config/kConf.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
+require_once(dirname(__FILE__) . '/../../infra/general/kMemcacheManager.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
 
 class KalturaResponseCacher
@@ -521,7 +522,7 @@ class KalturaResponseCacher
 	
 	private static function getMaxInvalidationTime($invalidationKeys)
 	{
-		$memcache = kSessionBase::getKeysMemcache();
+		$memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_GLOBAL_KEYS);
 		if (!$memcache)
 			return null;
 
