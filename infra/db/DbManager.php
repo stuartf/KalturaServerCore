@@ -110,9 +110,10 @@ class DbManager
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		
 		$stickySessionKey = 'StickySession:'.kCurrentContext::$user_ip;
-		if (function_exists('apc_fetch'))
+		$memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_GLOBAL_QUERIES);
+		if ($memcache)
 		{
-			$key = apc_fetch($stickySessionKey);
+			$key = $memcache->get($stickySessionKey);
 			if($key)
 			{
 				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
@@ -148,8 +149,8 @@ class DbManager
 
 				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
 				
-				if (!$read && function_exists('apc_store'))
-					apc_store($stickySessionKey, $key, $stickySessionExpiry);
+				if (!$read && $memcache)
+					$memcache->set($stickySessionKey, $key, 0, $stickySessionExpiry);
 					
 				if (!is_null($connection))
 					return $connection;
