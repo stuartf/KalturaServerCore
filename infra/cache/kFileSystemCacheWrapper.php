@@ -40,7 +40,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		$filePath = $this->baseFolder;
 		if ($this->keyFolderChars)
 			$filePath .= substr($key, 0, $this->keyFolderChars) . '/';
-		return $this->baseFilename . $key;
+		return $filePath . $this->baseFilename . $key;
 	}
 
 	/**
