@@ -21,7 +21,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	public function get($key, $defaultExpiry = 0)
 	{
 		return apc_fetch($key);
 	}
@@ -29,7 +29,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	public function set($key, $var, $expiry = 0, $defaultExpiry = 0)
 	{
 		apc_store($key, $var, $expiry);
 	}

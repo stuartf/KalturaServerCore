@@ -56,7 +56,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	public function get($key, $defaultExpiry = 0)
 	{
 		return $this->memcache->get($key);
 	}
@@ -64,7 +64,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	public function set($key, $var, $expiry = 0, $defaultExpiry = 0)
 	{
 		$this->memcache->set($key, $var, $this->flags, $expiry);
 	}
@@ -72,7 +72,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::multiGet()
 	 */
-	public function multiGet($keys)
+	public function multiGet($keys, $defaultExpiry = 0)
 	{
 		return $this->memcache->get($key);
 	}

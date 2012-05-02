@@ -10,18 +10,18 @@ class kBaseCacheWrapper
 	 * @param string $key
 	 * @return mixed or false on error
 	 */
-	abstract public function get($key);
+	abstract public function get($key, $defaultExpiry = 0);
 	
 	/**
 	 * @param array $keys
 	 * @return array or false on error
 	 */
-	public function multiGet($keys)
+	public function multiGet($keys, $defaultExpiry = 0)
 	{
 		$result = array();
 		foreach ($keys as $key)
 		{
-			$curResult = $this->get($key);
+			$curResult = $this->get($key, $defaultExpiry);
 			if ($curResult !== false)
 			{
 				$result[$key] = $curResult;
@@ -35,7 +35,7 @@ class kBaseCacheWrapper
 	 * @param mixed $var
 	 * @param int $expiry
 	 */
-	abstract public function set($key, $var, $expiry = 0);
+	abstract public function set($key, $var, $expiry = 0, $defaultExpiry = 0);
 
 	/**
 	 * This function is required since this code can run before the autoloader
