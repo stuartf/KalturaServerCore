@@ -108,7 +108,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	protected static function safeFilePutContents($filePath, $var)
 	{
 		// write to a temp file and then rename, so that the write will be atomic
-		$tempFilePath = tempnam(dirname($filePath), basename($filePath);
+		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
 		file_put_contents($tempFilePath, $var);
 		rename($tempFilePath, $filePath);
 	}

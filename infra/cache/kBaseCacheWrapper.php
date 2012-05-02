@@ -4,7 +4,7 @@
  * @package infra
  * @subpackage cache
  */
-class kBaseCacheWrapper
+abstract class kBaseCacheWrapper
 {	
 	/**
 	 * @param string $key
