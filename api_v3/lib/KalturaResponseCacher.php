@@ -522,7 +522,7 @@ class KalturaResponseCacher
 	
 	private static function getMaxInvalidationTime($invalidationKeys)
 	{
-		$memcache = kCacheManager::getMemcache(kCacheManager::MC_GLOBAL_KEYS);
+		$memcache = kCacheManager::getCache(kCacheManager::MC_GLOBAL_KEYS);
 		if (!$memcache)
 			return null;
 
