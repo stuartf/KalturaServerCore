@@ -43,7 +43,7 @@ class kCacheManager
 			return self::$caches[$type];
 		}
 		
-		if (!array_key_exists($type, $cacheConfigs))
+		if (!array_key_exists($type, self::$cacheConfigs))
 		{
 			return null;
 		}
