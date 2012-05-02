@@ -110,7 +110,7 @@ class DbManager
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		
 		$stickySessionKey = 'StickySession:'.kCurrentContext::$user_ip;
-		$memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_GLOBAL_QUERIES);
+		$memcache = kCacheManager::getMemcache(kCacheManager::MC_GLOBAL_QUERIES);
 		if ($memcache)
 		{
 			$key = $memcache->get($stickySessionKey);

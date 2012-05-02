@@ -30,7 +30,7 @@ class myCache
 		
 		if ( self::$s_memcache == NULL )
 		{
-			self::$s_memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_LOCAL);
+			self::$s_memcache = kCacheManager::getMemcache(kCacheManager::MC_LOCAL);
 			if (self::$s_memcache)
 			{
 				self::$s_ready = true;

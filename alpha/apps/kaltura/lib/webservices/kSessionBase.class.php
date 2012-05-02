@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../../../infra/general/kMemcacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
 
 // NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
 class kSessionBase
@@ -120,7 +120,7 @@ class kSessionBase
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
 			return null;			// cannot validate action limited KS at this level
 		
-		$memcache = kMemcacheManager::getMemcache(kMemcacheManager::MC_GLOBAL_KEYS);
+		$memcache = kCacheManager::getMemcache(kCacheManager::MC_GLOBAL_KEYS);
 		if (!$memcache)
 			return null;			// failed to connect to memcache or memcache not enabled
 
