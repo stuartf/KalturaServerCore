@@ -51,7 +51,7 @@ class kCacheManager
 		$config = self::$cacheConfigs[$type];
 		$className = "k{$config[0]}CacheWrapper";
 
-		require_once(dirname(__FILE__) . $className . '.php');
+		require_once(dirname(__FILE__) . '/' . $className . '.php');
 		$cache = new $className;
 
 		$config = array_slice($config, 1);
