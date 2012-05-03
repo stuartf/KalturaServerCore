@@ -11,7 +11,7 @@ class kPlayManifestCacher
 	protected $_cacheEnabled = false;
 
 	protected $_cacheKey = "";
-	protected $_cacheWrapper = null
+	protected $_cacheWrapper = null;
 	
 	protected $_ksPartnerId = null;
 	protected $_ksValidated = false;
