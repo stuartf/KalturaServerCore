@@ -147,7 +147,7 @@ class kQueryCache
 		$keysToGet[] = self::DONT_CACHE_KEY;
 		
 		$queryStart = microtime(true);
-		$cacheResult = self::$s_memcacheKeys->get($keysToGet);
+		$cacheResult = self::$s_memcacheKeys->multiGet($keysToGet);
 		KalturaLog::debug("kQueryCache: keys query took " . (microtime(true) - $queryStart) . " seconds");
 		
 		if ($cacheResult === false)
@@ -242,7 +242,7 @@ class kQueryCache
 		
 		$queryTime = time();
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
-		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
+		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
@@ -269,7 +269,7 @@ class kQueryCache
 		{
 			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
-			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 0, 
+			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 
 				self::CACHED_QUERIES_EXPIRY_SEC + self::INVALIDATION_KEYS_EXPIRY_MARGIN))
 			{
 				KalturaLog::err("kQueryCache: failed to update invalidation key");

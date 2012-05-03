@@ -526,7 +526,7 @@ class KalturaResponseCacher
 		if (!$memcache)
 			return null;
 
-		$cacheResult = $memcache->get($invalidationKeys);
+		$cacheResult = $memcache->multiGet($invalidationKeys);
 		if ($cacheResult === false)
 			return null;			// failed to get the invalidation keys
 			

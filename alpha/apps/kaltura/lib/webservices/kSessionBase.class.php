@@ -126,7 +126,7 @@ class kSessionBase
 
 		$ksKey = self::INVALID_SESSION_KEY_PREFIX . $this->hash;
 		$keysToGet = array(self::INVALID_SESSIONS_SYNCED_KEY, $ksKey);
-		$cacheResult = $memcache->get($keysToGet);
+		$cacheResult = $memcache->multiGet($keysToGet);
 		if ($cacheResult === false)
 			return null;			// failed to get the keys
 

@@ -11,7 +11,7 @@ class kPlayManifestCacher
 	protected $_cacheEnabled = false;
 
 	protected $_cacheKey = "";
-	protected $_cacheDataFilePath = "";
+	protected $_cacheWrapper = null
 	
 	protected $_ksPartnerId = null;
 	protected $_ksValidated = false;
@@ -81,7 +81,7 @@ class kPlayManifestCacher
 
 		$this->_cacheKey = md5( http_build_query($params) );
 
-		$this->cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
+		$this->_cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
 	}
 	
 	static public function getInstance()
@@ -101,7 +101,7 @@ class kPlayManifestCacher
 		$startTime = microtime(true);
 		if ($this->_ksValidated)
 		{
-			$response = $this->cacheWrapper->get($this->_cacheKey, self::CACHE_EXPIRY);
+			$response = $this->_cacheWrapper->get($this->_cacheKey, self::CACHE_EXPIRY);
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
@@ -135,15 +135,6 @@ class kPlayManifestCacher
 	///////////////////////////////////////////////////////////////////
 	//	Cache storing functions
 
-	private function createDirForPath($filePath)
-	{
-		$dirname = dirname($filePath);
-		if (!is_dir($dirname))
-		{
-			mkdir($dirname, 0777, true);
-		}
-	}
-
 	public function storeCache($renderer)
 	{
 		if (!$this->_ksValidated)
@@ -171,6 +162,6 @@ class kPlayManifestCacher
 		$requiredFiles = $renderer->getRequiredFiles();
 		$serializedRenderer = serialize($renderer);
 	
-		$this->cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY, self::CACHE_EXPIRY);
+		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY, self::CACHE_EXPIRY);
 	}
 }

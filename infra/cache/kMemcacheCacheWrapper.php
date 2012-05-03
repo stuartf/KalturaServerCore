@@ -74,7 +74,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function multiGet($keys, $defaultExpiry = 0)
 	{
-		return $this->memcache->get($key);
+		return $this->memcache->get($keys);
 	}
 }
 

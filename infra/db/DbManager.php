@@ -150,7 +150,7 @@ class DbManager
 				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
 				
 				if (!$read && $memcache)
-					$memcache->set($stickySessionKey, $key, 0, $stickySessionExpiry);
+					$memcache->set($stickySessionKey, $key, $stickySessionExpiry);
 					
 				if (!is_null($connection))
 					return $connection;
