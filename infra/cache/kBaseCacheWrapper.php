@@ -8,12 +8,14 @@ abstract class kBaseCacheWrapper
 {	
 	/**
 	 * @param string $key
+	 * @param int $defaultExpiry
 	 * @return mixed or false on error
 	 */
 	abstract public function get($key, $defaultExpiry = 0);
 	
 	/**
 	 * @param array $keys
+	 * @param int $defaultExpiry
 	 * @return array or false on error
 	 */
 	public function multiGet($keys, $defaultExpiry = 0)
@@ -34,6 +36,7 @@ abstract class kBaseCacheWrapper
 	 * @param string $key
 	 * @param mixed $var
 	 * @param int $expiry
+	 * @param int $defaultExpiry
 	 */
 	abstract public function set($key, $var, $expiry = 0, $defaultExpiry = 0);
 

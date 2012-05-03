@@ -16,6 +16,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	protected $serializeData;
 
 	/**
+	 * @param string $rootFolder
 	 * @param string $baseFolder
 	 * @param string $baseFilename
 	 * @param int $keyFolderChars
@@ -105,6 +106,10 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		self::safeFilePutContents($filePath, $var);
 	}
 	
+	/**
+	 * @param string $filePath
+	 * @param string $var
+	 */
 	protected static function safeFilePutContents($filePath, $var)
 	{
 		// write to a temp file and then rename, so that the write will be atomic
@@ -113,9 +118,13 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		rename($tempFilePath, $filePath);
 	}
 		
-	// This function avoids the 'file does not exist' warning
+	/**
+	 * @param string $filePath
+	 * @return string
+	 */
 	protected static function safeFileGetContents($filePath)
 	{
+		// This function avoids the 'file does not exist' warning
 		if (!file_exists($filePath))
 		{
 			return false;
@@ -123,6 +132,9 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		return @file_get_contents($filePath);
 	}
 
+	/**
+	 * @param string $filePath
+	 */
 	protected static function safeUnlink($filePath)
 	{
 		if (!file_exists($filePath))

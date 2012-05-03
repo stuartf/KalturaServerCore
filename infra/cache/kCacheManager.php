@@ -6,6 +6,7 @@
  */
 class kCacheManager
 {
+	// Cache ids
 	const APC = 1;
 	
 	const MC_LOCAL = 11;
@@ -54,6 +55,7 @@ class kCacheManager
 		require_once(dirname(__FILE__) . '/' . $className . '.php');
 		$cache = new $className;
 
+		// get required kConf params
 		$config = array_slice($config, 1);
 		foreach ($config as $index => $value)
 		{
@@ -70,6 +72,7 @@ class kCacheManager
 			}
 		}
 		
+		// initialize the cache
 		if (call_user_func_array(array($cache, 'init'), $config) === false)
 		{
 			$cache = null;
