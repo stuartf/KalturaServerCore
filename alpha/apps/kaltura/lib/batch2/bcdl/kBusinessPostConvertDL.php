@@ -211,6 +211,9 @@ class kBusinessPostConvertDL
 			    {
 			        $exportOriginalAsset = true;
 			        $isOriginalAndExporting = true;
+			        if(isset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()])) {
+					    unset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()]);
+			        }
 			    }
 			    else if ($readyBehavior != flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 			    {
