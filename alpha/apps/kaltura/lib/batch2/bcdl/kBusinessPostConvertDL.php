@@ -190,7 +190,9 @@ class kBusinessPostConvertDL
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
 			KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
-							
+
+			$isOriginalAndExporting = false;
+			
 			// don't mark any incomplete flag
 			if($siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
@@ -202,6 +204,21 @@ class kBusinessPostConvertDL
 			}
 				
 			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset, $profile);
+			
+		    if ($siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_EXPORTING)
+			{
+			    if ($siblingFlavorAsset->getIsOriginal())
+			    {
+			        $exportOriginalAsset = true;
+			        $isOriginalAndExporting = true;
+			    }
+			    else if ($readyBehavior != flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
+			    {
+			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
+				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
+			    }
+			    
+			}
 			
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 			{
@@ -218,22 +235,8 @@ class kBusinessPostConvertDL
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
 				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			}
-			
-			if ($siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_EXPORTING)
-			{
-			    if ($siblingFlavorAsset->getIsOriginal())
-			    {
-			        $exportOriginalAsset = true;
-			    }
-			    else
-			    {
-			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
-				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
-			    }
-			    
-			}
 						
-			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED && !$isOriginalAndExporting)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is required");
 				$requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()] = true;
@@ -246,10 +249,11 @@ class kBusinessPostConvertDL
 		if(count($requiredFlavorParamsIds))
 		{
 			$inCompleteRequiredFlavorParamsIds = array_keys($requiredFlavorParamsIds);
-			foreach($inCompleteRequiredFlavorParamsIds as $inCompleteFlavorId)
+			foreach($inCompleteRequiredFlavorParamsIds as $inCompleteFlavorId) {
 				$inCompleteFlavorIds[] = $inCompleteFlavorId;
+			}
 				
-			KalturaLog::debug('Convert Finished - has In-Compelte Required flavors [[' . print_r($inCompleteRequiredFlavorParamsIds, true) . ']');
+			KalturaLog::debug('Convert Finished - has In-Complete Required flavors [[' . print_r($inCompleteRequiredFlavorParamsIds, true) . ']');
 		} 
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
