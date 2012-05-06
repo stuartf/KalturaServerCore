@@ -10,6 +10,20 @@
 class kBatchManager
 {
 	/**
+	 * @var BatchJob
+	 */
+	protected static $currentUpdatingJob;
+	
+	/**
+	 * @return BatchJob
+	 */
+	public static function getCurrentUpdatingJob()
+	{
+		return self::$currentUpdatingJob;
+	}
+	
+    
+	/**
 	 * batch createFlavorAsset orgenize a convert job data 
 	 * 
 	 * @param flavorParamsOutputWrap $flavor
@@ -322,6 +336,8 @@ class kBatchManager
 	// common to all the jobs using the BatchJob table 
 	public static function updateExclusiveBatchJob($id, kExclusiveLockKey $lockKey, BatchJob $dbBatchJob)
 	{
+	    self::$currentUpdatingJob = $dbBatchJob;
+	    
 		$dbBatchJob = kBatchExclusiveLock::updateExclusive($id, $lockKey, $dbBatchJob);
 		
 		$event = new kBatchJobStatusEvent($dbBatchJob);

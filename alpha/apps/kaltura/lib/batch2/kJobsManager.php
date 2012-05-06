@@ -815,7 +815,7 @@ class kJobsManager
  		{
  			if($keepCurrentVersion)
  			{
- 				if($asset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+ 				if(!in_array($asset->getStatus(), $asset->getLocalReadyStatuses()))
 	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
  			}
  			else 
@@ -986,7 +986,7 @@ class kJobsManager
 				if($flavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 				{
 					if($sourceIncludedInProfile)
-						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+					    $flavorAsset->setStatusLocalReady();
 					else
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
 						
@@ -1169,9 +1169,19 @@ class kJobsManager
 		
 		if(!$batchJob->getParentJobId() && $batchJob->getEntryId())
 		{
-			$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
-			$batchJob->setRootJobId($entry->getBulkUploadId());
-			$batchJob->setBulkJobId($entry->getBulkUploadId());
+		    $currentJob = kBatchManager::getCurrentUpdatingJob();
+			if($currentJob && $currentJob->getEntryId() == $batchJob->getEntryId())
+			{
+				$batchJob->setParentJobId($currentJob->getId());
+				$batchJob->setBulkJobId($currentJob->getBulkJobId());
+				$batchJob->setRootJobId($currentJob->getRootJobId());
+			}
+			else
+		    {
+    			$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
+    			$batchJob->setRootJobId($entry->getBulkUploadId());
+    			$batchJob->setBulkJobId($entry->getBulkUploadId());
+		    }
 		}
 			
 		// validate partner id

@@ -123,6 +123,7 @@ return array(
 	'Kaltura_Client_Enum_FlavorAssetStatus::WAIT_FOR_CONVERT' => 'Wait for convert',
 	'Kaltura_Client_Enum_FlavorAssetStatus::IMPORTING' => 'Importing',
 	'Kaltura_Client_Enum_FlavorAssetStatus::VALIDATING' => 'Validating',
+	'Kaltura_Client_Enum_FlavorAssetStatus::EXPORTING' => 'Exporting',
 
 	'Kaltura_Client_FileSync_Enum_FileSyncStatus::ERROR' => 'Error',
 	'Kaltura_Client_FileSync_Enum_FileSyncStatus::PENDING' => 'Pending',
@@ -218,6 +219,9 @@ return array(
 	'Kaltura_Client_Enum_StorageServePriority::Kaltura_FIRST' => 'Kaltura Storage First',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST' => 'External Storage First',
+
+    'Kaltura_Client_Enum_StorageProfileReadyBehavior::NO_IMPACT' => 'No Effect',
+    'Kaltura_Client_Enum_StorageProfileReadyBehavior::REQUIRED' => 'Required',
 
 	'Kaltura_Client_Enum_DistributionProfileStatus::ENABLED' => 'Enabled',
 	'Kaltura_Client_Enum_DistributionProfileStatus::DISABLED' => 'Disabled',

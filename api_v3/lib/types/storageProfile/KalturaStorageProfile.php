@@ -167,6 +167,12 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $rtmpPrefix;
 	
+	/**
+	 * 
+	 * @var KalturaStorageProfileReadyBehavior
+	 */
+	public $readyBehavior;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -196,6 +202,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"deliveryPriority",
 		"deliveryStatus",
 		"rtmpPrefix",
+	    "readyBehavior",
 	);
 	
 	public function getMapBetweenObjects ( )
