@@ -246,6 +246,12 @@ class playManifestAction extends kalturaAction
 		
 		$url = ltrim($url, "/");
 		
+		// Hack to resolve seeking issue on webm, until we fix it with Akamai
+		if ($entry->getPartnerId() == 520441 && kString::endsWith($url, '.webm'))
+		{
+			$url .= '/a.mp4';
+		}
+		
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
 	}
 	
