@@ -443,13 +443,39 @@ public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key 
 	}
 
 	/**
-	 * Get the external FileSync object by its key
+	 * Get the READY external FileSync object by its key
 	 * 
 	 * @param FileSyncKey $key
 	 * @param int $externalStorageId
 	 * @return FileSync
 	 */	
 	public static function getReadyExternalFileSyncForKey(FileSyncKey $key, $externalStorageId = null)
+	{
+		return self::getExternalFileSyncForKeyByStatus($key, $externalStorageId, array(FileSync::FILE_SYNC_STATUS_READY));
+	}
+	
+	/**
+	 * Get the READY/PENDING external FileSync object by its key
+	 * 
+	 * @param FileSyncKey $key
+	 * @param int $externalStorageId
+	 * @return FileSync
+	 */	
+	public static function getReadyPendingExternalFileSyncForKey(FileSyncKey $key, $externalStorageId = null)
+	{
+		return self::getExternalFileSyncForKeyByStatus($key, $externalStorageId, array(FileSync::FILE_SYNC_STATUS_READY, FileSync::FILE_SYNC_STATUS_PENDING));
+	}
+	
+	
+/**
+	 * Get the external FileSync object by its key and statuses
+	 * 
+	 * @param FileSyncKey $key
+	 * @param int $externalStorageId
+	 * @param array $statuses an array of required status values
+	 * @return FileSync
+	 */	
+	protected static function getExternalFileSyncForKeyByStatus(FileSyncKey $key, $externalStorageId = null, $statuses = array())
 	{
 		if(is_null($key->partner_id))
 			throw new kFileSyncException("partner id not defined for key [$key]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
@@ -468,7 +494,11 @@ public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key 
 		{
 			$c->addAnd ( FileSyncPeer::DC , $externalStorageId );
 		}
-		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+		
+		if (!empty($statuses)) {
+		    $c->addAnd ( FileSyncPeer::STATUS , $statuses, Criteria::IN );
+		}
+		
 		
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id))
 			return FileSyncPeer::doSelectOne($c);
@@ -618,6 +648,7 @@ public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key 
 		}
 		// saerch only for ready
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+		$c->addAscendingOrderByColumn(FileSyncPeer::DC); // favor local data centers instead of remote storage locations
 		
 		$file_sync_list = FileSyncPeer::doSelect( $c );
 		if ( $file_sync_list == null )
