@@ -23,7 +23,7 @@ require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath('../cache/classMap.cache');
+KAutoloader::setClassMapFilePath(ROOT_DIR.'/scripts/cache/classMap.cache');
 KAutoloader::register();
 
 error_reporting(E_ALL);
@@ -40,6 +40,13 @@ if(!$storageProfile)
 	echo "Usage: php exportToNetStorage.php {partner id} {storage profile id}\n";
 	exit;
 }
+
+$flavorParamsIds = $storageProfile->getFlavorParamsIds();
+KalturaLog::log("flavorParamsIds [$flavorParamsIds]");
+
+$flavorParamsArr = null;
+if(!is_null($flavorParamsIds) && strlen(trim($flavorParamsIds)))
+	$flavorParamsArr = explode(',', $flavorParamsIds);
 
 $moreEntries = true;
 $maxConcurrentJobs = 20;
@@ -59,8 +66,8 @@ while ($moreEntries)
 {
     $c = new Criteria();
     $c->add(BatchJobPeer::PARTNER_ID, $partnerId);
-    $c->add(BatchJobPeer::JOB_TYPE, BatchJobType::STORAGE_EXPORT);
-    $c->add(BatchJobPeer::STATUS, $nonFinalBatchStatuses, Criteria::IN);
+    $c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::STORAGE_EXPORT);
+    $c->addAnd(BatchJobPeer::STATUS, $nonFinalBatchStatuses, Criteria::IN);
     $batchCount = BatchJobPeer::doCount($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
     
     if ($batchCount >= $maxConcurrentJobs)
@@ -75,7 +82,7 @@ while ($moreEntries)
     $c = new Criteria();
     $c->add(entryPeer::PARTNER_ID, $partnerId);
 	if ($lastCreatedAt)
-		$c->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
+		$c->addAnd(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
 	$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
     $c->setLimit($curLimit);
     $entries = entryPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
@@ -94,7 +101,10 @@ while ($moreEntries)
     	
     	$flavors = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
     	foreach($flavors as $flavor)
-    		$keys[] = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+   		{
+			if(!$flavorParamsArr || in_array($flavor->getFlavorParamsId(), $flavorParamsArr))
+				$keys[] = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    	}
     	
     	foreach($keys as $index => $key)
     	{
