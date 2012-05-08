@@ -169,10 +169,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
-	public function exportEntry(entry $entry, StorageProfile $externalStorage, &$exportedKeys, &$nonExportedKeys)
+	public function exportEntry(entry $entry, StorageProfile $externalStorage, &$exportedKeys = array(), &$nonExportedKeys = array())
 	{
-	    $exportedKeys = array();
-	    $nonExportedKeys = array();
 		$checkFileSyncsKeys = $this->getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
 		{
