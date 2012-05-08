@@ -157,7 +157,11 @@ class accessControlScope
 	public function getTime() 
 	{
 		if(is_null($this->time))
+		{
+			if (defined("KALTURA_API_V3"))
+				KalturaResponseCacher::setConditionalCacheExpiry(600);
 			return time();
+		}
 			
 		return $this->time;
 	}

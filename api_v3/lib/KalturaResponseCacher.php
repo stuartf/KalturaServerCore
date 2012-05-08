@@ -57,9 +57,10 @@ class KalturaResponseCacher
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the KalturaResponseCacher initializes
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
+	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used 
 	
 	protected $_wouldHaveUsedCondCache = false;			// XXXXXXX TODO: remove this
-
+	
 	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
 	protected static $_nextInstanceId = 0;
 
@@ -187,6 +188,16 @@ class KalturaResponseCacher
 		{
 			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
 			$curInstance->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
+		}
+	}
+	
+	public static function setConditionalCacheExpiry($expiry)
+	{
+		foreach (self::$_activeInstances as $curInstance)
+		{
+			if ($curInstance->_conditionalCacheExpiry && $curInstance->_conditionalCacheExpiry < $expiry)
+				continue;
+			$curInstance->_conditionalCacheExpiry = $expiry;
 		}
 	}
 	
@@ -359,6 +370,9 @@ class KalturaResponseCacher
 			// save the cache conditions
 			$conditions = array(array_unique($this->_invalidationKeys), $this->_invalidationTime);
 			file_put_contents($this->_cacheConditionsFilePath, serialize($conditions));
+
+			if ($this->_conditionalCacheExpiry)
+				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_conditionalCacheExpiry);
 		}
 		else
 		{
