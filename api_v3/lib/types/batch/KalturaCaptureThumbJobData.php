@@ -37,6 +37,11 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	public $thumbAssetId;
 	
 	/**
+	 * @var string
+	 */
+	public $srcAssetId;
+	
+	/**
 	 * @var KalturaAssetType
 	 */
 	public $srcAssetType;
@@ -53,6 +58,7 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 		"srcFileSyncRemoteUrl" ,
 		"thumbParamsOutputId" ,
 		"thumbAssetId" ,
+		"srcAssetId" ,
 		"srcAssetType" ,
 		"thumbPath" ,
 	);
