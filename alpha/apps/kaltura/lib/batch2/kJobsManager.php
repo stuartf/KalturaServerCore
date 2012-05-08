@@ -481,7 +481,7 @@ class kJobsManager
 				$nextOperator = $operatorSet->getOperator();
 				if(!$nextOperator)
 				{
-					KalturaLog::log("First operator is invalid");
+					KalturaLog::err("First operator is invalid");
 					return null;
 				}
 				
@@ -507,7 +507,7 @@ class kJobsManager
 				$parentData = $parentJob->getData();
 				if(!$parentData || !($parentData instanceof kConvartableJobData))
 				{
-					KalturaLog::log("Parent job data is invalid");
+					KalturaLog::err("Parent job data is invalid");
 					return null;
 				}
 				
@@ -518,7 +518,7 @@ class kJobsManager
 				$nextOperator = $operatorSet->getOperator($nextOperatorSet, $nextOperatorIndex);
 				if(!$nextOperator)
 				{
-					KalturaLog::log("Next operator is invalid");
+					KalturaLog::err("Next operator is invalid");
 					return null;
 				}
 				
@@ -541,7 +541,7 @@ class kJobsManager
 				$currentConversionEngine = next($conversionEngines);
 				if(! $currentConversionEngine)
 				{
-					KalturaLog::log("There is no other conversion engine to use");
+					KalturaLog::err("There is no other conversion engine to use");
 					return null;
 				}
 			}
@@ -598,18 +598,17 @@ class kJobsManager
 	
 	
 	/**
-	 * addFlavorConvertJob adds a single flavor conversion 
-	 * 
-	 * @param FileSyncKey $srcSyncKey
-	 * @param flavorParamsOutput $flavor
-	 * @param int $flavorAssetId
-	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
-	 * @param int $lastEngineType  
-	 * @param BatchJob $dbConvertFlavorJob
-	 * @return BatchJob 
+	 * @param int $partnerId
+	 * @param string $entryId
+	 * @param string $thumbAssetId
+	 * @param FileSyncKey $srcSyncKey
+	 * @param string $srcAssetId
+	 * @param int $srcAssetType enum of assetType
+	 * @param thumbParamsOutput $thumbParams
+	 * @return BatchJob
 	 */
-	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetType, thumbParamsOutput $thumbParams = null)
+	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetId, $srcAssetType, thumbParamsOutput $thumbParams = null)
 	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		if(!$fileSync)
@@ -666,6 +665,7 @@ class kJobsManager
 		// creates convert data
 		$data = new kCaptureThumbJobData();
 		$data->setThumbAssetId($thumbAssetId);
+		$data->setSrcAssetId($srcAssetId);
 		$data->setSrcAssetType($srcAssetType);
 		$data->setSrcFileSyncLocalPath($localPath);
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);
