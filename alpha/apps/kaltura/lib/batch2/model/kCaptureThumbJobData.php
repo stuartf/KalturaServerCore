@@ -44,6 +44,11 @@ class kCaptureThumbJobData extends kJobData
 	/**
 	 * @var string
 	 */
+	private $srcAssetId;
+	
+	/**
+	 * @var string
+	 */
 	private $thumbPath;
 	
 	/**
@@ -60,6 +65,22 @@ class kCaptureThumbJobData extends kJobData
 	public function setThumbPath($thumbPath)
 	{
 		$this->thumbPath = $thumbPath;
+	}
+
+	/**
+	 * @return the $srcAssetId
+	 */
+	public function getSrcAssetId()
+	{
+		return $this->srcAssetId;
+	}
+
+	/**
+	 * @param $srcAssetId the $srcAssetId to set
+	 */
+	public function setSrcAssetId($srcAssetId)
+	{
+		$this->srcAssetId = $srcAssetId;
 	}
 
 	/**
