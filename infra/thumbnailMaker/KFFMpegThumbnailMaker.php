@@ -16,9 +16,16 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2")
+	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null)
 	{
-		KalturaLog::debug(__METHOD__."position = $position, width = $width, height = $height, frameCount = $frameCount, frameCount = $frameCount");
+		if(!isset($frameCount))
+			$frameCount = 1;
+		if(!isset($targetType))
+			$targetType = "image2";		
+		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
+		if(isset($dar) && $dar>0 && isset($height)){
+			$width = round($height*$dar);
+		}
 		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType);
 
 		$cmd= $cmdArr[0];
