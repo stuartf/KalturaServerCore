@@ -29,7 +29,7 @@ class KImageMagickCropper extends KBaseCropper
 	 */
 	public function __construct($srcPath, $targetPath, $cmdPath = null, $forceJpeg = false, $forceRotation = null)
 	{
-KalturaLog::info("forceRotation=$forceRotation");
+KalturaLog::debug("forceRotation=$forceRotation");
 		if (is_null($cmdPath)) {
 			$cmdPath = kConf::get('bin_path_imagemagick');
 		}
@@ -57,7 +57,7 @@ KalturaLog::info("forceRotation=$forceRotation");
 	
 	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0)
 	{
-KalturaLog::info("forceRotation".$this->forceRotation);
+KalturaLog::debug("forceRotation".$this->forceRotation);
 		$attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
@@ -78,7 +78,7 @@ KalturaLog::info("forceRotation".$this->forceRotation);
 				break;
 			}
 		}
-KalturaLog::info("orientation=$orientation");
+KalturaLog::debug("orientation=$orientation");
 		
 		if($density != 0) {
 			$attributes[] = "-density ".$density;
