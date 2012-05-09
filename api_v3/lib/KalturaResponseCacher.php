@@ -755,7 +755,6 @@ class KalturaResponseCacher
 		$type = (int)$type;
 		
 		$partnerId = $params['partnerId'];
-		$paramSecret = $params['secret'];
 		$secrets = kSessionBase::getSecretsFromCache($partnerId);
 		if (!$secrets)
 		{
@@ -763,7 +762,8 @@ class KalturaResponseCacher
 		}
 		list($adminSecret, $userSecret) = $secrets;				
 		$secretToMatch = $type ? $adminSecret : $userSecret;
-		if ($adminSecret != $secretToMatch)
+		$paramSecret = $params['secret'];
+		if ($paramSecret != $secretToMatch)
 		{
 			return;			// invalid secret
 		}
