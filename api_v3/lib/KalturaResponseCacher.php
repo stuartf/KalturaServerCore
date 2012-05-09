@@ -735,8 +735,7 @@ class KalturaResponseCacher
 			return;			// not a stand-alone call to session start
 		}
 		
-		if (!isset($params['type']) || $params['type'] != '2' ||
-			!isset($params['secret']) ||
+		if (!isset($params['secret']) ||
 			!isset($params['partnerId']))
 		{
 			return;			// missing mandatory params or not admin session
@@ -747,20 +746,33 @@ class KalturaResponseCacher
 		{
 			return;			// the format is unsupported at this level
 		}
+
+		$type = isset($params['type']) ? $params['type'] : 0;
+		if (!in_array($type, array(0, 2)))
+		{
+			return;			// invalid session type
+		}
+		$type = (int)$type;
 		
 		$partnerId = $params['partnerId'];
 		$paramSecret = $params['secret'];
-		$adminSecret = kSessionBase::getAdminSecretFromCache($partnerId);
-		if (!$adminSecret || $adminSecret != $paramSecret)
+		$secrets = kSessionBase::getSecretsFromCache($partnerId);
+		if (!$secrets)
 		{
-			return;			// invalid admin secret
+			return;			// can't find the secrets of the partner in the cache
 		}
-
+		list($adminSecret, $userSecret) = $secrets;				
+		$secretToMatch = $type ? $adminSecret : $userSecret;
+		if ($adminSecret != $secretToMatch)
+		{
+			return;			// invalid secret
+		}
+		
 		$userId = isset($params['userId']) ? $params['userId'] : '';
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
-		$result = kSessionBase::generateSession($paramSecret, $userId, $params['type'], $partnerId, $expiry, $privileges);
+		$result = kSessionBase::generateSession($adminSecret, $userId, $type, $partnerId, $expiry, $privileges);
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
