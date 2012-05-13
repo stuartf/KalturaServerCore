@@ -116,6 +116,12 @@ while ($moreEntries)
     	
     		if(kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfileId))
     			unset($keys[$index]);
+    			
+    	    if (!kFileSyncUtils::getReadyInternalFileSyncForKey($key)) {
+    	        echo 'file sync key does not have an internal file -'.serialize($key).PHP_EOL;
+    	        unset($keys[$index]);
+    	    }
+    			
     	}
     	
     	if(!count($keys))
@@ -127,7 +133,9 @@ while ($moreEntries)
     	foreach($keys as $key)
     	{
     		$fileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $storageProfile);
-    		list($dcFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+
+    		$dcFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+    		
     		/* @var $dcFileSync FileSync */
     		$srcFileSyncLocalPath = $dcFileSync->getFileRoot() . $dcFileSync->getFilePath();
     		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath, false, $dcFileSync->getDc());
@@ -150,6 +158,8 @@ while ($moreEntries)
     }
     $entries = null;
     entryPeer::clearInstancePool();
+    assetPeer::clearInstancePool();
+    FileSyncPeer::clearInstancePool();
 }
 
 echo "Done\n";
