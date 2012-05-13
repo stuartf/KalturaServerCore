@@ -426,39 +426,14 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
-		
+									
 		$entry = $thumbAsset->getentry();
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
-									
+			
 		$this->checkIfUserAllowedToUpdateEntry($entry);
-					
-		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		foreach($entryThumbAssets as $entryThumbAsset)
-		{
-			if($entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-				
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-				
-			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$entryThumbAsset->save();
-		}
 		
-		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-		{
-			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$thumbAsset->save();
-		}
-		
-		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false);
-		$entry->save();
-		
-		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
+		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 	}
 
 	/**
