@@ -52,6 +52,7 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 		}
 		
 		$saveEntry = false;
+		$defaultThumbAssetNew = NULL;
 		foreach($oldAssets as $oldAsset)
 		{
 			/* @var $oldAsset asset */
@@ -96,6 +97,12 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 					$oldFlavorNewMediaInfo->save();
 				}
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
+				
+				if ($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				{
+					$defaultThumbAssetNew = $oldAsset;
+					KalturaLog::debug("Nominating ThumbAsset [".$oldAsset->getId()."] as the default ThumbAsset after replacent");
+				}
 			}	
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
@@ -108,7 +115,7 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 				
 				$entry->removeFlavorParamsId($oldAsset->getFlavorParamsId());
 				$saveEntry = true;
-			}		
+			}
 		}
 		
 		foreach($newAssets as $newAssetsByTypes)
@@ -117,7 +124,27 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 			{
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
 				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+
+				if ($createdAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB)) {
+					$defaultThumbAssetNew = $newAsset;
+					KalturaLog::debug("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
+				}
 			}
+		}
+
+		if ($defaultThumbAssetNew)
+		{
+			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
+			kalturalog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
+		}
+		else 
+		{		
+			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+			$entry->setThumbnail(".jpg"); // thumbnailversion++
+			$entry->save();
+			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 		}
 		
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
@@ -128,6 +155,40 @@ public static function replaceEntry(entry $entry, entry $tempEntry = null)
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 		myEntryUtils::deleteEntry($tempEntry,null,true);
+	}
+
+	public static function setAsDefaultThumbAsset($thumbAsset)
+	{
+		/* @var $thumbAsset thumbAsset */
+		$entry = $thumbAsset->getentry();
+		if (!$entry)
+			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]",KalturaErrors::ENTRY_ID_NOT_FOUND);
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());			
+
+		foreach($entryThumbAssets as $entryThumbAsset)
+		{
+			if($entryThumbAsset->getId() == $thumbAsset->getId())
+				continue;				
+			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				continue;
+			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			$entryThumbAsset->save();
+		}
+		
+		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+		{
+			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			$thumbAsset->save();
+			KalturaLog::DEBUG("Setting entry [". $thumbAsset->entryId ."] default ThumbAsset to [". $thumbAsset->id ."]");
+		}
+		
+		$entry->setThumbnail(".jpg");
+		$entry->setCreateThumb(false);
+		$entry->save();
+		
+		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
 	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
