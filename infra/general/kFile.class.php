@@ -30,18 +30,44 @@ class kFile
 			    	if (is_dir($fullPath))
 			    	{
 			    		$tmpPrefix = $tmpPrefix.'/';
-			    		$fileList[] = array($tmpPrefix, 'dir', self::kFileSize($fullPath));
+			    		$fileList[] = array($tmpPrefix, 'dir', kFile::fileSize($fullPath));
 			    		$fileList = array_merge($fileList, kFile::listDir($fullPath, $tmpPrefix));
 			    	}	
 			    	else
 			    	{
-			    		$fileList[] = array($tmpPrefix, 'file', self::kFileSize($fullPath));
+			    		$fileList[] = array($tmpPrefix, 'file', kFile::fileSize($fullPath));
 			    	}	    	
 		    	}
 		    }
 		    closedir($handle);
 		}
 		return $fileList;
+	}
+	
+	/**
+	 * @param string $filePath - path to file
+	 * @return float
+	 */
+	static public function fileSize($filePath)
+	{
+		$url = "file://$filePath";
+
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		$headers = curl_exec($ch);
+		if(!$headers)
+			KalturaLog::err('Curl error: ' . curl_error($ch));
+		curl_close($ch);
+		
+		if(!$headers)
+			return false;
+		       
+		if (preg_match('/Content-Length: (\d+)/', $headers, $matches))
+			return floatval($matches[1]);
+			
+		return false;	
 	}
 	
 	/**
@@ -197,7 +223,7 @@ class kFile
 					// first - name (with or without the full path)
 					$result[] = ($return_directory_as_prefix ? $directory . "/" : "") . $file;
 					// second - size 
-					$result[] = filesize($file_full_path);
+					$result[] = kFile::fileSize($file_full_path);
 					// third - time
 					$result[] = filemtime($file_full_path);
 					// forth - content (only if requested
@@ -247,12 +273,12 @@ class kFile
 			
 			if($to_byte > 0)
 			{
-				$to_byte = min($to_byte, filesize($file_name));
+				$to_byte = min($to_byte, kFile::fileSize($file_name));
 				$length = $to_byte - $from_byte;
 			}
 			else
 			{
-				$length = filesize($file_name);
+				$length = kFile::fileSize($file_name);
 			}
 			
 			$theData = fread($fh, $length);
@@ -719,7 +745,7 @@ class kFile
 			die();
 		
 		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
-		$total_length = $limit_file_size ? $limit_file_size : filesize($file_name);
+		$total_length = $limit_file_size ? $limit_file_size : kFile::fileSize($file_name);
 		
 		// get range parameters from HTTP range requst headers
 		list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
@@ -804,7 +830,7 @@ class kFileData
 		
 		if($this->exists)
 		{
-			$this->size = filesize($full_file_path);
+			$this->size = kFile::fileSize($full_file_path);
 			$this->raw_timestamp = filectime($full_file_path);
 			$this->timestamp = date("Y-m-d H:i:s.", $this->raw_timestamp);
 			

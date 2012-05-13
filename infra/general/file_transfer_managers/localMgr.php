@@ -37,7 +37,7 @@ class localMgr extends kFileTransferMgr
 	// login using a public key - not supported in FTP
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
-		return false; // NOT SUPPORTED
+		return true;
 	}
 
 
@@ -104,8 +104,7 @@ class localMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
-	    clearstatcache();
-	    return @filesize($remote_file);
+		return kFile::fileSize($remote_file);
 	}
 	
     protected function doModificationTime($remote_file)
