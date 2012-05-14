@@ -9,6 +9,7 @@ class KImageMagickCropper extends KBaseCropper
 	const RESIZE_WITH_PADDING = 2;
 	const CROP = 3;
 	const CROP_FROM_TOP = 4;
+	const RESIZE_WITH_FORCE = 5;
 	
 	protected $cmdPath;
 	protected $srcWidth;
@@ -164,12 +165,7 @@ KalturaLog::debug("orientation=$orientation");
 				case self::RESIZE:
 					$w = $width ? $width : '';
 					$h = $height ? $height : '';
-					
-					$resize = "-resize {$w}x{$h}";
-					if(strlen($w) && strlen($h))
-						$resize .= '!';
-						
-					$attributes[] = $resize;
+					$attributes[] = "-resize {$w}x{$h}";
 					break;
 					
 				case self::RESIZE_WITH_PADDING:
@@ -205,25 +201,15 @@ KalturaLog::debug("orientation=$orientation");
 						}
 						
 						$bgcolor = sprintf('%06x', $bgcolor);
-						
-						$resize = "-resize {$w}x{$h}";
-						if(strlen($w) && strlen($h))
-							$resize .= '!';
-							
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
-						$attributes[] = $resize;
+						$attributes[] = "-resize {$w}x{$h}";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
 					{
 						$w = $width ? $width : '';
 						$h = $height ? $height : '';
-						
-						$resize = "-resize {$w}x{$h}";
-						if(strlen($w) && strlen($h))
-							$resize .= '!';
-							
-						$attributes[] = $resize;
+						$attributes[] = "-resize {$w}x{$h}";
 					}
 					break;
 					
@@ -273,14 +259,20 @@ KalturaLog::debug("orientation=$orientation");
 					elseif($cropType == self::CROP_FROM_TOP && !$gravity)
 						$attributes[] = "-gravity North";
 						
+					$attributes[] = $gravity;	
+					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
+					$attributes[] = "-resize {$w}x{$h}";
+					break;
+				case self::RESIZE_WITH_FORCE:
+				    $w = $width ? $width : '';
+					$h = $height ? $height : '';
+					
 					$resize = "-resize {$w}x{$h}";
 					if(strlen($w) && strlen($h))
 						$resize .= '!';
-					
-					$attributes[] = $gravity;	
-					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
+						
 					$attributes[] = $resize;
-					break;
+				    break;
 			}
 		}
 		
