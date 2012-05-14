@@ -157,9 +157,7 @@ while ($moreEntries)
         $moreEntries = false;
     }
     $entries = null;
-    entryPeer::clearInstancePool();
-    assetPeer::clearInstancePool();
-    FileSyncPeer::clearInstancePool();
+    kMemoryManager::clearMemory();
 }
 
 echo "Done\n";
