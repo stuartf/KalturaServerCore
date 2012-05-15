@@ -179,7 +179,7 @@ class kConf extends kConfLocal
                 'query_cache_enabled' => false,
 				"query_cache_invalidate_on_change" => false,
                 
-                'apc_cache_ttl' => 900, // 15 minutes in seconds - ttl for apc cache values
+                'apc_cache_ttl' => 86400, // 15 minutes in seconds - ttl for apc cache values
                 
 				"exec_sphinx" => true, // Should be set to false in multiple data centers environments
                 
