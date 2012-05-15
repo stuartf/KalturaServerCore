@@ -138,7 +138,7 @@ while ($moreEntries)
     		
     		/* @var $dcFileSync FileSync */
     		$srcFileSyncLocalPath = $dcFileSync->getFileRoot() . $dcFileSync->getFilePath();
-    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath, false, $dcFileSync->getDc());
+    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath, true, $dcFileSync->getDc());
     	}
     		
     	echo $entry->getId() . " - " . count($keys) . " keys exported\n\n";
