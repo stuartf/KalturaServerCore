@@ -79,7 +79,7 @@ class kPlayManifestCacher
 		
 		ksort($params);
 
-		$this->_cacheKey = md5( http_build_query($params) );
+		$this->_cacheKey = 'playManifest-' . md5( http_build_query($params) );
 
 		$this->_cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
 	}
@@ -101,7 +101,7 @@ class kPlayManifestCacher
 		$startTime = microtime(true);
 		if ($this->_ksValidated)
 		{
-			$response = $this->_cacheWrapper->get($this->_cacheKey, self::CACHE_EXPIRY);
+			$response = $this->_cacheWrapper->get($this->_cacheKey);
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
@@ -162,6 +162,6 @@ class kPlayManifestCacher
 		$requiredFiles = $renderer->getRequiredFiles();
 		$serializedRenderer = serialize($renderer);
 	
-		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY, self::CACHE_EXPIRY);
+		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY);
 	}
 }
