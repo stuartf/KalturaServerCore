@@ -747,8 +747,25 @@ class kFile
 		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
 		$total_length = $limit_file_size ? $limit_file_size : kFile::fileSize($file_name);
 		
-		// get range parameters from HTTP range requst headers
-		list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
+		$useXSendFile = false;
+		$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
+		foreach($xsendfile_paths as $path)
+		{
+			if (strpos($file_name, $path) === 0)
+			{
+				header('X-Kaltura-Sendfile:');
+				$useXSendFile = true;
+				break;
+			}
+		}
+
+		if ($useXSendFile)
+			$range_length = null;
+		else
+		{
+			// get range parameters from HTTP range requst headers
+			list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
+		}
 		
 		if($mime_type)
 		{
@@ -761,6 +778,12 @@ class kFile
 		// upon detecting this header it cancels its original request and starts sending byte range requests
 		header("Accept-Ranges: bytes");
 		header("Access-Control-Allow-Origin:*");		
+
+		if ($useXSendFile)
+		{
+			header("X-Sendfile: $file_name");
+			die;
+		}
 
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");

@@ -157,8 +157,9 @@ public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 
 			header("Cache-Control:");
 			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 		}
-		
-		header("Content-Length: $content_length ");
+	
+		if ($content_length !== null)	
+			header("Content-Length: $content_length ");
 		header("Pragma:");
 		header("Content-Type: $content_type");
 	}
