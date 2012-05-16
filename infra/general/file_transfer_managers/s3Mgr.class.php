@@ -67,7 +67,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, S3::ACL_PUBLIC_READ);
+		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file);
 
 		if ($res)
 		{
