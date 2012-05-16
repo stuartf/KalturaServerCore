@@ -497,12 +497,12 @@ class KalturaResponseCacher
 				$this->_wouldHaveUsedCondCache = true;			// XXXXXXX TODO: remove this
 				continue;										// XXXXXXX TODO: remove this
 				
-				if (isset($cacheRules[CACHE_MODE_ANONYMOUS]))
+				if (isset($cacheRules[self::CACHE_MODE_ANONYMOUS]))
 				{
 					// since the conditions matched, we can extend the expiry of the anonymous cache
-					list($cacheExpiry, $expiryInterval, $conditions) = $cacheRules[CACHE_MODE_ANONYMOUS];
+					list($cacheExpiry, $expiryInterval, $conditions) = $cacheRules[self::CACHE_MODE_ANONYMOUS];
 					$cacheExpiry = time() + $expiryInterval;
-					$cacheRules[CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
+					$cacheRules[self::CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
 					$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $cacheTTL + self::EXPIRY_MARGIN);
 				}
 			}
