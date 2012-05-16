@@ -39,6 +39,7 @@ class KalturaResponseCacher
 
 	const CACHE_DELIMITER = "\r\n\r\n";
 	
+	const SUFFIX_DATA =  '.cache';
 	const SUFFIX_RULES = '.rules';
 	
 	protected $_cacheStore = null;
@@ -228,7 +229,7 @@ class KalturaResponseCacher
 			return false;
 		}
 		
-		$cacheResult = $this->_cacheStore->get($this->_cacheKey);
+		$cacheResult = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_DATA);
 		if (!$cacheResult)
 		{
 			return false;
@@ -378,13 +379,13 @@ class KalturaResponseCacher
 		$cachedResponse = null;						// XXXXXXX TODO: remove this
 		if ($this->_wouldHaveUsedCondCache)			// XXXXXXX TODO: remove this
 		{
-			$cachedResponse = $this->_cacheStore->get($this->_cacheKey);
+			$cachedResponse = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_DATA);
 		}
 
 		// write to the cache
 		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
 		
-		$this->_cacheStore->set($this->_cacheKey, implode(self::CACHE_DELIMITER, array($cacheId, $contentType, $response)), $maxExpiry);
+		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($cacheId, $contentType, $response)), $maxExpiry);
 		
 		// compare the calculated $response to the previously stored $cachedResponse
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
@@ -479,8 +480,7 @@ class KalturaResponseCacher
 			$cacheTTL = $cacheExpiry - time(); 
 			if($cacheTTL <= 0)
 			{
-				$this->_cacheStore->delete($this->_cacheKey);
-				$this->_cacheStore->delete($this->_cacheKey . self::SUFFIX_RULES);
+				// the cache is expired
 				continue;
 			}
 				
@@ -489,7 +489,7 @@ class KalturaResponseCacher
 				list($this->_cacheId, $invalidationKeys, $cachedInvalidationTime) = $conditions;
 				$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
 				if ($invalidationTime === null)		
-					continue;					// failed to get the invalidation time, can't use cache
+					continue;					// failed to get the invalidation time from memcache, can't use cache
 					
 				if ($cachedInvalidationTime < $invalidationTime)
 					continue;					// something changed since the response was cached
@@ -499,7 +499,7 @@ class KalturaResponseCacher
 				
 				if (isset($cacheRules[CACHE_MODE_ANONYMOUS]))
 				{
-					// since the conditions matched, we can extend the expiry of the conditional cache
+					// since the conditions matched, we can extend the expiry of the anonymous cache
 					list($cacheExpiry, $expiryInterval, $conditions) = $cacheRules[CACHE_MODE_ANONYMOUS];
 					$cacheExpiry = time() + $expiryInterval;
 					$cacheRules[CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
