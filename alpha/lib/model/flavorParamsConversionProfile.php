@@ -17,6 +17,6 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("flavorParamsConversionProfile:flavorParamsId=".$this->getFlavorParamsId().",conversionProfileId=".$this->getConversionProfileId());
+		return array("flavorParamsConversionProfile:flavorParamsId=".$this->getFlavorParamsId().",conversionProfileId=".$this->getConversionProfileId(), "flavorParamsConversionProfile:conversionProfileId=".$this->getConversionProfileId());
 	}
 }
