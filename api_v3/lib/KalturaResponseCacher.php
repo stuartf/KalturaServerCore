@@ -117,12 +117,20 @@ class KalturaResponseCacher
 		$ks = isset($params['ks']) ? $params['ks'] : '';
 		foreach($params as $key => $value)
 		{
-			if(preg_match('/[\d]+:ks/', $key))
+			if(!preg_match('/[\d]+:ks/', $key))
+				continue;				// not a ks
+
+			if (strpos($value, ':result') !== false)
+				continue;				// the ks is the result of some sub request
+
+			if ($ks && $ks != $value)
 			{
-				if (!$ks && strpos($value, ':result') === false)
-					$ks = $value;
-				unset($params[$key]);
+				self::disableCache();	// several different ks's in a multirequest - don't use cache
+				return;
 			}
+
+			$ks = $value;
+			unset($params[$key]);
 		}
 			
 		unset($params['ks']);
@@ -574,7 +582,7 @@ class KalturaResponseCacher
 			{
 				if ($key == 'partner_id')
 				{
-					if ($ks->partner_id != $value)
+					if (!$ks || $ks->partner_id != $value)
 						break;
 				}
 				else if (!isset($this->_params[$key]) || $this->_params[$key] != $value)
