@@ -71,6 +71,12 @@ class kQueryCache
 					break;
 				}
 				
+				if (in_array(Criterion::ODER, $criterion->getConjunctions()))
+				{
+					$invalidationKeys = null;
+					break;
+				}
+				
 				if ($criterion->getComparison() == Criteria::EQUAL)
 				{
 					$values = array($criterion->getValue());
@@ -116,6 +122,11 @@ class kQueryCache
 		// if the criteria has an empty IN, no need to go to the DB or memcache - return an empty array
 		foreach ($criteria->getMap() as $criterion)
 		{
+			if (in_array(Criterion::ODER, $criterion->getConjunctions()))
+			{
+				continue;
+			}
+			
 			if ($criterion->getComparison() == Criteria::IN && !$criterion->getValue())
 			{
 				KalturaLog::debug("kQueryCache: criteria has empty IN, returning empty result set, peer=$peerClassName");
