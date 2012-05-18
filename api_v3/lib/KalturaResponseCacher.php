@@ -66,6 +66,8 @@ class KalturaResponseCacher
 	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
 	protected static $_nextInstanceId = 0;
 	
+	protected static $_cacheWarmupInitiated = false;
+	
 	public function __construct($params = null, $cacheType = kCacheManager::FS_API_V3, $expiry = 0)
 	{
 		$this->_instanceId = self::$_nextInstanceId;  
@@ -343,10 +345,22 @@ class KalturaResponseCacher
 		if (!$cacheModes)
 			return;
 
-		// provide cache key in header unless the X-Kaltura header was already set with a value
-		// such as an error code. the header is used for debugging but it also appears in the access_log
-		// and there we rather show the error than the cach key
-		header("X-Kaltura: cache-key,".$this->_cacheKey, false);
+		// set the X-Kaltura header only if it does not exist or contains 'cache-key'
+		// the header is overwritten for cache-key so that for a multirequest we'll get the key of
+		// the entire request and not just the last request
+		$headers = headers_list();
+		$foundHeader = false;
+		foreach($headers as $header)
+		{
+			if (strpos($header, 'X-Kaltura') === 0 && strpos($header, 'cache-key') === false)
+			{
+				$foundHeader = true;
+				break;
+			}
+		}
+
+		if (!$foundHeader)
+			header("X-Kaltura: cache-key,".$this->_cacheKey);
 		
 		$cacheId = microtime(true) . '_' . getmypid();
 		
@@ -470,7 +484,7 @@ class KalturaResponseCacher
 				$_SERVER["HTTPS"] = "on";
 						
 			// make a trace in the access log of this being a warmup call
-			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey);
+			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
 		
 		$cacheRules = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_RULES);
@@ -648,6 +662,11 @@ class KalturaResponseCacher
 	// can the warm cache header get received via a warm request passed from the other DC?
 	private function warmCache($key)
 	{
+		if (self::$_cacheWarmupInitiated)
+			return;
+			
+		self::$_cacheWarmupInitiated = true;
+	
 		// require apc for checking whether warmup is already in progress
 		if (!function_exists('apc_fetch'))
 			return;
