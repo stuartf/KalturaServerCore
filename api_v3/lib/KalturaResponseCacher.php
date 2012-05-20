@@ -456,7 +456,10 @@ class KalturaResponseCacher
 				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
 				
 				$outputFileBase = '/tmp/condCache/' . $this->_cacheKey;
-				@$this->createDirForPath($outputFileBase);
+				if (!is_dir('/tmp/condCache/'))
+				{
+					mkdir('/tmp/condCache/', 0777, true);
+				}				
 				$cachedFileName = $outputFileBase . '-cached';
 				$nonCachedFileName = $outputFileBase . '-new';
 				@file_put_contents($cachedFileName, $cachedResponse);
