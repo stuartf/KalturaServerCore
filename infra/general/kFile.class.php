@@ -751,14 +751,21 @@ class kFile
 		$total_length = $limit_file_size ? $limit_file_size : kFile::fileSize($file_name);
 		
 		$useXSendFile = false;
-		$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
-		foreach($xsendfile_paths as $path)
+		if (in_array('mod_xsendfile', apache_get_modules()))
 		{
-			if (strpos($file_name, $path) === 0)
+			$xsendfile_uri = kConf::hasParam('xsendfile_uri') ? kConf::get('xsendfile_uri') : null;
+			if ($xsendfile_uri !== null && strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) !== false)
 			{
-				header('X-Kaltura-Sendfile:');
-				$useXSendFile = true;
-				break;
+				$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
+				foreach($xsendfile_paths as $path)
+				{
+					if (strpos($file_name, $path) === 0)
+					{
+						header('X-Kaltura-Sendfile:');
+						$useXSendFile = true;
+						break;
+					}
+				}
 			}
 		}
 
