@@ -82,15 +82,16 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$flavorAssets = array();
 		$flavorParamsIds = $externalStorage->getFlavorParamsIds();
 		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
+		$relevantStatuses = array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING);
 		if(is_null($flavorParamsIds) || !strlen(trim($flavorParamsIds)))
 		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, $relevantStatuses);
 		}
 		else
 		{
 			$flavorParamsArr = explode(',', $flavorParamsIds);
 			KalturaLog::log(__METHOD__ . " flavorParamsIds count [" . count($flavorParamsArr) . "]");
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId(), $flavorParamsArr);
+			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), $flavorParamsArr, $relevantStatuses);
 		}
 		
 
