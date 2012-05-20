@@ -85,7 +85,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	 * @param string $errstr
 	 * @return bool
 	 */
-	protected function errorHandler($errno, $errstr)
+	public function errorHandler($errno, $errstr)
 	{
 		self::safeLog("got error from memcache [$errno] [$errstr]");
 		$this->gotError = true;
