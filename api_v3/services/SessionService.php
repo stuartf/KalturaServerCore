@@ -146,6 +146,8 @@ class SessionService extends KalturaBaseService
 	 */	
 	function startWidgetSession ( $widgetId , $expiry = 86400 )
 	{
+		KalturaResponseCacher::setConditionalCacheExpiry(600);		// the ks is expiring so we need to limit the time it's cached
+
 		// make sure the secret fits the one in the partner's table
 		$ksStr = "";
 		
