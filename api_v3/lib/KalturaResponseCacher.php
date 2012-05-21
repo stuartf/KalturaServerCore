@@ -158,6 +158,7 @@ class KalturaResponseCacher
 		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		foreach ($this->_params as $key => $value)
