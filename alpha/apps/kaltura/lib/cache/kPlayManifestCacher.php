@@ -67,6 +67,7 @@ class kPlayManifestCacher
 		unset($params['playbackContext']);
 		
 		$params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		if (isset($params['referrer']))
