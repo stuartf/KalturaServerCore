@@ -158,9 +158,7 @@ class accessControlScope
 	{
 		if(is_null($this->time))
 		{
-			if (defined("KALTURA_API_V3"))
-				KalturaResponseCacher::setConditionalCacheExpiry(600);
-			return time();
+			return kApiCache::getTime();
 		}
 			
 		return $this->time;
