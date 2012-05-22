@@ -23,12 +23,12 @@ echo $$ > $LCK_FILE
 
 
 echo "`date +%s` start clean v3 `date`" >> /var/log/clear_cache.log
-#nice -n 19 find /tmp/cache_v3-600 -type f -mtime +1 -name "cache*" -delete
-/usr/bin/ionice -c3 find /tmp/cache_v3-600 -type f -mtime +1 -name "cache*" -delete
+#nice -n 19 find /tmp/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
+/usr/bin/ionice -c3 find /tmp/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
 echo "`date +%s` end clean v3 `date`" >> /var/log/clear_cache.log
-#nice -n 19 find /tmp/cache_v2 -type f -mtime +1 -name "cache*" -delete
-/usr/bin/ionice -c3 find /tmp/cache_v2 -type f -mtime +1 -name "cache*" -delete
+#nice -n 19 find /tmp/cache_v2 -type f -mmin +1440 -name "cache*" -delete
+/usr/bin/ionice -c3 find /tmp/cache_v2 -type f -mmin +1440 -name "cache*" -delete
 echo "`date +%s` end clean v2 `date`" >> /var/log/clear_cache.log
-#nice -n 19 find /tmp -maxdepth 0 -type f -mtime +1 -name "php*" -delete
-/usr/bin/ionice -c3 find /tmp -maxdepth 1 -type f -mtime +1 -name "php*" -delete
+#nice -n 19 find /tmp -maxdepth 0 -type f -mmin +1440 -name "php*" -delete
+/usr/bin/ionice -c3 find /tmp -maxdepth 1 -type f -mmin +1440 -name "php*" -delete
 echo "`date +%s` end clean php `date`" >> /var/log/clear_cache.log
