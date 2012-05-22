@@ -19,6 +19,10 @@ KalturaLog::debug(">------------------------------------- syndicationFeedRendere
 KalturaLog::info("syndicationFeedRenderer-start ");
 KalturaLog::debug("getFeed Params [" . print_r(requestUtils::getRequestParams(), true) . "]");
 
+kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null);
+kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
+kCurrentContext::$ps_vesion = "ps3";
+
 $feedId = $_GET['feedId'];
 $entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
 $limit = (isset($_GET['limit']) ? $_GET['limit'] : null);
