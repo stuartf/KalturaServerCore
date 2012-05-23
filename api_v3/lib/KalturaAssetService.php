@@ -15,7 +15,8 @@ abstract class KalturaAssetService extends KalturaBaseService
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new assetPeer());
+		if ($serviceName != 'flavorAsset' || $actionName != 'getByEntryId')
+			parent::applyPartnerFilterForClass(new assetPeer());
 		parent::applyPartnerFilterForClass(new assetParamsPeer());
 	}
 	
