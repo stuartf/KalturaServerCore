@@ -93,17 +93,22 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 		}
 		
-		parent::operate($operator, $realInFilePath, $configFilePath);
+		$finalOutputPath = $this->outFilePath;
 		
-		if ($uniqueName) {
-			@unlink($tmpUniqInFilePath);
-		}
-		//TODO: RENAME - will not be needed once PDFCreator can work with a configurations file
 		if (($inputExtension == 'pdf') && ($this->flavorParamsOutput->readonly == true)){
 			$tmpFile = $this->outFilePath.'.pdf';
 		}else{
 			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
 			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+		}
+		$this->outFilePath = $tmpFile;
+		
+		parent::operate($operator, $realInFilePath, $configFilePath);
+
+		$this->outFilePath = $finalOutputPath;
+		
+		if ($uniqueName) {
+			@unlink($tmpUniqInFilePath);
 		}
 		
 		$sleepTimes = $this->taskConfiguration->fileExistReties;
