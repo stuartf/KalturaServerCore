@@ -443,10 +443,44 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
+		// verify access to the relevant entries - either same partner as the KS or kaltura network
+		if ($filter->entryIdEqual)
+		{
+			$entryIds = array($filter->entryIdEqual);
+		}
+		else if ($filter->entryIdIn)
+		{
+			$entryIds = explode(',', $filter->entryIdIn);
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
+		}
+
+		$c = new Criteria();
+		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
+		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+		$c->addAnd($criterionPartnerOrKn);
+		$dbEntries = entryPeer::doSelect($c);
+		
+		if (!$dbEntries)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
+		
+		$entryIds = array();
+		foreach ($dbEntries as $dbEntry)
+		{
+			$entryIds[] = $dbEntry->getId();
+		}
+
+		$filter->entryIdEqual = null;
+		$filter->entryIdIn = implode(',', $entryIds);
+		
+		// get the flavors
 		$flavorAssetFilter = new AssetFilter();
 		
 		$filter->toObject($flavorAssetFilter);
-
+		
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
