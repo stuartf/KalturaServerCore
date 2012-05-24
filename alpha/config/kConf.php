@@ -116,7 +116,7 @@ class kConf extends kConfLocal
 				"kdp_wrapper_version" => 'v11.0',
 				"kdp3_wrapper_version" => 'v34.0',
 				"kdp3_wrapper_stats_url" => '', // '/alive.html?pid={partnerId}&',
-				"html5_version" => 'v1.6.12.1',
+				"html5_version" => 'v1.6.11.3h',
 				"clipapp_version" => 'v1.0.5',
 				"kmc_secured_login" => false,
 				
@@ -180,8 +180,11 @@ class kConf extends kConfLocal
 				"query_cache_invalidate_on_change" => false,
                 
                 'apc_cache_ttl' => 86400, // 15 minutes in seconds - ttl for apc cache values
-                
-				"exec_sphinx" => true, // Should be set to false in multiple data centers environments
+
+		'xsendfile_uri' => '/',
+		'xsendfile_paths' => array('/web/','/web2/','/tmp/'), // use xsendfile apache module for these path, NOTE: the module should be configured to allow serving files from these paths
+
+		"exec_sphinx" => true, // Should be set to false in multiple data centers environments
                 
                 'user_login_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
                 'user_login_max_wrong_attempts' => 5000,
