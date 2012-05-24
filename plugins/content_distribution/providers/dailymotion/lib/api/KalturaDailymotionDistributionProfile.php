@@ -14,11 +14,6 @@ class KalturaDailymotionDistributionProfile extends KalturaConfigurableDistribut
 	 * @var string
 	 */
 	public $password;
-
-	/**
-	 * @var KalturaDailymotionGeoBlockingMapping
-	 */
-	public $geoBlockingMapping;
 			
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -27,7 +22,6 @@ class KalturaDailymotionDistributionProfile extends KalturaConfigurableDistribut
 	(
 		'user',
 		'password',
-		'geoBlockingMapping',
 	);
 		 
 	public function getMapBetweenObjects()
