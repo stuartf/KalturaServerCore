@@ -100,7 +100,9 @@ class KalturaFrontController
 			catch(Exception $ex)
 			{
 				$result = $this->getExceptionObject($ex);
-			        if ($_SERVER["REQUEST_METHOD"] != "GET" || !isset($_REQUEST["kalsig"]))
+				if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
+					KalturaResponseCacher::disableConditionalCache();		// the conditional cache has a long expiry, so we disable it
+				else
 					KalturaResponseCacher::disableCache();
 	        	$this->onRequestEnd(false, $ex->getCode());
 			}
@@ -257,8 +259,10 @@ class KalturaFrontController
 	        catch(Exception $ex)
 	        {
 	            $currentResult = $this->getExceptionObject($ex);
-			if ($_SERVER["REQUEST_METHOD"] != "GET" || !isset($_REQUEST["kalsig"]))
-				KalturaResponseCacher::disableCache();
+				if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
+					KalturaResponseCacher::disableConditionalCache();		// the conditional cache has a long expiry, so we disable it
+				else
+					KalturaResponseCacher::disableCache();
 	        	$this->onRequestEnd(false, $ex->getCode(), $i);
 	        }
 	        
