@@ -40,6 +40,10 @@ class kConf extends kConfLocal
 				// the cache key. should be used for partners using access control with only site restriction.
 				"v3cache_include_referrer_in_key" => array(),
 
+				// list of exception codes that can be cached using the conditional cache
+				// should not contain errors that could be caused by temporary IT problems (like INTERNAL_SERVERL_ERROR)
+				"v3cache_conditional_cached_errors" => array('ENTRY_ID_NOT_FOUND', 'NO_FLAVORS_FOUND', 'SERVICE_FORBIDDEN'),
+
 		     	//xslt_enabled_php_functions.can be used in as a parameter in registerPHPFunctions
 			    "xslt_enabled_php_functions" =>array(
 			       	 'date', 'gmdate'),

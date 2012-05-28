@@ -188,6 +188,16 @@ class KalturaResponseCacher
 		self::$_activeInstances = array();
 	}
 
+	public static function setExpiry($expiry)
+	{
+		foreach (self::$_activeInstances as $curInstance)
+		{
+			if ($curInstance->_expiry && $curInstance->_expiry < $expiry)
+				continue;
+			$curInstance->_expiry = $expiry;
+		}
+	}
+	
 	public static function disableConditionalCache()
 	{
 		foreach (self::$_activeInstances as $curInstance)
@@ -469,11 +479,6 @@ class KalturaResponseCacher
 		}
 	}
 
-	public function setExpiry($expiry)
-	{
-		$this->_expiry = $expiry;
-	}
-	
 	private function hasCache()
 	{
 		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
