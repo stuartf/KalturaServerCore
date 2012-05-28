@@ -383,7 +383,7 @@ class KalturaFrontController
 
 	public function adjustApiCacheForException($ex)
 	{
-		KalturaResponseCacher::setExpiry(60);
+		KalturaResponseCacher::setExpiry(120);
 		
 		$cacheConditionally = false;
 		if ($ex instanceof KalturaAPIException && kConf::hasParam("v3cache_conditional_cached_errors"))
