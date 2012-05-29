@@ -149,6 +149,11 @@ class KalturaResponseCacher
 	
 	public function setKS($ks)
 	{
+		// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
+		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
+		if ($warmCacheHeader == "https")
+			$_SERVER['HTTPS'] = "on";
+	
 		$this->_ks = $ks;
 		$this->_ksObj = kSessionBase::getKSObject($ks);
 		$this->_ksPartnerId = ($this->_ksObj ? $this->_ksObj->partner_id : null);
@@ -488,10 +493,6 @@ class KalturaResponseCacher
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
 		if ($warmCacheHeader !== false)
 		{
-			// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
-			if ($warmCacheHeader == "https")
-				$_SERVER["HTTPS"] = "on";
-						
 			// make a trace in the access log of this being a warmup call
 			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
