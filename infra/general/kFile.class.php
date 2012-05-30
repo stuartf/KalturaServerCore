@@ -791,6 +791,8 @@ class kFile
 
 		if ($useXSendFile)
 		{
+			if (isset($GLOBALS["start"]))
+				header("X-Kaltura:dumpFile:".(microtime(true) - $GLOBALS["start"]));
 			header("X-Sendfile: $file_name");
 			die;
 		}
