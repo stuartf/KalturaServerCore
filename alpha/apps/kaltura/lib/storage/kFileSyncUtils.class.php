@@ -57,14 +57,7 @@ class kFileSyncUtils
 			else
 			{
 				KalturaLog::log(__METHOD__." - file was not found locally [$real_path]");
-				if ( $strict )
-				{
-					throw new Exception ( "Cannot find file on local disk [$real_path] for file sync [" . $file_sync->getId() . "]" );
-				}
-				else
-				{
-					return null;
-				}
+				throw new kFileSyncException("Cannot find file on local disk [$real_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
 			}
 		}
 		
