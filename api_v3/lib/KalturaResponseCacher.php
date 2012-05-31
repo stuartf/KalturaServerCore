@@ -184,7 +184,7 @@ class KalturaResponseCacher
 				$this->_params[$referrerKey] = parse_url($referrer, PHP_URL_HOST);
 			}
 			else
-				unset($referrerKey);
+				unset($this->_params[$referrerKey]);
 				
 			break;
 		}
