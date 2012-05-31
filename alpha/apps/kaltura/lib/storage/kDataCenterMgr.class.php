@@ -121,7 +121,7 @@ class kDataCenterMgr
 		KalturaLog::log(__METHOD__." - fileSync [{$fileSync->getId()}]");
 		$remoteUrl = self::getInternalRemoteUrl($fileSync); 
 		$locaFilePath = self::getLocalTempPathForFileSync($fileSync);
-		$cmdLine = kConf::get( "bin_path_curl" ) . ' -L -o"'.$locaFilePath.'" "'.$remoteUrl.'"';
+		$cmdLine = kConf::get( "bin_path_curl" ) . ' -s -L -o"'.$locaFilePath.'" "'.$remoteUrl.'"';
 		return $cmdLine;
 	}
 	
