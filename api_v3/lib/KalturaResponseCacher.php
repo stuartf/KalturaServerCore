@@ -166,15 +166,25 @@ class KalturaResponseCacher
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		$contextDataObjectType = 'contextDataParams:objectType';
 		foreach ($this->_params as $key => $value)
 		{
-			if (strpos($key, 'contextDataParams:referrer') === false)
+			if (substr($key, -strlen($contextDataObjectType)) !== $contextDataObjectType)
 				continue;
 
+			$keyPrefix = substr($key, 0, -strlen($contextDataObjectType));
+			$referrerKey = $keyPrefix . 'contextDataParams:referrer';
+
 			if (in_array($this->_ksPartnerId, kConf::get('v3cache_include_referrer_in_key')))
-				$this->_params[$key] = parse_url($value, PHP_URL_HOST);
+			{
+				if (isset($this->_params[$referrerKey]))
+					$referrer = $this->_params[$referrerKey];
+				else
+					$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+				$this->_params[$referrerKey] = parse_url($referrer, PHP_URL_HOST);
+			}
 			else
-				unset($this->_params[$key]);
+				unset($referrerKey);
 				
 			break;
 		}
@@ -588,7 +598,7 @@ class KalturaResponseCacher
 		}
 		
 		if ($ks && 
-			(($ks->valid_until && $ks->valid_until < time()) ||	// don't cache when the KS is expired
+			($ks->valid_until <= time() ||						// don't cache when the KS is expired
 			$ks->isSetLimitAction())) 							// don't cache when the KS has a limit on the number of actions
 		{
 			self::disableCache();
