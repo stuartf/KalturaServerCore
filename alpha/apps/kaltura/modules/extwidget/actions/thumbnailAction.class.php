@@ -276,7 +276,7 @@ class thumbnailAction extends sfAction
 								//Ready fileSync is on the other DC - dumping
 								kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 							}
-							throw new kFileSyncException('No ready fileSync found on any DC',kFileSyncException::FILE_NOT_FOUND);
+							KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 						}
 						// problem could be due to replication lag
 					}
