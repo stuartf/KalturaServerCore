@@ -19,6 +19,10 @@ class kvote extends Basekvote
 		{
 			$this->statistics_results = myStatisticsMgr::addKvote( $this , $this->getRank() );
 		}
+	else if (in_array(kvotePeer::STATUS, $this->modifiedColumns))
+		{
+		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this); 
+		}
 		
 		return parent::save( $con );
 	}
