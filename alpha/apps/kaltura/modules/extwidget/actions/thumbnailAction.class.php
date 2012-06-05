@@ -48,6 +48,8 @@ class thumbnailAction extends sfAction
 		$vid_slice = $this->getRequestParameter( "vid_slice" , -1);
 		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
 		$density = $this->getRequestParameter( "density" , 0);
+		$flavor_id =  $this->getRequestParameter( "flavor_id" , null);
+		$file_name =  $this->getRequestParameter( "file_name" , null);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -119,11 +121,12 @@ class thumbnailAction extends sfAction
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
 			if ( ! $entry )
 			{ 
-				// problem could be due to replocation lag
+				// problem could be due to replication lag
 				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			}
 		}
-		else{
+		else
+		{
 			// get the widget
 			$widget = widgetPeer::retrieveByPK( $widget_id );
 			if ( !$widget )
@@ -214,74 +217,10 @@ class thumbnailAction extends sfAction
 			
 		if ( ! $file_sync ) 
 		{
-			// if entry type is audio - serve generic thumb:
-			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
-			{
-				if($entry->getStatus() == entryStatus::DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
-				{
-					KalturaLog::log("rejected audio entry - not serving thumbnail");
-					KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
-				}
-				$contentPath = myContentStorage::getFSContentRootPath();
-				$msgPath = $contentPath."content/templates/entry/thumbnail/audio_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
-				//kFile::dumpFile($tempThumbPath, null, 0);
+			$tempThumbPath = $entry->getLocalThumbFilePath( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name );
+			if (!$tempThumbPath ){	
+				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
-			elseif($entry->getType() == entryType::LIVE_STREAM)
-			{
-				if($entry->getStatus() == entryStatus::DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
-				{
-					KalturaLog::log("rejected live stream entry - not serving thumbnail");
-					KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
-				}
-				$contentPath = myContentStorage::getFSContentRootPath();
-				$msgPath = $contentPath."content/templates/entry/thumbnail/live_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
-			}
-			elseif($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_SHOW) // roughcut without any thumbnail, probably just created
-			{
-				$contentPath = myContentStorage::getFSContentRootPath();
-				$msgPath = $contentPath."content/templates/entry/thumbnail/auto_edit.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
-				//kFile::dumpFile($tempThumbPath, null, 0);
-			}
-			//elseif($entry->getType() == entryType::MEDIA_CLIP && ($entry->getStatus() == entryStatus::PRECONVERT || $entry->getStatus() == entryStatus::IMPORT))
-			elseif($entry->getType() == entryType::MEDIA_CLIP)
-			{
-				// commenting out the new behavior, in this case the thumbnail will be created in resizeEntryImage
-				//$contentPath = myContentStorage::getFSContentRootPath();
-				//$msgPath = $contentPath."content/templates/entry/thumbnail/broken_thumb.jpg";
-				//header("Xkaltura-app: entry [$entry_id] in conversion, returning template broken thumb");
-				//KalturaLog::log( "Entry in conversion, no thumbnail yet [$entry_id], created dynamic 1x1 jpg");
-				//kFile::dumpFile($msgPath, null, 0);
-				try
-				{
-					$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices);
-				}
-				catch(Exception $ex)
-				{
-					if($ex->getCode() == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
-					{
-						// get original flavor asset
-						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
-						if ($origFlavorAsset) {
-							$syncKey = $origFlavorAsset->getSyncKey ( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-								
-							list($readyFileSync,$isLocal) = kFileSyncUtils::getReadyFileSyncForKey( $syncKey, TRUE, FALSE );
-							if ($readyFileSync) {
-								if ($isLocal) {
-									KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
-									KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
-								}
-								//Ready fileSync is on the other DC - dumping
-								kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
-							}
-							KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
-						}
-						// problem could be due to replication lag
-					}
-				}
-			} 
 		}
 		
 		if ( !$local && !$tempThumbPath && $file_sync )

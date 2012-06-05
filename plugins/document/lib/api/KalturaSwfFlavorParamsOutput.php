@@ -12,6 +12,7 @@ class KalturaSwfFlavorParamsOutput extends KalturaFlavorParamsOutput
 		
 		parent::toObject($object, $skip);
 		$object->setType(DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF));
+		return $object;
 	}
 	
 	/**

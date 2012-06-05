@@ -12,6 +12,7 @@ class KalturaPdfFlavorParams extends KalturaFlavorParams
 		
 		parent::toObject($object, $skip);
 		$object->setType(DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF));
+		return $object;
 	}
 	
 	/**
