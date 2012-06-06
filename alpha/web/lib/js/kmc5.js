@@ -682,7 +682,7 @@ kmc.preview_embed = {
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
 	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, html5) {
-
+		name = kmc.utils.escapeQuotes(name); 
 		var uiconf_id = uiconf.uiconf_id || uiconf,
 		uiconf_details = (typeof uiconf == "object") ? uiconf : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist),  // getUiconfDetails returns json
 		cache_st = kmc.preview_embed.setCacheStartTime(),
