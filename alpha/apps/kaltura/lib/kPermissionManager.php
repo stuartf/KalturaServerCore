@@ -89,13 +89,18 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$cacheStore = kCacheManager::getCache($cacheLayer);
 			if (!$cacheStore)
 				continue;
-				
-			self::$cacheStores[] = $cacheStore;
-		
+
 			$value = $cacheStore->get($key); // try to fetch from cache
 			if ($value)
 			{
 				KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
+				self::storeInCache($key, $value);		// store in lower cache layers
+			}
+			
+			self::$cacheStores[] = $cacheStore;
+		
+			if ($value)
+			{
 				return $value;
 			}
 		}
