@@ -139,32 +139,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	
-	/**
-	 * Delete a value stored in cache with the given key
-	 * @param string $key stored key
-	 */
-	private static function deleteFromCache($key)
-	{
-		if (!self::useCache())
-		{
-			return;
-		}
-		
-		foreach (self::$cacheStores as $cacheStore)
-		{		
-			$success = $cacheStore->delete(self::GLOBAL_CACHE_KEY_PREFIX . $key);
-			if ($success)
-			{
-				KalturaLog::debug("Successfully deleted stored cache value for key [$key]");
-			}
-			else
-			{
-				KalturaLog::debug("Cannot delete cache value for key [$key]");
-			}
-		}
-	}
-	
-	
 	
 	// ----------------------------
 	// -- Initialization methods --
@@ -239,8 +213,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 		}		
 		
-		
-		self::deleteFromCache($roleCacheKey);
 		$map = self::getPermissionsFromDb($dbRole);
 		
 		// update cache
