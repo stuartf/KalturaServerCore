@@ -6,7 +6,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	// -- Class members --
 	// -------------------
 		
-	const GLOBAL_CACHE_KEY_PREFIX = 'kPermissionManager_'; // Prefix added for all key names stored in the APC cache
+	const GLOBAL_CACHE_KEY_PREFIX = 'kPermissionManager_'; // Prefix added for all key names stored in the cache
 	
 	private static $map = array(); // Local map of permission items allowed for the current role
 	
@@ -26,6 +26,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static $roleIds = null;
 	private static $operatingPartnerId = null;
 	
+	private static $cacheLayers = array(kCacheManager::APC, kCacheManager::MC_GLOBAL_QUERIES);
 	/**
 	 * @var Partner
 	 */
@@ -44,7 +45,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	private static function useCache()
 	{
-		if (self::$useCache && function_exists('apc_fetch') && function_exists('apc_store'))
+		if (self::$useCache)
 		{
 			return true;
 		}
@@ -77,16 +78,28 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			return null;
 		}
+		
+		self::$cacheStores = array();
+		
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-		$value = apc_fetch($key); // try to fetch from cache
-		if ($value) {
-			KalturaLog::debug("Found an APC cache value for key [$key]");
-			return $value;
+		foreach (self::$cacheLayers as $cacheLayer)
+		{
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if (!$cacheStore)
+				continue;
+				
+			self::$cacheStores[] = $cacheStore;
+		
+			$value = $cacheStore->get($key); // try to fetch from cache
+			if ($value)
+			{
+				KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
+				return $value;
+			}
 		}
-		else {
-			KalturaLog::debug("No APC cache value found for key [$key]");
-			return null;
-		}
+
+		KalturaLog::debug("No cache value found for key [$key]");
+		return null;
 	}
 	
 	/**
@@ -99,47 +112,51 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		if (!self::useCache())
 		{
-			return false;
+			return;
 		}
+		
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-		$success = apc_store($key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
-
-		if ($success)
+		
+		foreach (self::$cacheStores as $cacheStore)
 		{
-			KalturaLog::debug("New value stored in APC cache for key [$key]");
-			return true;
-		}
-		else
-		{
-			KalturaLog::debug("No APC cache value stored for key [$key]");
-			return false;
+			$success = $cacheStore->set($key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
+			if ($success)
+			{
+				KalturaLog::debug("New value stored in cache for key [$key]");
+			}
+			else
+			{
+				KalturaLog::debug("No cache value stored for key [$key]");
+			}
 		}
 	}
 	
 	
 	/**
-	 * Delete a value stored in APC cache with the given key
+	 * Delete a value stored in cache with the given key
 	 * @param string $key stored key
 	 */
 	private static function deleteFromCache($key)
 	{
 		if (!self::useCache())
 		{
-			return null;
+			return;
 		}
+		
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-		
-		$success = apc_delete($key);
-		if ($success) {
-			KalturaLog::debug("Successfully deleted stored APC cache value for key [$key]");
-			return true;
+
+		foreach (self::$cacheStores as $cacheStore)
+		{		
+			$success = $cacheStore->delete($key);
+			if ($success)
+			{
+				KalturaLog::debug("Successfully deleted stored cache value for key [$key]");
+			}
+			else
+			{
+				KalturaLog::debug("Cannot delete cache value for key [$key]");
+			}
 		}
-		else
-		{
-			KalturaLog::debug("Cannot delete APC cache value for key [$key]");
-			return false;
-		}
-		
 	}
 	
 	
@@ -787,19 +804,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		return self::$map[self::PERMISSION_NAMES_ARRAY];
 	}
-	
-	
-	private function delFromCache($roleId, $partnerId)
-	{
-		if (!self::useCache())
-		{
-			return null;
-		}
 		
-		$cacheKey = self::getRoleIdKey($roleId, $partnerId);
-		return self::deleteFromCache($cacheKey);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
