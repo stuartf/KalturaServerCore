@@ -27,6 +27,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static $operatingPartnerId = null;
 	
 	private static $cacheLayers = array(kCacheManager::APC, kCacheManager::MC_GLOBAL_QUERIES);
+	private static $cacheStores = array();
+	
 	/**
 	 * @var Partner
 	 */
