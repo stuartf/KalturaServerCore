@@ -83,14 +83,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		self::$cacheStores = array();
 		
-		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
 		foreach (self::$cacheLayers as $cacheLayer)
 		{
 			$cacheStore = kCacheManager::getCache($cacheLayer);
 			if (!$cacheStore)
 				continue;
 
-			$value = $cacheStore->get($key); // try to fetch from cache
+			$value = $cacheStore->get(self::GLOBAL_CACHE_KEY_PREFIX . $key); // try to fetch from cache
 			if ($value)
 			{
 				KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
@@ -122,11 +121,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return;
 		}
 		
-		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-		
 		foreach (self::$cacheStores as $cacheStore)
 		{
-			$success = $cacheStore->set($key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
+			$success = $cacheStore->set(
+				self::GLOBAL_CACHE_KEY_PREFIX . $key, 
+				$value, 
+				kConf::get('apc_cache_ttl')); // try to store in cache
 			if ($success)
 			{
 				KalturaLog::debug("New value stored in cache for key [$key]");
@@ -150,11 +150,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return;
 		}
 		
-		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-
 		foreach (self::$cacheStores as $cacheStore)
 		{		
-			$success = $cacheStore->delete($key);
+			$success = $cacheStore->delete(self::GLOBAL_CACHE_KEY_PREFIX . $key);
 			if ($success)
 			{
 				KalturaLog::debug("Successfully deleted stored cache value for key [$key]");
