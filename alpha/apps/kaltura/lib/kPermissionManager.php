@@ -74,7 +74,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * Get value from cache for the given key
 	 * @param string $key
 	 */
-	private static function getFromCache($key)
+	private static function getFromCache($key, $roleCacheDirtyAt)
 	{
 		if (!self::useCache())
 		{
@@ -89,19 +89,20 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$cacheStore)
 				continue;
 
-			$value = $cacheStore->get(self::GLOBAL_CACHE_KEY_PREFIX . $key); // try to fetch from cache
-			if ($value)
+			$value = $cacheStore->get(self::GLOBAL_CACHE_KEY_PREFIX . $key); // try to fetch from cache			
+			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
 			{
-				KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
-				self::storeInCache($key, $value);		// store in lower cache layers
+				self::$cacheStores[] = $cacheStore;
+				continue;
 			}
 			
+			KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
+			self::storeInCache($key, $value);		// store in lower cache layers		
 			self::$cacheStores[] = $cacheStore;
-		
-			if ($value)
-			{
-				return $value;
-			}
+
+			// cache is updated - init from cache
+			unset($value['updatedAt']);			
+			return $value;
 		}
 
 		KalturaLog::debug("No cache value found for key [$key]");
@@ -178,23 +179,21 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static function getPermissions($roleId)
 	{
 		$map = self::initEmptyMap();
-				
-		// get role from cache
-		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
-		$cacheRole = self::getFromCache($roleCacheKey);
 		
+		// get cache dirty time
 		$roleCacheDirtyAt = 0;
 		if (self::$operatingPartner) {
 			$roleCacheDirtyAt = self::$operatingPartner->getRoleCacheDirtyAt();
-		}
+		}		
+		
+		// get role from cache
+		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
+		$cacheRole = self::getFromCache($roleCacheKey, $roleCacheDirtyAt);
 		
 		// compare updatedAt between partner dirty flag and cache
-		if ( $cacheRole && isset($cacheRole['updatedAt']) && ( $cacheRole['updatedAt'] >= $roleCacheDirtyAt ) )
+		if ( $cacheRole )
 		{
-			// cache is updated - init from cache
-			unset($cacheRole['updatedAt']);
-			$map = $cacheRole;
-			return $map; // initialization from cache finished
+			return $cacheRole; // initialization from cache finished
 		}
 		
 		// cache is not updated - delete stored value and re-init from DB
