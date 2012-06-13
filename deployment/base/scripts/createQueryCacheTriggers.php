@@ -5,7 +5,7 @@ $dryRun = true;
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
 	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
-	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
+	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id')),	'flags' => 'replace_spaces'),
 	array('table' => "entry", 							'keys' => array(array("'entry:id='", '@OBJ@.id'))),
 	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
 	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
@@ -201,7 +201,11 @@ function buildTriggerBody($invalidationKey, $triggerType)
 			if (strpos($curStr, '@OBJ@') === false)
 				$curKey[] = $curStr;
 			else 
+			{
+				if (isset($invalidationKey['flags']) && strpos($invalidationKey['flags'], 'replace_spaces') !== false)
+					$curStr = "REPLACE($curStr,' ','_')";
 				$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+			}
 		}
 		$curKey = 'concat(' . implode(', ', $curKey) . ')';
 		
