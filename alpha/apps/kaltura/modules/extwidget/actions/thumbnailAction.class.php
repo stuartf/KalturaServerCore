@@ -50,7 +50,7 @@ class thumbnailAction extends sfAction
 		$density = $this->getRequestParameter( "density" , 0);
 		$flavor_id =  $this->getRequestParameter( "flavor_id" , null);
 		$file_name =  $this->getRequestParameter( "file_name" , null);
-		
+		$file_name = basename($file_name);
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
 		$rel_width  = $this->getRequestParameter( "rel_width", -1 );
