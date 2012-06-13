@@ -202,9 +202,10 @@ function buildTriggerBody($invalidationKey, $triggerType)
 				$curKey[] = $curStr;
 			else 
 			{
+				$curStrValue = $curStr;
 				if (isset($invalidationKey['flags']) && strpos($invalidationKey['flags'], 'replace_spaces') !== false)
-					$curStr = "REPLACE($curStr,' ','_')";
-				$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+					$curStrValue = "REPLACE($curStr,' ','_')";
+				$curKey[] = "IF($curStr IS NULL,'',$curStrValue)";
 			}
 		}
 		$curKey = 'concat(' . implode(', ', $curKey) . ')';
