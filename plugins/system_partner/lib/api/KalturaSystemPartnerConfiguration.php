@@ -87,11 +87,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @deprecated
 	 */
 	public $restrictThumbnailByKs;
-
-	/**
-	 * @var bool
-	 */
-	public $supportAnimatedThumbnails;
 		
 	/**
 	 * @var int
@@ -311,7 +306,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailExpiryReason",
 		"extendedFreeTrail",
 		"restrictThumbnailByKs",
-		"supportAnimatedThumbnails",
 		"crmLink",
 		"crmId",
 		"verticalClasiffication",
