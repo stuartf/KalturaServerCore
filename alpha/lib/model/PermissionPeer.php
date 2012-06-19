@@ -189,6 +189,9 @@ class PermissionPeer extends BasePermissionPeer
 	
 	public static function getByNameAndPartner($permissionName, $partnerIdsArray)
 	{
+		if(is_string($partnerIdsArray))
+			$partnerIdsArray = explode(',', $partnerIdsArray);
+			
 		$c = new Criteria();
 		if (!in_array('*', $partnerIdsArray, true)) {
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
