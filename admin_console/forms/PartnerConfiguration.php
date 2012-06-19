@@ -511,6 +511,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
 	
+		// partner is set to free trail package
+		if(!$object->partnerPackage == PartnerController::PARTNER_PACKAGE_FREE)
+		{
+			if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
+			{
+				$this->setPermissionGroupElementsToDisabled(array('accountPackagesService'));
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)
