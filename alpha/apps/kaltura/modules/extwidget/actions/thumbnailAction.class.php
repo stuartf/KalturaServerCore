@@ -157,6 +157,8 @@ class thumbnailAction extends sfAction
 		if($density == 0) {
 			$density = $partner->getDefThumbDensity();
 		}
+		$thumbParams = new kThumbnailParameters();
+		$thumbParams->setSupportAnimatedThumbnail($partner->getSupportAnimatedThumbnails());
 		
 		//checks whether the thumbnail display should be restricted by KS
 		$base64Referrer = $this->getRequestParameter("referrer");
@@ -247,7 +249,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices  );
+				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, null, $thumbParams);
 			}
 			catch(Exception $ex)
 			{
