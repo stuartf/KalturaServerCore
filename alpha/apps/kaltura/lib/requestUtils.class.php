@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../../../../infra/general/infraRequestUtils.class.php');
+
 /**
  * Will hold helper functions and conventions for working with the HttpRequest object
  *

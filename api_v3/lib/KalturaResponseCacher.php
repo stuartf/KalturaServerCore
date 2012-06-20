@@ -2,6 +2,7 @@
 require_once(dirname(__FILE__) . '/../../alpha/config/kConf.php');
 require_once(dirname(__FILE__) . '/../../infra/cache/kApiCache.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
 
 class KalturaResponseCacher extends kApiCache
 {
