@@ -1,4 +1,6 @@
 <?php
+require_once(dirname(__FILE__) . '/access_control/kGeoCoder.php');
+
 @include("IP2Location.inc.php");
 
 class myIPGeocoder extends kGeoCoder

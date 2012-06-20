@@ -259,7 +259,7 @@ class KalturaFrontController
 					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex);
 				}
-				$cache->storeCache(serialize($currentResult));
+				$cache->storeCache($currentResult, "", true);
 			}
 			$this->onRequestEnd($success, $errorCode, $i);
 	        

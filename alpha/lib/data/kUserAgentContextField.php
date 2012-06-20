@@ -12,9 +12,19 @@ class kUserAgentContextField extends kStringField
 	 */
 	protected function getFieldValue(accessControlScope $scope = null) 
 	{
+		kApiCache::addExtraField(kApiCache::ECF_USER_AGENT);
+
 		if(!$scope)
 			$scope = new accessControlScope();
-			
+		
 		return $scope->getUserAgent();
+	}
+
+	/* (non-PHPdoc)
+	 * @see kStringValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return false;
 	}
 }

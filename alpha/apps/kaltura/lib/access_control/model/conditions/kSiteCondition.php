@@ -24,46 +24,10 @@ class kSiteCondition extends kMatchCondition
 	 * @see kCondition::getFieldValue()
 	 */
 	public function getFieldValue(accessControl $accessControl)
-	{
+	{	
 		$scope = $accessControl->getScope();
 		$referrer = $scope->getReferrer();
-		
-		$referrerDetails = parse_url($referrer);
-		if(isset($referrerDetails['host']))
-		{
-			$suspectedDomain = $referrerDetails['host'];
-		}
-		elseif(isset($referrerDetails['path']))
-		{
-			// parse_url could not extract domain, but returned path
-			// we validate that this path could be considered a domain
-			$suspectedDomain = rtrim($referrerDetails['path'], '/'); // trim trailing slashes. example: www.kaltura.com/test.php
-			
-			// stop string at first slash. example: httpssss/google.com - malformed url...
-			if (strpos($suspectedDomain, "/") !== false)
-			{
-				$suspectedDomain = substr($suspectedDomain, 0, strpos($suspectedDomain, "/"));
-			}
-		}
-		else // empty path and host, cannot parse the URL
-		{
-			return null;
-		}
-		
-		// some urls might return host or path which is not yet clean for comparison with user's input
-		if (strpos($suspectedDomain, "?") !== false)
-		{
-			$suspectedDomain = substr($suspectedDomain, 0, strpos($suspectedDomain, "?"));
-		}
-		if (strpos($suspectedDomain, "#") !== false)
-		{
-			$suspectedDomain = substr($suspectedDomain, 0, strpos($suspectedDomain, "#"));
-		}
-		if (strpos($suspectedDomain, "&") !== false)
-		{
-			$suspectedDomain = substr($suspectedDomain, 0, strpos($suspectedDomain, "&"));
-		}
-		return $suspectedDomain;
+		return requestUtils::parseUrlHost($referrer);
 	}
 	
 	/* (non-PHPdoc)
@@ -89,6 +53,8 @@ class kSiteCondition extends kMatchCondition
 					$this->values[] = $globalWhitelistedDomain;
 			}
 		}
+
+		kApiCache::addExtraField(kApiCache::ECF_REFERRER, kApiCache::COND_MATCH, $this->getStringValues($scope));
 		
 		return parent::internalFulfilled($accessControl);
 	}
@@ -102,14 +68,10 @@ class kSiteCondition extends kMatchCondition
 	}
 
 	/* (non-PHPdoc)
-	 * @see kCondition::shouldDisableCache()
+	 * @see kCondition::shouldFieldDisableCache()
 	 */
-	public function shouldDisableCache($scope)
+	public function shouldFieldDisableCache($scope)
 	{
-		// no need to disable cache if the referrer is part of the cache key
-		$ks = $scope->getKs();
-		if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key')))
-			return false;
-		return true;
+		return false;
 	}
 }
