@@ -295,7 +295,7 @@ class kApiCache
 		$this->_cacheKeyDirty = false;
 	
 		ksort($this->_params);
-		$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params) );
+		$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params, '', '&') );
 		if (is_null($this->_originalCacheKey))
 			$this->_originalCacheKey = $this->_cacheKey;
 	}
