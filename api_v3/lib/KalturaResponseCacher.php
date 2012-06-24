@@ -156,7 +156,7 @@ class KalturaResponseCacher extends kApiCache
 				unset($this->_params[$referrerKey]);
 			}
 			else
-				$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+				$referrer = self::getHttpReferrer();
 				
 			$this->_referrers[] = $referrer;
 		}

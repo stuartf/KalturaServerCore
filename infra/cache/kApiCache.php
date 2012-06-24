@@ -58,6 +58,7 @@ class kApiCache
 	protected $_extraFields = array();
 	protected $_referrers = array();
 	protected static $_country = null;
+	protected static $_usesHttpReferrer = false;
 	protected static $_hasExtraFields = false;
 	
 	protected function __construct()
@@ -164,6 +165,12 @@ class kApiCache
 		return self::$_country;
 	}
 	
+	static protected function getHttpReferrer()
+	{
+		self::$_usesHttpReferrer = true;
+		return isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+	}
+	
 	protected function getFieldValues($extraField)
 	{
 		switch ($extraField)
@@ -228,7 +235,8 @@ class kApiCache
 		if (in_array($extraFieldParams, $this->_extraFields))
 			return;			// already added
 		$this->_extraFields[] = $extraFieldParams;
-		self::$_hasExtraFields = true;
+		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
+			self::$_hasExtraFields = true;
 		
 		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
