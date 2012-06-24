@@ -8,6 +8,11 @@
 abstract class kStringField extends kStringValue
 {
 	/**
+	 * @var accessControlScope
+	 */
+	protected $scope = null;
+	
+	/**
 	 * Calculates the value at realtime
 	 * @param accessControlScope $scope
 	 * @return string $value
@@ -19,7 +24,15 @@ abstract class kStringField extends kStringValue
 	 */
 	public function getValue() 
 	{
-		return $this->getFieldValue();
+		return $this->getFieldValue($this->scope);
+	}
+	
+	/**
+	 * @param accessControlScope $scope
+	 */
+	public function setScope(accessControlScope $scope) 
+	{
+		$this->scope = $scope;
 	}
 
 	/* (non-PHPdoc)
