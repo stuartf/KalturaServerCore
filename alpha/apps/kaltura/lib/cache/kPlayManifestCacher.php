@@ -66,7 +66,9 @@ class kPlayManifestCacher extends kApiCache
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		if (isset($this->_params['referrer']))
 		{
-			$referrer = $this->_params['referrer'];
+			$referrer = base64_decode(str_replace(" ", "+", $this->_params['referrer']));
+			if (!is_string($referrer)) 
+				$referrer = "";				
 			unset($this->_params['referrer']);
 		}
 		else
