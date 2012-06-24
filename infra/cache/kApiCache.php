@@ -185,7 +185,7 @@ class kApiCache
 
 		case self::ECF_USER_AGENT:
 			if (isset($_SERVER['HTTP_USER_AGENT']))
-				return array(isset($_SERVER['HTTP_USER_AGENT']));
+				return array($_SERVER['HTTP_USER_AGENT']);
 			break;
 		
 		case self::ECF_COUNTRY:
