@@ -215,26 +215,10 @@ class KalturaResponseCacher extends kApiCache
 		return $response;
 	}
 	
-		
-	public function checkOrStart()
+	protected function sendCachingHeaders($usingCache)
 	{
-		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
-			return;
-					
-		$response = $this->checkCache();		
-		if (!$response)
-		{
-			ob_start();
-			return;
-		}
-		
-		if ($this->_contentType) 
-		{
-			header($this->_contentType, true);
-		}	
-
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-		if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
+		if ($usingCache && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
 		{
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age max-stale=0");
@@ -247,6 +231,30 @@ class KalturaResponseCacher extends kApiCache
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
 			header("Pragma: no-cache", true);
 		}
+	}
+		
+	public function checkOrStart()
+	{
+		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
+		{
+			$this->sendCachingHeaders(false);
+			return;
+		}
+					
+		$response = $this->checkCache();		
+		if (!$response)
+		{
+			$this->sendCachingHeaders(false);
+			ob_start();
+			return;
+		}
+		
+		if ($this->_contentType) 
+		{
+			header($this->_contentType, true);
+		}	
+
+		$this->sendCachingHeaders(true);
 
 		// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
 		if (@$_REQUEST["format"] == 9)
