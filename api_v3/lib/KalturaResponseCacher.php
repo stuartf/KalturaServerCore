@@ -34,6 +34,7 @@ class KalturaResponseCacher extends kApiCache
 	
 	const SUFFIX_DATA =  '.cache';
 	const SUFFIX_RULES = '.rules';
+	const SUFFIX_LOG = '.log';
 	
 	protected $_cacheStore = null;
 	protected $_defaultExpiry = 600;
@@ -370,10 +371,12 @@ class KalturaResponseCacher extends kApiCache
 		}
 
 		// write to the cache
+		//$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_LOG, print_r($this->_params, true), $maxExpiry + self::EXPIRY_MARGIN);
+
 		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
 		
 		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($cacheId, $contentType, $response)), $maxExpiry);
-		
+
 		// compare the calculated $response to the previously stored $cachedResponse
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
 		{
