@@ -259,7 +259,7 @@ class kApiCache
 			return;
 		
 		foreach ($extraFields as $extraFieldParams)
-			call_user_func_array(array($this, 'addExtraFieldInternal'), $extraFieldParams);
+			call_user_func_array(array('kApiCache', 'addExtraField'), $extraFieldParams);
 		
 		$this->finalizeCacheKey();
 	}
