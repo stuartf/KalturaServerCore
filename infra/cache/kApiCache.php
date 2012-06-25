@@ -18,6 +18,7 @@ class kApiCache
 	const COND_NONE = '';
 	const COND_MATCH = 'match';
 	const COND_REGEX = 'regex';
+	const COND_SITE_MATCH = 'siteMatch';
 	
 	const EXTRA_KEYS_PREFIX = 'extra-keys-';
 
@@ -213,7 +214,18 @@ class kApiCache
 					preg_match("/$curRefValue/i", $fieldValue))
 					return true;
 			}
-			return false;			
+			return false;	
+
+		case self::COND_SITE_MATCH:
+			if (!count($refValue))
+				return null;
+			foreach($refValue as $curRefValue)
+			{
+				if ($fieldValue === $curRefValue || 
+					strpos($fieldValue, "." . $curRefValue) !== false)
+					return true;
+			}
+			return false;	
 		}
 		return $fieldValue;
 	}
@@ -224,6 +236,7 @@ class kApiCache
 		{			
 		case self::COND_REGEX:
 		case self::COND_MATCH:
+		case self::COND_SITE_MATCH:
 			return "_{$condition}_" . implode(',', $refValue);
 		}
 		return '';
