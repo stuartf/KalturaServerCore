@@ -157,6 +157,11 @@ class kApiCache
 		{
 			$curInstance->addExtraFieldInternal($extraField, $condition, $refValue);
 		}
+
+		// the following code is required since there are no active cache instances in thumbnail action
+		// and we need _hasExtraFields to be correct
+		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
+			self::$_hasExtraFields = true;
 	}
 
 	static protected function getCountry()
