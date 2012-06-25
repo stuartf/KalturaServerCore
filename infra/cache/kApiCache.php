@@ -176,7 +176,7 @@ class kApiCache
 		return self::$_country;
 	}
 	
-	static protected function getHttpReferrer()
+	static public function getHttpReferrer()
 	{
 		self::$_usesHttpReferrer = true;
 		return isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
