@@ -183,7 +183,7 @@ class infraRequestUtils
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		$reuslt = self::internalGetRemoteAddress();		
+		$result = self::internalGetRemoteAddress();		
 		self::$isInGetRemoteAddress = false;
 		return $result;
 	}
