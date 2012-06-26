@@ -294,7 +294,8 @@ class thumbnailAction extends sfAction
 		
 		$nocache = strpos($tempThumbPath, "_NOCACHE_") !== false;
 		
-		if($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields()) 
+		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules())) 
 			$nocache = true;
 
 		// notify external proxy, so it'll cache this url
