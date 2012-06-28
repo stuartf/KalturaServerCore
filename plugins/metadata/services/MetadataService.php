@@ -347,6 +347,8 @@ class MetadataService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$metadataFilter->attachToCriteria($c);
+		if ($entryIds === array())
+			$c->addAnd(MetadataPeer::OBJECT_ID, array(), Criteria::IN);
 		$count = MetadataPeer::doCount($c);
 		
 		if (! $pager)
