@@ -436,6 +436,24 @@ class entryPeer extends BaseentryPeer
 	{
 		return array(entryPeer::STATUS);
 	}
+
+	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
+		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+		$c->addAnd($criterionPartnerOrKn);
+		$dbEntries = self::doSelect($c);
+		
+		$entryIds = array();
+		foreach ($dbEntries as $dbEntry)
+		{
+			$entryIds[] = $dbEntry->getId();
+		}
+		
+		return $entryIds;
+	}
 }
 
 class entryPool

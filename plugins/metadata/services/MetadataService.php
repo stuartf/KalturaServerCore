@@ -14,7 +14,8 @@ class MetadataService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new MetadataProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		if ($actionName != 'list')
+			myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		myPartnerUtils::addPartnerToCriteria(new entryPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 //		myPartnerUtils::addPartnerToCriteria(new FileSyncPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
@@ -22,6 +23,16 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName == 'list')
+		{
+			$this->partnerGroup .= ',0';
+			return true;
+		}
+			
+		return parent::kalturaNetworkAllowed($actionName);
+	}
 
 	/**
 	 * Allows you to add a metadata object and metadata content associated with Kaltura object
@@ -306,7 +317,31 @@ class MetadataService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaMetadataFilter;
-			
+		
+		$entryIds = null;
+		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
+		{
+			if ($filter->objectIdEqual)
+			{
+				$entryIds = array($filter->objectIdEqual);
+			}
+			else if ($filter->objectIdIn)
+			{
+				$entryIds = explode(',', $filter->objectIdIn);
+			}
+		}
+		
+		if (is_null($entryIds))
+		{
+			myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		}
+		else
+		{
+			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
+			$filter->objectIdEqual = null;
+			$filter->objectIdIn = implode(',', $entryIds);
+		}
+		
 		$metadataFilter = new MetadataFilter();
 		$filter->toObject($metadataFilter);
 		
