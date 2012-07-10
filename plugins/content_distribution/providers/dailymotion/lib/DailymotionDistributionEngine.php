@@ -62,9 +62,10 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaDailymotionDistributionProfile $distributionProfile
+	 * @param KalturaDailymotionDistributionJobProviderData $providerData
 	 * @return array()
 	 */
-	public function getDailymotionProps($enabled = null)
+	public function getDailymotionProps($enabled = null, $distributionProfile = null, $providerData = null)
 	{
 		$props = array();
 		$props['tags'] = str_replace(',', ' , ', $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_TAGS));
@@ -78,9 +79,15 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if(!is_null($enabled))
 			$props['private']= !$enabled;
 
+		$geoBlocking = $this->getGeoBlocking($distributionProfile, $providerData);
+
+		KalturaLog::debug('Geo blocking array: '.print_r($geoBlocking, true));
+		if (count($geoBlocking))
+			$props['geoblocking'] = $geoBlocking;
+
 		return $props;
 	}
-	
+
 	/**
 	 * Tries to transalte the friendly name of the category to the api value, if not found the same value will be returned (as a fallback)
 	 * @param string $category
@@ -106,8 +113,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		
 		$needDel = false;
 
-		$props = $this->getDailymotionProps($enabled);
-		
+		$props = $this->getDailymotionProps($enabled, $distributionProfile, $data->providerData);
+
 		if($data->entryDistribution->remoteId)
 		{
 			$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
@@ -225,7 +232,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	{
 	    $this->fieldValues = unserialize($data->providerData->fieldValues);
 	    
-		$props = $this->getDailymotionProps($enabled);
+		$props = $this->getDailymotionProps($enabled, $distributionProfile, $data->providerData);
 	
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
 		$this->configureTimeouts($dailyMotionImpl);
@@ -274,5 +281,33 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	        return $this->fieldValues[$fieldName];
 	    }
 	    return null;
+	}
+
+	/**
+	 * @param KalturaDailymotionDistributionProfile $distributionProfile
+	 * @param KalturaDailymotionDistributionJobProviderData $providerData
+	 * @return array
+	 */
+	private function getGeoBlocking($distributionProfile = null, $providerData = null)
+	{
+		$geoBlocking = array();
+		if (is_null($distributionProfile))
+			return $geoBlocking;
+
+		if ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::METADATA) {
+			$geoBlockingOperation = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_OPERATION);
+			$geoBlockingCountryList = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_COUNTRY_LIST);
+			if ($geoBlockingOperation)
+				$geoBlocking[] = $geoBlockingOperation;
+			$geoBlocking = array_merge($geoBlocking, explode(',', $geoBlockingCountryList));
+		}
+		elseif ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::ACCESS_CONTROL) {
+			$geoBlocking[] = $providerData->accessControlGeoBlockingOperation;
+			$geoBlocking = array_merge($geoBlocking, explode(',', $providerData->accessControlGeoBlockingCountryList));
+		}
+
+		foreach($geoBlocking as &$tmpstr)
+			$tmpstr = strtolower($tmpstr);
+		return $geoBlocking;
 	}
 }
