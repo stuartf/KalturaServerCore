@@ -1,0 +1,8 @@
+#
+# before running
+# vi /opt/kaltura/app/plugins/metadata/MetadataPlugin.php
+# add "return true;"
+# to isAllowedPartner($partnerId)
+#
+
+./loop.sh >log-loop

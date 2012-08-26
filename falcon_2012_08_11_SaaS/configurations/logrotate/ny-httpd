@@ -1,0 +1,18 @@
+/var/log/httpd/*log {
+    daily
+    nodateext
+    rotate 10
+    missingok
+#    notifempty
+    compress
+    sharedscripts
+    postrotate
+	/bin/kill -USR1 `cat /var/run/httpd/httpd.pid 2>/dev/null` 2> /dev/null || true
+    endscript
+   lastaction
+        /usr/bin/scp /var/log/httpd/access_log.1.gz ny-reports:/data/logs/investigate/`hostname`-access_log-`/bin/date --iso-8601`.gz
+        /usr/bin/scp /var/log/httpd/error_log.1.gz ny-reports:/data/logs/investigate/`hostname`-error_log-`/bin/date --iso-8601`.gz
+        /usr/bin/scp /var/log/httpd/ssl_access_log.1.gz ny-reports:/data/logs/investigate/`hostname`-ssl_access_log-`/bin/date --iso-8601`.gz
+        /usr/bin/scp /var/log/httpd/ssl_error_log.1.gz ny-reports:/data/logs/investigate/`hostname`-ssl_error_log-`/bin/date --iso-8601`.gz
+    endscript
+}

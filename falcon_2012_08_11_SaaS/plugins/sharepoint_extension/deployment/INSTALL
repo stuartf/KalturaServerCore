@@ -1,0 +1,17 @@
+1. make sure you extract the package under your Kaltura's server 'plugins' folder.
+for example:
+/opt/kaltura/app/plugins/sharepoint_extension
+
+2. as root, run:
+/path/to/php install.php
+
+3. add the plugin to the default plugins loaded in your environment.
+you should do this in the following file:
+	{PATH TO YOUR KALTURA SERVER}/app/alpha/config/kConfLocal.php
+in that file, find:
+	self::$map['default_plugins']
+at the end of this section, add another line:
+	self::$map['default_plugins'][] = "KalturaSharepointExtensionPlugin";
+
+4. clear server cache, using:
+/path/to/php {PATH TO YOUR KALTURA SERVER}/app/scripts/clear_cache.php
