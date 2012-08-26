@@ -42,24 +42,32 @@ class BulkUploadResultEntry extends BulkUploadResult
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
 		if(!$entry)
-			return;
+			return $this->getStatus();
 			
 		$this->setEntryStatus($entry->getStatus());
 		$this->save();
 		
     	$closedStatuses = array (
-    	    entryStatus::ERROR_IMPORTING,
-			entryStatus::ERROR_CONVERTING,
 			entryStatus::READY,
 			entryStatus::DELETED,
 			entryStatus::PENDING,
 			entryStatus::NO_CONTENT,
     	);
+    	
+    	$errorStatuses = array (
+    	    entryStatus::ERROR_IMPORTING,
+			entryStatus::ERROR_CONVERTING,
+	    );
 
 		if(in_array($this->getObjectStatus(), $closedStatuses))
 		{
 			$this->updateEntryThumbnail();
 		    $this->setStatus(BulkUploadResultStatus::OK);
+		    $this->save();
+		}
+		else if (in_array($this->getObjectStatus(), $errorStatuses))
+		{
+		    $this->setStatus(BulkUploadResultStatus::ERROR);
 		    $this->save();
 		}
 			
