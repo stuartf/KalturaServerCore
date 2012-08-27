@@ -23,7 +23,7 @@ kmc.functions = {
 
 	loadSwf : function() {
 
-		var kmc_swf_url = 'http://' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
+		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
 
 		var flashvars = {
 			// kmc configuration
@@ -35,6 +35,7 @@ kmc.functions = {
 			host				: kmc.vars.host,
 			cdnhost				: kmc.vars.cdn_host,
 			srvurl				: "api_v3/index.php",
+			protocol 			: window.location.protocol + '//',
 			partnerid			: kmc.vars.partner_id,
 			subpid				: kmc.vars.subp_id,
 			uid					: kmc.vars.user_id,
@@ -94,6 +95,7 @@ kmc.functions = {
 		var flashvars = {
 			host			: kmc.vars.host,
 			cdnhost			: kmc.vars.cdn_host,
+			protocol 		: window.location.protocol.slice(0, -1),
 			userId			: kmc.vars.user_id,
 			partnerid		: kmc.vars.partner_id,
 			subPartnerId	: kmc.vars.subp_id,
@@ -154,7 +156,7 @@ kmc.functions = {
 	},
 	openClipApp : function( entry_id, mode ) {
 		
-		var iframe_url = 'http://' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
+		var iframe_url = window.location.protocol + '//' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
 			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
@@ -547,6 +549,10 @@ kmc.preview_embed = {
 
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
+		// Change preview player protocol if kmc was loaded in https
+		if( location.protocol == 'https:' ) {
+			preview_player = preview_player.replace(/http:/g, "https:");
+		}		
 		embed_code = embed_code.replace('{FLAVOR}','');
 		
 		var modal_content = ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
