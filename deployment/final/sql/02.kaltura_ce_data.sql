@@ -217,12 +217,12 @@ update flavor_params set id = 0 where id = 1;
 
 insert  into `flavor_params_conversion_profile`(`conversion_profile_id`,`flavor_params_id`,`system_name`,`origin`,`ready_behavior`,`force_none_complied`,`created_at`,`updated_at`,`id`) values 
 (1,0,'Source',1,0,NULL,now(),now(),1),
-(1,5,'',0,2,NULL,now(),now(),2),
-(1,7,'',0,2,NULL,now(),now(),3),
-(1,9,'',0,2,NULL,now(),now(),4),
-(1,10,'',0,2,NULL,now(),now(),5),
-(1,11,'',0,2,NULL,now(),now(),6),
-(1,12,'',0,2,NULL,now(),now(),7),
+(1,31,'',0,2,NULL,now(),now(),2),
+(1,32,'',0,2,NULL,now(),now(),3),
+(1,33,'',0,2,NULL,now(),now(),4),
+(1,34,'',0,2,NULL,now(),now(),5),
+(1,35,'',0,2,NULL,now(),now(),6),
+(1,36,'',0,2,NULL,now(),now(),7),
 (1,19,'',0,0,NULL,now(),now(),8);
 
 insert  into `kuser`(`id`,`login_data_id`,`is_admin`,`screen_name`,`first_name`,`last_name`,`full_name`,`email`,`sha1_password`,`salt`,`date_of_birth`,`country`,`state`,`city`,`zip`,`url_list`,`picture`,`icon`,`about_me`,`tags`,`tagline`,`network_highschool`,`network_college`,`network_other`,`mobile_num`,`mature_content`,`gender`,`registration_ip`,`registration_cookie`,`im_list`,`views`,`fans`,`entries`,`produced_kshows`,`status`,`created_at`,`updated_at`,`partner_id`,`display_in_search`,`search_text`,`partner_data`,`storage_size`,`puser_id`,`admin_tags`,`indexed_partner_data_int`,`indexed_partner_data_string`,`custom_data`) values
