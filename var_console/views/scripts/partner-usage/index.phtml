@@ -14,7 +14,6 @@
 				<th title="<?php echo $this->translate('partner-usage table averageStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table averageStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table peakStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table peakStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
-				<th title="<?php echo $this->translate('partner-usage table deletedStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table deletedStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
 			</tr>
 		</thead>
@@ -24,8 +23,7 @@
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->avgStorage); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->peakStorage); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->storage); ?></td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->deletedStorage); ?></td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->combinedStorageBandwidth); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->combinedStorageBandwidth); ?> MB</td>
 			</tr>
 		</tbody>
 	</table>
@@ -44,7 +42,6 @@
 				<th title="<?php echo $this->translate('partner-usage table averageStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table averageStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table peakStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table peakStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
-				<th title="<?php echo $this->translate('partner-usage table deletedStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table deletedStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
 			</tr>
 		</thead>
@@ -65,7 +62,6 @@
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->peakStorage); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> </td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->deletedStorage); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->combinedStorageBandwidth); ?> </td>
 			</tr>
 			<?php endforeach; ?>
