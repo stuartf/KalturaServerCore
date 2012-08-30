@@ -325,7 +325,6 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::KMC_ROLES_AND_PERMISSIONS' => 'KMC Roles and Permissions',
 	'KalturaUiConfObjType::PLAYER_SL' => 'Player Silverlight',
 	'KalturaUiConfObjType::CLIENTSIDE_ENCODER' => 'Client Side Encoder',
-	'Kaltura_Client_Enum_UiConfObjType::KSR' => 'Kaltura Screen Recorder',
 	 
     
 	//batch index
@@ -838,6 +837,7 @@ return array(
 	'partner-usage table bandwidth' => 'Bandwidth Used',
 	'partner-usage table totalStorage' => 'Total Storage',
 	'partner-usage table storage' => 'Storage Added',
+    'partner-usage table deletedStorage' => 'Deleted Storage',
     'partner-usage table peakStorage' => 'Peak Storage',
     'partner-usage table averageStorage' => 'Average Storage',
     'partner-usage table combinedBandwidthStorage' => 'Combined Bandwidth and Storage',
@@ -858,7 +858,8 @@ return array(
 	'partner-usage table bandwidth tooltip' => 'The total bandwidth streaming during the given date range by the specific Publisher account',
 	'partner-usage table totalStorage tooltip' => 'The total storage consumption by the specific Publisher account',
 	'partner-usage table storage tooltip' => 'The amount of new storage consumption (new uploads) during the given date range for the specific Publisher account',
-    'partner-usage table peakStorage tooltip' => 'The peak amount of storage consumption during the given date range for the specific publisher',
+    'partner-usage table deletedStorage tooltip' => 'The deleted storage during the given date range for the specific Publisher account',
+	'partner-usage table peakStorage tooltip' => 'The peak amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table averageStorage tooltip' => 'The average amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table combinedBandwidthStorage tooltip' => 'The combined amount of bandwidth and storage consumed during the given date range for the specific publisher',
 
