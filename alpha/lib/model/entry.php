@@ -1108,6 +1108,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
 	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
