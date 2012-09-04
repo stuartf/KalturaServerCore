@@ -602,6 +602,7 @@ class KalturaSyndicationFeedRenderer
  		case self::STATE_FOOTER:
 			$this->writeClosingXmlNode('channel',1); // close CHANNEL
 			$this->writeClosingXmlNode('rss'); // close RSS
+			break;
 		}
 	}
 	
