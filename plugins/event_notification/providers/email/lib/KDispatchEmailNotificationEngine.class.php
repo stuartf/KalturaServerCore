@@ -35,7 +35,14 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		if(isset($taskConfig->params->defaultFromName) && $taskConfig->params->defaultFromName)
 			$this->defaultFromName = $taskConfig->params->defaultFromName;
 
-		if(!$this::$mailer)
+		if($this::$mailer)
+		{
+			$this::$mailer->ClearAllRecipients();
+			$this::$mailer->ClearCustomHeaders();
+			$this::$mailer->ClearReplyTos();
+			$this::$mailer->ClearAttachments();
+		}
+		else
 		{
 			$this::$mailer = new PHPMailer();
 			$this::$mailer->CharSet = 'utf-8';
@@ -235,7 +242,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		$body = $emailNotificationTemplate->body;
 
 		$footer = $this->getEmailFooter();
-		if(!is_null(footer))
+		if(!is_null($footer))
 		{
 			$body .= "\n" . $footer;
 		}
