@@ -234,7 +234,44 @@ class Partner extends BasePartner
 	public function setFlvConversionString( $v )
 	{
 		return $this->putInCustomData( "flvConversionString", $v );
-	}	
+	}
+
+	
+	public function getPasswordStructureValidations()
+	{
+		return $this->getFromCustomData( "passwordStructureValidation" , null  );
+	}
+	
+	public function setPasswordStructureValidations( $v )
+	{
+		return $this->putInCustomData( "passwordStructureValidation", $v );
+	}
+	
+	
+	public function getInvalidPasswordStructureMessage(){
+		$invalidPasswordStructureMessage = kConf::get('invalid_password_structure_message');
+		$structureValidations = $this->getPasswordStructureValidations();
+		if($structureValidations && is_array($structureValidations)){
+			$invalidPasswordStructureMessage ='';
+			foreach ($structureValidations as $structureValidation){
+				$invalidPasswordStructureMessage.= $structureValidation[1];	
+			}
+		}
+		return $invalidPasswordStructureMessage;
+	}
+	
+	public function getPasswordStructureRegex(){
+		$passwordStructureRegex = null;
+		$structureValidations = $this->getPasswordStructureValidations();
+		if($structureValidations && is_array($structureValidations)){
+			$passwordStructureRegex = array();
+			foreach ($structureValidations as $structureValidation){
+				if($structureValidation[0])
+					$passwordStructureRegex[] = $structureValidation[0];	
+			}
+		}		
+		return $passwordStructureRegex;
+	}
 	
 	/**
 	 * @deprecated getDefaultConversionProfileId should be used and is used by the new conversion profiles

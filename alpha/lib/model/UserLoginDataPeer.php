@@ -156,10 +156,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
 		if ($newPassword && 
-				  !UserLoginDataPeer::isPasswordStructureValid($newPassword) ||
+				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
 				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
 				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)         ){
+				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||      
+				  ($newPassword == $loginData->getLoginEmail()) ){
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
@@ -203,9 +204,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 	}
 	
-	public static function isPasswordStructureValid($pass)
+	public static function isPasswordStructureValid($pass,$partnerId = null)
 	{
 		$regexps = kConf::get('user_login_password_structure');
+		if($partnerId){
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if($partner && $partner->getPasswordStructureRegex())
+				$regexps = $partner->getPasswordStructureRegex();
+		}
 		if (!is_array($regexps)) {
 			$regexps = array($regexps);
 		}
@@ -269,9 +275,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		
 		// check password structure
-		if (!self::isPasswordStructureValid($newPassword)                 ||
+		if (!self::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId())  ||
 			stripos($newPassword, $loginData->getFirstName() !== false)   ||
-			stripos($newPassword, $loginData->getLastName() !== false)         ) {
+			stripos($newPassword, $loginData->getLastName() !== false)    ||     
+			$newPassword == $loginData->getLoginEmail()     ) {
 			throw new kUserException ('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
@@ -505,7 +512,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
 		}
 			
-		$partner = partnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner) {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
@@ -523,7 +530,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$existingData = self::getByEmail($loginEmail);
 		if (!$existingData)
 		{
-			if ($checkPasswordStructure && !UserLoginDataPeer::isPasswordStructureValid($password)) {
+			if ($checkPasswordStructure && !UserLoginDataPeer::isPasswordStructureValid($password, $partnerId)) {
 				throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
 			}
 			
