@@ -60,18 +60,21 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$navigation = new Zend_Navigation($config);
 		
 		$additionalNavigation = Zend_Registry::get('config')->navigation;
-		$menu = $additionalNavigation->monitoring;
-		$subMenu = $menu->enableDisable;
-		
-		$target = '';
-		if($subMenu->target)
-			$target = $subMenu->target;
+		if ($additionalNavigation)
+		{
+			$menu = $additionalNavigation->monitoring;
+			$subMenu = $menu->enableDisable;
 			
-		$navigation->addPage(array(
-			    'label' => $subMenu->label,
-			    'uri' => $subMenu->uri,
-				'target' => $target
-		));
+			$target = '';
+			if($subMenu->target)
+				$target = $subMenu->target;
+				
+			$navigation->addPage(array(
+				    'label' => $subMenu->label,
+				    'uri' => $subMenu->uri,
+					'target' => $target
+			));
+		}
 		$menuPage = $navigation->findOneBy('label', 'Monitoring');
 		$subMenuPage = $navigation->findOneBy('label', $subMenu->label);
 		$subMenuPage->setParent($menuPage);
