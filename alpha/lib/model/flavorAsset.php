@@ -167,12 +167,13 @@ class flavorAsset extends asset
 	    // check if flavor asset is new before saving
 	    $isNew = $this->isNew();
 	    $statusModified = $this->isColumnModified(assetPeer::STATUS);
+	    $flavorParamsIdModified = $this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID);
 	    
 	    // save the asset
 		$saveResult = parent::save();
 		
 		// update associated entry's flavorParamsId list
-		if ( $this->getStatus() == self::ASSET_STATUS_READY && ($isNew || $statusModified) )
+		if ( $this->getStatus() == self::ASSET_STATUS_READY && ($isNew || $statusModified || $flavorParamsIdModified) )
 		{
 		    $entry = $this->getentry();
 		    if (!$entry) {
@@ -181,6 +182,10 @@ class flavorAsset extends asset
 		    else {
 		        KalturaLog::debug('Adding flavor params id ['.$this->getFlavorParamsId().'] to entry id ['.$entry->getId().']');
 		        $entry->addFlavorParamsId($this->getFlavorParamsId());
+		        
+		        if($flavorParamsIdModified)
+		        	$entry->removeFlavorParamsId($this->getColumnsOldValue(assetPeer::FLAVOR_PARAMS_ID));
+		        
 		        $entry->save();
 		    }
 		}
