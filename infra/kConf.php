@@ -10,6 +10,8 @@ class kConf
 {
 	const APC_CACHE_MAP = 'kConf';
 	
+	static $pathParams = array('cache_root_path', 'general_cache_dir', 'syndication_core_xsd_path', 'testme_tracking_code');
+	
 	protected static $map = null;
 	
 	private static function init()
@@ -147,10 +149,14 @@ class kConf
 	public static function get($paramName)
 	{
 		self::init();
-		if(isset(self::$map[$paramName]))
-			return self::$map[$paramName];
-		
-		throw new Exception("Cannot find [$paramName] in config"); 
+		if(!isset(self::$map[$paramName]))
+			throw new Exception("Cannot find [$paramName] in config"); 
+
+		$result = self::$map[$paramName];
+		if (in_array($paramName, self::$pathParams) && substr($result, 0, 1) != '/')
+			$result = realpath(dirname(__file__) . '/../') . '/' . $result;
+			
+		return $result;		
 	}
 	
 	public static function hasParam($paramName)
