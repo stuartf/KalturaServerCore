@@ -667,8 +667,10 @@ class Partner extends BasePartner
 	
 	public function getExtendedFreeTrailEndsWarning() { return $this->getFromCustomData("extendedFreeTrailEndsWarning", null, false); }
 	public function setExtendedFreeTrailEndsWarning( $v ) { $this->putInCustomData("extendedFreeTrailEndsWarning", $v); }
-	
-	
+
+	public function getApiAccessControlId() { return $this->getFromCustomData("apiAccessControlId", null, null); }
+	public function setApiAccessControlId( $v ) { $this->putInCustomData("apiAccessControlId", $v); }
+
 	
 	/** 27Apr2011 - added fields for new registration form **/
 	// first name
@@ -1350,6 +1352,16 @@ class Partner extends BasePartner
 		}
 		return $id;
 	}
-	
-	
+
+	/**
+	 * @return AccessControl
+	 */
+	public function getApiAccessControl()
+	{
+		$id = $this->getApiAccessControlId();
+		if ($id)
+			return accessControlPeer::retrieveByPK($id);
+		else
+			return null;
+	}
 }
