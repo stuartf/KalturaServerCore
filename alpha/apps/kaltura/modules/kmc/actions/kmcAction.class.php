@@ -13,6 +13,9 @@ class kmcAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
+		// Prevent the page fron being embeded in an iframe
+		header( 'X-Frame-Options: DENY' );
+		
 		$this->beta = $this->getRequestParameter( "beta" );
 		$this->kmc_login_version 	= kConf::get('kmc_login_version');
 		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
@@ -24,12 +27,13 @@ class kmcAction extends kalturaAction
 				$partnerId = $loginData->getConfigPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
 				if ($partner && $partner->getPasswordStructureValidations())
-					$this->displayErrorFromServer = true;
+					$this->displayErrorFromServer = true;  			
+				
 			}
 			catch (kCoreException $e) {
 				$this->hashKeyErrorCode = $e->getCode();
 			}
-		}
+		}		
 		sfView::SUCCESS;
 	}
 }
