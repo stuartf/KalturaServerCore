@@ -13,8 +13,6 @@ class secForm {
 	var $email;
 	var $fname;
 	var $lname;
-	var $partnerId;
-	var $userId;
 	var $Ks;
 	var $error;
 	var $curAction;
@@ -22,9 +20,6 @@ class secForm {
 	function secForm() {
 		//echo '<pre>'; print_r( explode(";", base64_decode($_COOKIE['kmcks'])) ); exit();
 		// Get data from cookies
-		$this->email = $_COOKIE['email'];
-		$this->partnerId = $_COOKIE['pid'];
-		$this->userId = $_COOKIE['uid'];
 		$this->Ks = $_COOKIE['kmcks'];
 
 		// Get data from url parameters
@@ -77,7 +72,7 @@ class secForm {
 		require_once( realpath( dirname(__FILE__) ) . '/../../clients/php5/KalturaClient.php' );
 				
 		try {		
-			$conf = new KalturaConfiguration( $this->partnerId );
+			$conf = new KalturaConfiguration( null );
 			$conf->serviceUrl = 'http://' . $kConf->get('www_host');
 			$client = new KalturaClient( $conf );
 			$client->setKS( $this->Ks );
@@ -119,7 +114,7 @@ class secForm {
 		$this->showHead();
 		
 		echo <<<HTML
-		<form method="post"><br />
+		<form method="post" autocomplete="off"><br />
 			<input type="hidden" name="do" value="password" />
 			<div class="left">Current Password:</div>
 			<div class="right"><input id="focused" type="password" name="cur_password" /></div>
@@ -182,7 +177,7 @@ HTML;
 		$this->showHead();
 	
 		echo <<<HTML
-		<form method="post">
+		<form method="post" autocomplete="off">
 			<input type="hidden" name="do" value="email" />
 			<div class="left">Current email address:</div>
 			<div class="right current truncated" title="{$this->email}">{$this->email}</div>
@@ -238,7 +233,7 @@ HTML;
 		$this->showHead();
 	
 		echo <<<HTML
-		<form method="post">
+		<form method="post" autocomplete="off">
 			<input type="hidden" name="do" value="name" />
 			<div class="left">Current name:</div>
 			<div class="right current truncated" title="{$this->fname} {$this->lname}">{$this->fname} {$this->lname}</div>
@@ -282,7 +277,6 @@ HTML;
 			
 			// Changing name
 			$client->user->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
-			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
 			// Show success message
 			$this->showSuccess();
