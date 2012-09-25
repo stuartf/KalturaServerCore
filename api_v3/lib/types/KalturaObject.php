@@ -264,7 +264,7 @@ abstract class KalturaObject
         }
 	}
 	
-	public function validatePropertyMinLength($propertyName, $minLength, $allowNull = false)
+	public function validatePropertyMinLength($propertyName, $minLength, $allowNull = false, $validateEachWord = false)
 	{
 		if(!$allowNull)
 			$this->validatePropertyNotNull($propertyName);
@@ -276,6 +276,18 @@ abstract class KalturaObject
 		
 		if (strlen($this->$propertyName) < $minLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
+	
+	    if ($validateEachWord)
+	    {
+	        $separateWords = explode(" ", $this->$propertyName);
+	        foreach ($separateWords as $word)
+	        {
+	            if (strlen($word) < $minLength)
+	            {
+	                throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
+	            }
+	        }
+	    }
 	}
 	
 	
@@ -511,5 +523,16 @@ abstract class KalturaObject
 			$objectPropertyName = $propertyName;
 		}
 		return $objectPropertyName;
+	}
+	
+	public function trimStringProperties(array $propertyNames)
+	{
+	    foreach ($propertyNames as $propertyName)
+	    {
+	        if (!$this->isNull($propertyName))
+	        {
+	            $this->$propertyName = trim($this->$propertyName);
+	        }
+	    }
 	}
 }

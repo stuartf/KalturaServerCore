@@ -590,10 +590,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			        if(strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						$this->addMatch("@$sphinxField $val\\\*");
+						$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
 						$filter->unsetByName($field);
 					}
-				    break;	
+				    break;		
 				default:
 					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
 			}
