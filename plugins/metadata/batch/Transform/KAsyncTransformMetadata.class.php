@@ -54,6 +54,22 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		return 1;
 	}
 	
+	private function invalidateFailedMetadatas($results, $transformObjectIds = array())
+	{
+		foreach($results as $index => $result){
+        	if(is_array($result) && isset($result['code']) && isset($result['message'])){
+              	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
+              	try{
+              		$this->kClient->metadata->invalidate($transformObjectIds[$index]);
+              	}
+              	catch (KalturaAPIException $e){
+              		KalturaLog::err("object id[".$transformObjectIds[$index] ."] with error: ".$e->getMessage());
+              		continue;
+              	}
+            }
+        }		
+	}
+	
 	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
 		KalturaLog::debug("transform($job->id)");
@@ -91,6 +107,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		}
 			
 		$this->kClient->startMultiRequest();
+		$transformObjectIds = array();
 		foreach($transformList->objects as $object)
 		{
 			/* @var $object KalturaMetadata */
@@ -100,20 +117,28 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 				$this->kClient->metadata->update($object->id, $xml, $object->version);
 			}
 			else 
-			{
-				$this->kClient->metadata->invalidate($object->id, $object->version);				
+			{			
+				$this->kClient->metadata->invalidate($object->id, $object->version);
 			}
+			
+			$transformObjectIds[] = $object->id;
 				    
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				$this->kClient->doMultiRequest();
+				$results = $this->kClient->doMultiRequest();
+				$this->invalidateFailedMetadatas($results, $transformObjectIds);
+				$transformObjectIds = array();
 				$this->kClient->startMultiRequest();
 			}
+			
 		}
-		$this->kClient->doMultiRequest();
+		$results = $this->kClient->doMultiRequest();
+		$this->invalidateFailedMetadatas($results, $transformObjectIds);
 		
 		$this->closeJob($job, null, null, "Metadata objects [" . count($transformList->objects) . "] transformed", KalturaBatchJobStatus::RETRY);
 		
 		return $job;
 	}
+	
+	
 }
