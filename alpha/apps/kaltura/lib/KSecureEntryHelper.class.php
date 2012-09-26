@@ -162,7 +162,7 @@ class KSecureEntryHelper
 			KExternalErrors::dieError(KExternalErrors::ENTRY_MODERATION_ERROR);
 	}
 	
-	protected function validateAccessControl()
+	public function validateAccessControl()
 	{
 		$accessControl = $this->entry->getAccessControl();
 		if(!$accessControl)
