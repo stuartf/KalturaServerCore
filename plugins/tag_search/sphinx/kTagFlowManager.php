@@ -276,12 +276,16 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	protected function trimObjectTags ($tagsString)
 	{
-	    $arr = explode(",", $tagsString);
-	    for ($i=0; $i < count($arr); $i++)
-	    {
-	        $arr[$i] = trim($arr[$i]);
-	    }
-	    return $arr;
+		$tags = explode(",", $tagsString);
+		$tagsToReturn = array();
+        foreach($tags as $tag)
+        {
+        	$tag = trim($tag);
+            if ($tag){
+            	$tagsToReturn[] = $tag;
+            }
+        }
+        return $tagsToReturn;	
 	}
 	
 }
