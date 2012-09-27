@@ -241,7 +241,7 @@ class KalturaResponseCacher extends kApiCache
 
 		$processingTime = microtime(true) - $startTime;
 		if (self::hasExtraFields())
-			$cacheHeader = 'cached-with-extra-fields'
+			$cacheHeader = 'cached-with-extra-fields';
 		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
 
 		return $response;
