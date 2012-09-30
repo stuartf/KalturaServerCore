@@ -36,6 +36,12 @@ class flavorParamsAction extends kalturaSystemAction
 			if ($this->getRequestParameter("clone"))
 			{
 				$newFalvorParams = $this->editFlavorParam->copy();
+				$newFalvorParams->setAspectRatioProcessingMode($this->editFlavorParam->getAspectRatioProcessingMode());
+				$newFalvorParams->setForceFrameToMultiplication16($this->editFlavorParam->getForceFrameToMultiplication16());
+				$newFalvorParams->setIsGopInSec($this->editFlavorParam->getIsGopInSec());
+//				$newFalvorParams->setIsAvoidVideoShrinkFramesizeToSource($this->editFlavorParam->getIsAvoidVideoShrinkFramesizeToSource());
+//				$newFalvorParams->setIsAvoidVideoShrinkBitrateToSource($this->editFlavorParam->getIsAvoidVideoShrinkBitrateToSource());
+//				$newFalvorParams->setIsVideoFrameRateForLowBrAppleHls($this->editFlavorParam->getIsVideoFrameRateForLowBrAppleHls());
 				$newFalvorParams->setIsDefault(false);
 				$newFalvorParams->setPartnerId(-1);
 				$newFalvorParams->save();
@@ -70,6 +76,7 @@ class flavorParamsAction extends kalturaSystemAction
 					if ($this->advanced >= 1) 
 					{
 						$this->editFlavorParam->setName($this->getRequestParameter("name"));
+						$this->editFlavorParam->setSystemName($this->getRequestParameter("systemName"));
 						$this->editFlavorParam->setDescription($this->getRequestParameter("description"));
 						$this->editFlavorParam->setIsDefault($this->getRequestParameter("is-default", false));
 						$this->editFlavorParam->setReadyBehavior($this->getRequestParameter("ready-behavior"));
@@ -80,9 +87,9 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setAspectRatioProcessingMode($this->getRequestParameter("aspectRatioProcessingMode",0));
 						$this->editFlavorParam->setIsGopInSec($this->getRequestParameter("isGopInSec",0));
 						$this->editFlavorParam->setForceFrameToMultiplication16($this->getRequestParameter("forceFrameToMultiplication16"));
-						$this->editFlavorParam->setIsAvoidVideoShrinkFramesizeToSource($this->getRequestParameter("isAvoidVideoShrinkFramesizeToSource",0));
-						$this->editFlavorParam->setIsAvoidVideoShrinkBitrateToSource($this->getRequestParameter("isAvoidVideoShrinkBitrateToSource",0));
-						$this->editFlavorParam->setIsVideoFrameRateForLowBrAppleHls($this->getRequestParameter("isVideoFrameRateForLowBrAppleHls",0));
+//						$this->editFlavorParam->setIsAvoidVideoShrinkFramesizeToSource($this->getRequestParameter("isAvoidVideoShrinkFramesizeToSource",0));
+//						$this->editFlavorParam->setIsAvoidVideoShrinkBitrateToSource($this->getRequestParameter("isAvoidVideoShrinkBitrateToSource",0));
+//						$this->editFlavorParam->setIsVideoFrameRateForLowBrAppleHls($this->getRequestParameter("isVideoFrameRateForLowBrAppleHls",0));
 						$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
 						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
 						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
