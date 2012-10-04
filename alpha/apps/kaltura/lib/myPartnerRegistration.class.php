@@ -185,7 +185,8 @@ class myPartnerRegistration
 			$newPartner->setPartnerParentId( $this->partnerParentId );
 			$newPartner->setMonitorUsage(PartnerFreeTrialType::NO_LIMIT);
 			$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
-			$newPartner->setPartnerPackage($parentPartner->getPartnerPackage());
+			if ($parentPartner)
+				$newPartner->setPartnerPackage($parentPartner->getPartnerPackage());
 		}
 		
 		if(substr_count($description, 'Drupal module|'))
