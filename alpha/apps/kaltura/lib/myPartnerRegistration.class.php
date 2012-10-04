@@ -179,17 +179,13 @@ class myPartnerRegistration
 		/* fix drupal5 module partner type */
 		//var_dump($description);
 		
-		if ($templatePartnerId)
-		{
-		    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId);
-		    $newPartner->setPartnerPackage($templatePartner->getPartnerPackage());
-		}
-		
 		if ( $this->partnerParentId )
 		{
 			// this is a child partner of some VAR/partner GROUP
 			$newPartner->setPartnerParentId( $this->partnerParentId );
 			$newPartner->setMonitorUsage(PartnerFreeTrialType::NO_LIMIT);
+			$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
+			$newPartner->setPartnerPackage($parentPartner->getPartnerPackage());
 		}
 		
 		if(substr_count($description, 'Drupal module|'))
