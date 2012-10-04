@@ -62,16 +62,20 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 	protected function getDistributionFiles(FtpDistributionProfile $distributionProfileDb, EntryDistribution $entryDistributionDb)
 	{
 		$files = new KalturaFtpDistributionFileArray();
-
+		$sendMetadataAfterAssets = false;
+		if(!is_null($distributionProfileDb->getSendMetadataAfterAssets()))
+			$sendMetadataAfterAssets = $distributionProfileDb->getSendMetadataAfterAssets();
+			
 		if (!$distributionProfileDb->getDisableMetadata()) 
 		{
-			$file = new KalturaFtpDistributionFile();
+			$metadataFile = new KalturaFtpDistributionFile();
 			$metadataXml = $distributionProfileDb->getMetadataXml($entryDistributionDb);
-			$file->filename = $distributionProfileDb->getMetadataFilename($entryDistributionDb);
-			$file->contents = $metadataXml;
-			$file->assetId = 'metadata';
-			$file->hash = md5($metadataXml);
-			$files[] = $file;
+			$metadataFile->filename = $distributionProfileDb->getMetadataFilename($entryDistributionDb);
+			$metadataFile->contents = $metadataXml;
+			$metadataFile->assetId = 'metadata';
+			$metadataFile->hash = md5($metadataXml);
+			if (!$sendMetadataAfterAssets)
+				$files[] = $metadataFile;
 		}
 		
 		$flavorAssetsIds = explode(',', $entryDistributionDb->getFlavorAssetIds());
@@ -104,6 +108,10 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 				
 			$files[] = $file;
 		}
+		
+		//sending metadata after assets as configured in the connector profile
+		if ($metadataFile && $sendMetadataAfterAssets)
+			$files[] = $metadataFile;
 		
 		return $files;
 	}
