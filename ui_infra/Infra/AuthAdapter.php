@@ -72,7 +72,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		
 		if ($this->partnerId)
 		{
-		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
+		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId,86400, '*,disableentitlement');
     		$client->setKs($ks);
     		$user = $client->user->getByLoginId($this->username, $this->partnerId);
     		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
@@ -82,7 +82,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		try
 		{
 		    if (!$this->ks)
-    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
+    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId,86400, '*,disableentitlement');
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
     		$identity = new Infra_UserIdentity($user, $this->ks, $this->timezoneOffset, $user->partnerId, $this->password);
@@ -120,7 +120,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
         			$authorizedPartnerId = $userPartners->objects[0]->id;
         			
         			$client->setKs(null);
-        		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
+        		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId,86400, '*,disableentitlement');
         			$client->setKs($ks);
         			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
         			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $authorizedPartnerId, $this->password);
