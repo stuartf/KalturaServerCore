@@ -8,7 +8,10 @@ kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_User_Manual.pdf";
 kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Set base URL
-kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname;
+kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
+kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
+kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host + kmc.vars.port;
+
 
 // Log function
 kmc.log = function() {
