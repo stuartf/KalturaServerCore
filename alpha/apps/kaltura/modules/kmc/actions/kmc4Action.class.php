@@ -176,7 +176,8 @@ class kmc4Action extends kalturaAction
 	{
 		$url_data = parse_url( $url );
 		if( $url_data !== false ){
-			return $url_data['host'];
+			$port = (isset($url_data['port'])) ? ':' . $url_data['port'] : '';
+			return $url_data['host'] . $port;
 		} else {
 			return $url;
 		}
