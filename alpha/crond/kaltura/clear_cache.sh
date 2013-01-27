@@ -1,4 +1,10 @@
 #!/bin/bash
+if [ -L $0 ];then
+	REAL_SCRIPT=`readlink $0`
+else
+	REAL_SCRIPT=$0
+fi
+. `dirname $REAL_SCRIPT`/../../../configurations/system.ini
 
 # Store PID of script:
 # Match script without arguments
@@ -24,11 +30,11 @@ echo $$ > $LCK_FILE
 
 
 echo "`date +%s` start clean v3 `date`" >> $LOG_FILE 2>&1
-#nice -n 19 find /tmp/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
-/usr/bin/ionice -c3 find /tmp/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
+#nice -n 19 find $RESPONSE_CACHE_DIR/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
+/usr/bin/ionice -c3 find $RESPONSE_CACHE_DIR/cache_v3-600 -type f -mmin +1440 -name "cache*" -delete
 echo "`date +%s` end clean v3 `date`" >> $LOG_FILE 2>&1
-#nice -n 19 find /tmp/cache_v2 -type f -mmin +1440 -name "cache*" -delete
-/usr/bin/ionice -c3 find /tmp/cache_v2 -type f -mmin +1440 -name "cache*" -delete
+#nice -n 19 find $RESPONSE_CACHE_DIR/cache_v2 -type f -mmin +1440 -name "cache*" -delete
+/usr/bin/ionice -c3 find $RESPONSE_CACHE_DIR/cache_v2 -type f -mmin +1440 -name "cache*" -delete
 echo "`date +%s` end clean v2 `date`" >> $LOG_FILE 2>&1
 #nice -n 19 find /tmp -maxdepth 0 -type f -mmin +1440 -name "php*" -delete
 /usr/bin/ionice -c3 find /tmp -maxdepth 1 -type f -mmin +1440 -name "php*" -delete
