@@ -1,4 +1,5 @@
 #!/bin/sh
+
 #
 # sphinx searchd Free open-source SQL full-text search engine
 #
@@ -16,10 +17,9 @@
 # Description: Sphinx is a free open-source SQL full-text search engine     
 ### END INIT INFO
 
-. /etc/kaltura.d/system.ini
-
+. `dirname $REAL_SCRIPT`/../configurations/system.ini
 # Source function library.
-. $APP_DIR/scripts/functions.rc
+. /etc/init.d/functions
 prog="searchd"
 config="$APP_DIR/configurations/sphinx/kaltura.conf"
 exec="$BASE_DIR/bin/sphinx/searchd"
