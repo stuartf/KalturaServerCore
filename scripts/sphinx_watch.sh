@@ -17,6 +17,11 @@
 # Description: Sphinx is a free open-source SQL full-text search engine     
 ### END INIT INFO
 
+if [ -L $0 ];then
+	REAL_SCRIPT=`readlink $0`
+else
+	REAL_SCRIPT=$0
+fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 # Source function library.
 . /etc/init.d/functions
