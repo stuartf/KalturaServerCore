@@ -60,6 +60,8 @@ class kUrlManager
 		$class = 'kUrlManager';
 		
 		$cdnHost = preg_replace('/https?:\/\//', '', $cdnHost);
+		$cdnHost = preg_replace('/:\d+$/', '', $cdnHost);
+		
 		$params = null;
 	
 		$urlManagers = kConf::getMap('url_managers');
