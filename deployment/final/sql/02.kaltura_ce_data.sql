@@ -196,8 +196,9 @@ insert  into `file_sync`(`id`,`partner_id`,`object_type`,`object_id`,`version`,`
 (169,'0','2','11170171','1','1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/11170171.xml','15268',NULL),
 (170,'0','2','11170171','1','2','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/11170171.features.xml','13143',NULL),
 (171,'0','2','11170181','1','1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/11170181.xml','14943',NULL),
-(172,'0','2','11170181','1','2','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/11170181.features.xml','13257',NULL);
-
+(172,'0','2','11170181','1','2','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/11170181.features.xml','13257',NULL),
+(173,0,2,'9111371',NULL,'1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@','content/uiconf/special/9111371.xml','1662',NULL),
+(174,'0','2','9780761',NULL,'1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@','content/uiconf/special/9780761.xml','1616',NULL);
 
 insert  into `flavor_asset`(`id`,`int_id`,`partner_id`,`tags`,`created_at`,`updated_at`,`deleted_at`,`entry_id`,`flavor_params_id`,`status`,`version`,`description`,`width`,`height`,`bitrate`,`frame_rate`,`size`,`is_original`,`file_ext`,`container_format`,`video_codec_id`,`type`,`custom_data`,`partner_data`) values
 ('_KMCLOGO',1,0,'web,mbr',now(),now(),NULL,'_KMCLOGO',0,2,'1','',0,0,0,0,0,0,NULL,NULL,NULL,1,'a:3:{s:13:\"FlavorBitrate\";i:0;s:15:\"FlavorFrameRate\";d:0;s:18:\"FlavorVideoCodecId\";N;}',NULL),
@@ -3589,7 +3590,9 @@ insert  into `ui_conf`(`id`,`obj_type`,`partner_id`,`subp_id`,`conf_file_path`,`
 (11170151,8,0,0,'content/uiconf/special/11170151.xml','Sakai_Default_ImagePlayer','400','300',NULL,'/flash/kdp3/v3.6.11/kdp3.swf',now(),now(),NULL,'1','kdp3,player','a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'2','2','1','/html5/html5lib/v1.7.0.4/mwEmbedLoader.php'),
 (11170161,8,0,0,'content/uiconf/special/11170161.xml','Sakai_Default_AudioPlayer','400','100',NULL,'/flash/kdp3/v3.6.11/kdp3.swf',now(),now(),NULL,'1','kdp3,player','a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'2','2','1','/html5/html5lib/v1.7.0.4/mwEmbedLoader.php'),
 (11170171,8,0,0,'content/uiconf/special/11170171.xml','Sakai_default_video_player','400','330',NULL,'/flash/kdp3/v3.6.11/kdp3.swf',now(),now(),NULL,'1',NULL,'a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'2','2','1','/html5/html5lib/v1.7.0.4/mwEmbedLoader.php'),
-(11170181,8,0,0,'content/uiconf/special/11170181.xml','Sakai_edit_video_player','400','330',NULL,'/flash/kdp3/v3.6.11/kdp3.swf',now(),now(),NULL,'0',NULL,'a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'2','2','1','/html5/html5lib/v1.7.0.4/mwEmbedLoader.php');
+(11170181,8,0,0,'content/uiconf/special/11170181.xml','Sakai_edit_video_player','400','330',NULL,'/flash/kdp3/v3.6.11/kdp3.swf',now(),now(),NULL,'0',NULL,'a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'2','2','1','/html5/html5lib/v1.7.0.4/mwEmbedLoader.php'),
+(9111371,19,0,0,'content/uiconf/special/9111371.xml','ksr global test','','',NULL,'/flash/ksr/v1.0.32/ScreencastOMaticRun-1.0.32.jar',now(),now(),'','1','',NULL,'2',NULL,'2','3',NULL,NULL),
+(9780761,19,0,0,'content/uiconf/special/9780761.xml','Kaltura Screen Recorder for Moodle (nov12)',NULL,NULL,NULL,'/flash/ksr/v1.0.33s/ScreencastOMaticRun-1.0.33.jar',now(),now(),NULL,'1',NULL,'a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,'1','3',NULL,NULL);
 
 
 insert  into `user_login_data`(`id`,`login_email`,`first_name`,`last_name`,`sha1_password`,`salt`,`config_partner_id`,`login_blocked_until`,`created_at`,`updated_at`,`custom_data`) values 
