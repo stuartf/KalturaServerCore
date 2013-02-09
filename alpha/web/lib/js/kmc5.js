@@ -1248,8 +1248,8 @@ kmc.user = {
 
 		// setup url
 		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
-		var from_domain = http_protocol + '://' + window.location.hostname;
-		var url = from_domain + "/secure_form.php?action=" + action;
+		//var from_domain = http_protocol + '://' + window.location.hostname;
+		var url = kmc.vars.base_url +  "/secure_form.php?action=" + action;
 		// pass in the fields
 		for(var i in fields) {
 			var fld = (fields[i]) ? fields[i] : '';
