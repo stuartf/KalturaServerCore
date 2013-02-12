@@ -228,6 +228,7 @@ class category extends Basecategory implements IIndexable
 			$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
 			$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
 			$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+			$categoryKuser->setPermissionNames(implode(",", $permissionNamesArr));
 			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
 			$categoryKuser->setPartnerId($this->getPartnerId());
 			$categoryKuser->setUpdateMethod(UpdateMethodType::MANUAL);
@@ -588,7 +589,6 @@ class category extends Basecategory implements IIndexable
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
-		$filter->setCategoryDirectMembers(true);
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
