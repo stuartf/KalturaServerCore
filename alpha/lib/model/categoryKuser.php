@@ -408,16 +408,17 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	 */
 	public static function removeCategoryPermissions (array $permissionNames)
 	{
-		foreach ($permissionNames as &$permissionName)
+		$return = array();
+		foreach ($permissionNames as $permissionName)
 		{
-			if ($permissionName == PermissionName::CATEGORY_CONTRIBUTE || $permissionName == PermissionName::CATEGORY_EDIT ||
-				$permissionName == PermissionName::CATEGORY_MODERATE || $permissionName == PermissionName::CATEGORY_VIEW)
+			if ($permissionName != PermissionName::CATEGORY_CONTRIBUTE && $permissionName != PermissionName::CATEGORY_EDIT &&
+				$permissionName != PermissionName::CATEGORY_MODERATE && $permissionName != PermissionName::CATEGORY_VIEW)
 				{
-					unset($permissionName);
+					$return[] = $permissionName;
 				}
 		}
 		
-		return $permissionNames;
+		return $return;
 	}
 
 } // categoryKuser
