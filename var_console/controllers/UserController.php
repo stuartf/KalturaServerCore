@@ -56,6 +56,8 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$loginForm->isValid($request->getPost());
+			
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
 			//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
 		    $auth = Infra_AuthHelper::getAuthInstance();
@@ -102,6 +104,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
             try 
@@ -129,6 +132,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$this->proccessResetPasswordLinkForm($form, $token);
 		}
 		

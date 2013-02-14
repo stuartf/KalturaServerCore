@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Auth
  */
-class Form_Login extends Zend_Form
+class Form_Login extends Infra_Form
 {
 	public function init()
 	{
@@ -49,7 +49,7 @@ class Form_Login extends Zend_Form
 			'decorators' => array('ViewHelper')
 		));
 		
-		$this->addElement('hidden', 'tomezone_offset', array(
+		$this->addElement('hidden', 'timezone_offset', array(
 			'decorators' => array('ViewHelper')
 		));
 		
