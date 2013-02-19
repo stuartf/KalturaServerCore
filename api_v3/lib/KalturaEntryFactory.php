@@ -46,7 +46,11 @@ class KalturaEntryFactory
 				break;
 				
 			default:
-				$obj = new KalturaBaseEntry();
+				$obj = KalturaPluginManager::loadObject('KalturaBaseEntry', $type);
+				
+				if(!$obj)
+					$obj = new KalturaBaseEntry();
+					
 				break;
 		}
 		
