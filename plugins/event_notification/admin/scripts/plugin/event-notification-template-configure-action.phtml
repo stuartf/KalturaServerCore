@@ -1,0 +1,177 @@
+
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div>
+<?php endif; ?>
+
+<?php echo $this->form ?>
+
+<?php 
+	foreach($this->plugins as $phtml => $pluginData)
+		echo $this->partial($phtml, $pluginData);
+?>
+
+<script type="text/javascript">
+
+var newConditionIndex = 0;
+
+<?php require_once __DIR__ . '/js/kConditions.js'; ?>
+<?php require_once __DIR__ . '/js/kParameters.js'; ?>
+
+function getVariables(kSelection, value, variables) {
+
+	var variable =  'value';
+	if(kSelection.variable)
+		variable = kSelection.variable;
+
+	variables[variable] = value;
+	return variables;
+}
+
+function addSelections(jqSelectionText, label, kSelections, selectCallback) {
+	var jqSelection = jQuery('<select><option value="">' + label + '</option></select>');
+	var jqWrap = null;
+	
+	for(var value in kSelections){
+		var kSelection = kSelections[value];
+		jqSelection.append('<option value="' + value + '">' + kSelection.label + '</option>');
+	}
+
+	jqSelection.change(function(){
+
+		if(jqWrap){
+			jqWrap.empty();
+		}
+		else{
+			jqWrap = jQuery('<div/>');
+			jqSelection.after(jqWrap);
+		}
+
+		var value =  jqSelection.val();
+		var kSelection = kSelections[value];
+		if(!kSelection.subSelections && !kSelection.fieldType){
+
+			var variablesObject = getVariables(kSelection, value, {});
+			selectCallback.apply(jqSelection, [null, variablesObject]);
+			return;
+		}
+
+		var jqSubField = null;
+		switch(kSelection.fieldType)
+		{
+			case 'text':
+				jqSubField = jQuery('<input>');
+				jqSubField.keyup(function(){
+					selectCallback.apply(jqSelection, [null, {value: "'" + jqSubField.val() + "'"}]);
+				});
+				break;
+	
+			case 'checkbox':
+				jqSubField = jQuery('<input type="checkbox">');
+				jqSubField.change(function(){
+					selectCallback.apply(jqSelection, [null, {value: (jqSubField.attr('checked') ? 'true' : 'false')}]);
+				});
+				break;
+			
+			default:
+				jqSubField = addSelections(jqSelectionText, kSelection.subLabel, kSelection.subSelections, function(subCode, variables){
+					variables = getVariables(kSelection, jqSubField.val(), variables);
+		
+					var code = subCode;
+					if(kSelection.getCode)
+						var code = kSelection.getCode.apply(jqSelection, [subCode, variables]);
+					
+					if(selectCallback){
+						selectCallback.apply(jqSelection, [code, variables]);
+					}
+					else{
+						jqSelectionText.val(code);
+					}
+				});
+		}
+		jqWrap.append(jqSubField);
+	});
+	
+	return jqSelection;
+};
+
+function newCondition() {
+	var currentIndex = newConditionIndex;
+	var jqConditionTemplate = jQuery("#frmCondition");
+
+	var jqNewConditionForm = jqConditionTemplate.clone();
+	jqNewConditionForm.attr("id", "frmCondition_" + currentIndex);
+	
+	var jqConditionText = jqNewConditionForm.find('[name="condition"]');
+	jqConditionText.attr('name', 'condition[' + currentIndex + ']');
+	jqConditionText.attr('readonly', true);
+
+	var jqConditionRemoveButton = jqNewConditionForm.find('[name="removeConditionButton"]');
+	jqConditionRemoveButton.click(function(){
+		jqNewConditionForm.remove();
+	});
+
+	var jqSelection = addSelections(jqConditionText, 'Select Condition', kConditions);
+	jqConditionText.before(jqSelection);
+	
+	jqConditionTemplate.after(jqNewConditionForm);
+	jqNewConditionForm.show();
+	newConditionIndex++;
+}
+
+var newContentParameterIndex = 0;
+
+function newContentParameter() {
+	var currentIndex = newContentParameterIndex;
+	var jqNewContentParameterTemplate = jQuery("#frmContentParameter");
+	
+	var jqNewContentParameterForm = jqNewContentParameterTemplate.clone();
+	jqNewContentParameterForm.attr("id", "frmContentParameter_" + currentIndex);
+	jqNewContentParameterForm.addClass("content-parameter");
+
+	var jqContentParameterKey = jqNewContentParameterForm.find('[name="contentParameterKey"]');
+	jqContentParameterKey.attr('name', 'contentParameterKey[' + currentIndex + ']');
+
+	var jqContentParameterValue = jqNewContentParameterForm.find('[name="contentParameterValue"]');
+	jqContentParameterValue.attr('name', 'contentParameterValue[' + currentIndex + ']');
+
+	var jqSelection = addSelections(jqContentParameterValue, 'Select Parameter', kParameters);
+	jqContentParameterKey.before(jqSelection);
+	
+	var jqContentParameterButton = jqNewContentParameterForm.find('[name="removeContentParameterButton"]');
+	jqContentParameterButton.click(function(){
+		removeContentParameter(currentIndex);
+	});
+	
+	jqNewContentParameterTemplate.after(jqNewContentParameterForm);
+	jqNewContentParameterForm.show();
+
+	newContentParameterIndex++;
+}
+
+function removeContentParameter(index){
+	jQuery("#frmContentParameter_" + index).remove();
+}
+
+function automaticEnabled(enabled) {
+	if(enabled)	{
+		jQuery('#frmAutomaticConfig').show();
+	}
+	else {
+		jQuery('#frmAutomaticConfig').hide();
+	}
+}
+
+if (typeof(jQuery) != 'undefined') {
+	jQuery(function() {
+		automaticEnabled(jQuery('#automatic_dispatch_enabled').attr('checked'));
+	});
+}
+
+jQuery(document).ready(function() {
+	<?php if ($this->formValid): ?>
+		jQuery('#partner-configure-dialog').dialog('close');
+		jQuery('#frmPaginator1').submit();
+	<?php endif; ?>
+});
+
+</script>
