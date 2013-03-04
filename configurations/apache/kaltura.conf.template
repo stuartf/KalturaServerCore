@@ -1,0 +1,9 @@
+<VirtualHost *:@KALTURA_VIRTUAL_HOST_PORT@>
+	ErrorLog "@LOG_DIR@/kaltura_apache_errors.log"
+	CustomLog @LOG_DIR@/kaltura_apache_access.log vhost_kalt
+	
+	# redirect root to start page
+	RewriteRule ^$ http://@KALTURA_VIRTUAL_HOST_NAME@/start/index.php
+	
+	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
+</VirtualHost>

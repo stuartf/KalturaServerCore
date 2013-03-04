@@ -1,0 +1,28 @@
+Listen @KALTURA_VIRTUAL_HOST_PORT@
+LogLevel debug
+SSLPassPhraseDialog  builtin
+SSLSessionCache         shmcb:/var/cache/mod_ssl/scache(512000)
+SSLSessionCacheTimeout  300
+SSLRandomSeed startup file:/dev/urandom  256
+SSLRandomSeed connect builtin
+SSLMutex default
+SSLCryptoDevice builtin
+
+#SSLCertificateFile /etc/onprem-falcon2.crt 
+#SSLCertificateKeyFile /etc/onprem-falcon2.private.key
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+
+<VirtualHost @KALTURA_VIRTUAL_HOST_NAME@>
+	SSLEngine on
+	SSLProtocol all -SSLv2
+	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
+	
+	ErrorLog "@LOG_DIR@/kaltura_apache_errors_ssl.log"
+	CustomLog @LOG_DIR@/kaltura_apache_access_ssl.log vhost_kalt
+		
+	# redirect root to start page
+	RewriteRule ^$ https://@KALTURA_VIRTUAL_HOST_NAME@/start/index.php
+	
+	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
+</VirtualHost>
