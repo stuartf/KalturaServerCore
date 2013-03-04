@@ -605,7 +605,29 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			        if(strlen($val))
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
+						if ($fieldsEscapeType != SearchIndexFieldEscapeType::MD5_LOWER_CASE)
+						{
+							$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
+						}
+						else
+						{
+							$this->addMatch('@' .  $sphinxField . ' "'.$val.'"');
+						}
+						$filter->unsetByName($field);
+					}
+				    break;	
+				case baseObjectFilter::NOT_CONTAINS:
+				if(strlen($val))
+					{
+						$val = is_array($val) ? $val : explode(",", $val);
+						foreach ($val as &$singleVal)
+						{
+							$singleVal = SphinxUtils::escapeString($singleVal, $fieldsEscapeType);
+						}
+						if (self::getFieldPrefix ($sphinxField))
+						{
+							$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -(' .implode(' | ', $val) . ')');
+						}
 						$filter->unsetByName($field);
 					}
 				    break;	
@@ -833,5 +855,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			KalturaLog::debug("Added [$column]");
 			$this->orderByClause[] = "$column $orderByType";
 		}
+	}
+	
+	public function getFieldPrefix ($fieldName)
+	{
+		return null;	
 	}
 }
