@@ -48,6 +48,9 @@ class MetadataService extends KalturaBaseService
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+	    if (!$metadataProfile)
+	    	throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $metadataProfileId);
+	    
 		if ($metadataProfile->getObjectType() != $objectType)
 		    throw new KalturaAPIException(MetadataErrors::INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE, $metadataProfile->getObjectType() , $objectType);
 		
