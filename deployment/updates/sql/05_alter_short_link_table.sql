@@ -1,0 +1,1 @@
+ALTER TABLE short_link MODIFY full_url text;
