@@ -28,6 +28,7 @@
 // ===================================================================================================
 
 var crypto = require("crypto");
+var http = require("http");
 
 /**
  * Generates a URL-encoded query string from the associative (or indexed) array provided.
