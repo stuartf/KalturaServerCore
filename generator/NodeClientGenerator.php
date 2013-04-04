@@ -297,14 +297,14 @@ class NodeClientGenerator extends ClientGeneratorFromXml
             $actionClass .= "{$extraTab}for(var index in $paramName)\n";
             $actionClass .= "{$extraTab}{\n";
             $actionClass .= "{$extraTab}  var obj = ${paramName}[index];\n";
-            $actionClass .= "{$extraTab}  this.client.addParam(kparams, \"$paramName:\" + index, toParams(obj));\n";
+            $actionClass .= "{$extraTab}  this.client.addParam(kparams, \"$paramName:\" + index, kcb.toParams(obj));\n";
             $actionClass .= "$extraTab}\n";
             break;
           default: //is Object
             if ($actionParam->attributes()->optional == '1') {
               $actionClass .= "  if ($paramName != null)\n  ";
             }
-            $actionClass .= "  this.client.addParam(kparams, \"$paramName\", toParams($paramName));\n";
+            $actionClass .= "  this.client.addParam(kparams, \"$paramName\", kcb.toParams($paramName));\n";
             break;
         }
       }

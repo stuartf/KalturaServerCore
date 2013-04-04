@@ -134,7 +134,7 @@ function addIfNotNull(obj, params, paramName, paramValue)
  * @param obj  The object who's members to serialize.
  * @return    a serialized object.
  */
-function toParams(obj)
+module.exports.toParams = toParams = function(obj)
 {
   var params = {};
   params["objectType"] = getClass(obj);
@@ -143,7 +143,7 @@ function toParams(obj)
       addIfNotNull(obj, params, prop, val);
   }
   return params;
-}
+};
 
 /**
  * Sorts an array by key, maintaining key to data correlations. This is useful mainly for associative arrays. 
