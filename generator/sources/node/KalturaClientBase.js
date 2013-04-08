@@ -408,7 +408,15 @@ KalturaClientBase.prototype.signature = function(params)
 KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url, params, files)
 {
   url += "&" + http_build_query(params);
-  http.get(url, callCompletedCallback);
+  http.get(url, function(res){
+      var data = "";
+      res.on("data", function(chunk) {
+          data += chunk;
+      });
+      res.on("end", function() {
+          callCompletedCallback(data);
+      });
+  });
 };
 
 /**
