@@ -414,7 +414,10 @@ KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url
           data += chunk;
       });
       res.on("end", function() {
-          callCompletedCallback(data);
+          callCompletedCallback(JSON.parse(data));
+      });
+      res.on("error", function() {
+          console.log("Got error: " + e.message);
       });
   });
 };
