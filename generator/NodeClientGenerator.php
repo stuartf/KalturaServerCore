@@ -103,16 +103,16 @@ class NodeClientGenerator extends ClientGeneratorFromXml
   protected function writeEnum(SimpleXMLElement $enumNode)
   {
     $className = $enumNode->attributes()->name;
-    $this->echoLine ($this->enumTypes, "\nvar $className = module.exports.$className = function(){");
+    $this->echoLine ($this->enumTypes, "\nvar $className = module.exports.$className = {");
     //parse the constants
     foreach($enumNode->children() as $child) {
       switch($enumNode->attributes()->enumType)
       {
         case "string":
-          $this->echoLine ($this->enumTypes, $className . '.' . $child->attributes()->name . " = \"" . $child->attributes()->value . "\";");
+          $this->echoLine ($this->enumTypes, $child->attributes()->name . " : \"" . $child->attributes()->value . "\",");
           break;
         default:
-          $this->echoLine ($this->enumTypes, $className . '.' . $child->attributes()->name . " = " . $child->attributes()->value . ";");
+          $this->echoLine ($this->enumTypes, $child->attributes()->name . " : " . $child->attributes()->value . ",");
           break;
       } 
     }
