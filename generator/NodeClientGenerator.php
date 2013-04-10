@@ -50,6 +50,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
           }
         break;
         case "classes":
+
+          $this->echoLine ($this->voClasses, "var util = require('util');");
+          $this->echoLine ($this->voClasses, "var kcb = require('./KalturaClientBase');");
+
           //create object classes
           foreach($reflectionType->children() as $classes_node)
           {
@@ -57,6 +61,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
           }
         break;
         case "services":
+
+          $this->echoLine ($this->serviceClasses, "var util = require('util');");
+          $this->echoLine ($this->serviceClasses, "var kcb = require('./KalturaClientBase');");
+
           //implement services (api actions)
           foreach($reflectionType->children() as $services_node)
           {
@@ -128,8 +136,6 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $classDesc = "/**\n";
     $classCode = "";
     $clasName = $classNode->attributes()->name;
-    $this->echoLine ($classCode, "var util = require('util');");
-    $this->echoLine ($classCode, "var kcb = require('./KalturaClientBase');");
     $this->echoLine ($classCode, "var $clasName = module.exports.$clasName = function(){");
     //parse the class properties
     foreach($classNode->children() as $classProperty) {
@@ -151,7 +157,6 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     //parse the class base class (parent in heritage)
     if($classNode->attributes()->base) {
       $parentClass = $classNode->attributes()->base;
-      //$this->echoLine ($this->voClasses, "$clasName.prototype = new " . $parentClass . "();");
       $this->echoLine ($this->voClasses, "util.inherits($clasName, $parentClass);");
     } else {
       $this->echoLine ($this->voClasses, "util.inherits($clasName, kcb.KalturaObjectBase);");
@@ -314,14 +319,12 @@ class NodeClientGenerator extends ClientGeneratorFromXml
         $actionClass .= "  this.client.queueServiceActionCall(\"$serviceName\", \"$actionName\", kparams);\n";
       $actionClass .= "  if (!this.client.isMultiRequest())\n";
       $actionClass .= "    this.client.doQueue(callback);\n";
-      $actionClass .= "}";
+      $actionClass .= "};";
       $this->echoLine ($serviceClass, $actionClass);
     }
     $serviceClassDesc .= $actionsList;
     $serviceClassDesc .= "*/";
     $serviceClass = $serviceClassDesc . "\n" . $serviceClass;
-    $this->echoLine ($this->serviceClasses, "var util = require('util');");
-    $this->echoLine ($this->serviceClasses, "var kcb = require('./KalturaClientBase');");
     $this->echoLine ($this->serviceClasses, $serviceClass);
   }
   
