@@ -78,22 +78,6 @@ function http_build_query (formdata, numeric_prefix, arg_separator) {
 }
 
 /**
- * This will only return (a string) if the object passed to getFunctionName is a function or an "object" function from IE. 
- * The function does not rely on function.name if present as it can't always be trusted.
- * @param func  The function to test.
- * @return string the function name.
- */
-function getFunctionName(func) {
-  if ( typeof func == "function" || typeof func == "object" ) {
-    var fName = (""+func).match(/^function\s*([\w\$]*)\s*\(/); 
-    if ( fName !== null ) {
-        return fName[1];
-    }
-  }
-  return null;
-}
-
-/**
  * Getting the name of the constructor if the constructor hasn't been modified, 
  * which if it has modified (and is therfor invalid to use), it falls back to using Object.prototype.toString 
  * to get the class though it won't return the name of the constructor function that created it then. 
@@ -107,7 +91,7 @@ function getClass(obj, forceConstructor) {
   if ( typeof obj == "undefined" ) { return "undefined"; }
   if ( obj === null ) { return "null"; }
   if ( forceConstructor === true && obj.hasOwnProperty("constructor") ) { delete obj.constructor; } // reset constructor
-  if ( forceConstructor !== false && !obj.hasOwnProperty("constructor") ) { return getFunctionName(obj.constructor); }
+  if ( forceConstructor !== false && !obj.hasOwnProperty("constructor") ) { return obj.constructor.name; }
   return Object.prototype.toString.call(obj)
     .match(/^\[object\s(.*)\]$/)[1];
 }

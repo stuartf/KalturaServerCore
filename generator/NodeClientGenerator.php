@@ -136,7 +136,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $classDesc = "/**\n";
     $classCode = "";
     $clasName = $classNode->attributes()->name;
-    $this->echoLine ($classCode, "var $clasName = module.exports.$clasName = function(){");
+    $this->echoLine ($classCode, "function $clasName(){");
     $this->echoLine ($classCode, "  $clasName.super_.call(this);");
     //parse the class properties
     foreach($classNode->children() as $classProperty) {
@@ -152,7 +152,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
       $this->echoLine ($classCode, "  this.$propName = null;");
     }
     $classDesc .= " */";
-    $classCode .= "};";
+    $classCode .= "};\n";
+    $classCode .= "module.exports.$clasName = $clasName;\n";
     $classCode = $classDesc . "\n" . $classCode;
     $this->echoLine ($this->voClasses, $classCode);
     //parse the class base class (parent in heritage)
@@ -173,11 +174,12 @@ class NodeClientGenerator extends ClientGeneratorFromXml
   {
     $serviceName = $serviceNodes->attributes()->name;
     $serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
-    $serviceClass = "var $serviceClassName = module.exports.$serviceClassName = function(client){\n";
+    $serviceClass = "function $serviceClassName(client){\n";
     $serviceClass .= "  $serviceClassName.super_.call(this);\n";
     $serviceClass .= "  this.init(client);\n";
-    $serviceClass .= "}\n";
+    $serviceClass .= "};\n";
     $serviceClass .= "util.inherits($serviceClassName, kcb.KalturaServiceBase);\n";
+    $serviceClass .= "module.exports.$serviceClassName = $serviceClassName;\n";
     
     $serviceClassDesc = "/**\n";
     $serviceClassDesc .= " *Class definition for the Kaltura service: $serviceName.\n";
@@ -347,9 +349,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $this->echoLine($this->mainClass, "var kvo = require('./KalturaVO');");
     $this->echoLine($this->mainClass, "var ksvc = require('./KalturaServices');");
     $this->echoLine($this->mainClass, "var ktypes = require('./KalturaTypes');");
-    $this->echoLine($this->mainClass, "var KalturaClient = module.exports.KalturaClient = function(config) {");
+    $this->echoLine($this->mainClass, "function KalturaClient(config) {");
     $this->echoLine($this->mainClass, "  this.init(config);");
     $this->echoLine($this->mainClass, "};");
+    $this->echoLine($this->mainClass, "module.exports.KalturaClient = KalturaClient;");
     $this->echoLine ($this->mainClass, "util.inherits(KalturaClient, kcb.KalturaClientBase);");
     $this->echoLine ($this->mainClass, "KalturaClient.prototype.apiVersion = \"$apiVersion\";");
     $this->echoLine ($this->mainClass, "module.exports.KalturaConfiguration = kcb.KalturaConfiguration;");
