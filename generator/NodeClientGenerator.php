@@ -137,6 +137,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $classCode = "";
     $clasName = $classNode->attributes()->name;
     $this->echoLine ($classCode, "var $clasName = module.exports.$clasName = function(){");
+    $this->echoLine ($classCode, "  $clasName.super_.call(this);");
     //parse the class properties
     foreach($classNode->children() as $classProperty) {
       $propType = $classProperty->attributes()->type;
@@ -173,6 +174,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $serviceName = $serviceNodes->attributes()->name;
     $serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
     $serviceClass = "var $serviceClassName = module.exports.$serviceClassName = function(client){\n";
+    $serviceClass .= "  $serviceClassName.super_.call(this);\n";
     $serviceClass .= "  this.init(client);\n";
     $serviceClass .= "}\n";
     $serviceClass .= "util.inherits($serviceClassName, kcb.KalturaServiceBase);\n";
